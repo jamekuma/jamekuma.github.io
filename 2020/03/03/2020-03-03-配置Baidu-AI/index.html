@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jamekuma.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","width":270,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="薅百度的羊毛  这几天做软件杯的项目的时候，为了实现文本中关键词关系的抽取，clone了github上的一个TensorFlow项目。该项目需要较高配置的GPU，本地跑不了，因此开始尝试寻找免费的算力资源。发现百度AI平台上面提供AI studio的算力平台，配置了Tesla V100-SXM2的GPU，算力超强。更重要的是，每天登录都可领12小时的算力卡。但是本平台只支持PaddlePaddl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何在Baidu AI平台上配置tensorflow-gpu">
+<meta property="og:url" content="https://jamekuma.github.io/2020/03/03/2020-03-03-%E9%85%8D%E7%BD%AEBaidu-AI/index.html">
+<meta property="og:site_name" content="Jame&#39;s Blog">
+<meta property="og:description" content="薅百度的羊毛  这几天做软件杯的项目的时候，为了实现文本中关键词关系的抽取，clone了github上的一个TensorFlow项目。该项目需要较高配置的GPU，本地跑不了，因此开始尝试寻找免费的算力资源。发现百度AI平台上面提供AI studio的算力平台，配置了Tesla V100-SXM2的GPU，算力超强。更重要的是，每天登录都可领12小时的算力卡。但是本平台只支持PaddlePaddl">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://jamekuma.github.io/images/image-20200303201813126.png">
+<meta property="article:published_time" content="2020-03-02T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-03-19T08:29:35.675Z">
+<meta property="article:author" content="Jame Kuma">
+<meta property="article:tag" content="深度学习">
+<meta property="article:tag" content="配置环境">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://jamekuma.github.io/images/image-20200303201813126.png">
+
+<link rel="canonical" href="https://jamekuma.github.io/2020/03/03/2020-03-03-%E9%85%8D%E7%BD%AEBaidu-AI/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>如何在Baidu AI平台上配置tensorflow-gpu | Jame's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jame's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/jamekuma" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jamekuma.github.io/2020/03/03/2020-03-03-%E9%85%8D%E7%BD%AEBaidu-AI/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/showPhoto.jpg">
+      <meta itemprop="name" content="Jame Kuma">
+      <meta itemprop="description" content="“人类的赞歌是勇气的赞歌！”">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jame's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          如何在Baidu AI平台上配置tensorflow-gpu
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-03 00:00:00" itemprop="dateCreated datePublished" datetime="2020-03-03T00:00:00+08:00">2020-03-03</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%99%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">教程</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/03/03/2020-03-03-%E9%85%8D%E7%BD%AEBaidu-AI/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/03/03/2020-03-03-%E9%85%8D%E7%BD%AEBaidu-AI/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>薅百度的羊毛</p>
+</blockquote>
+<p>这几天做软件杯的项目的时候，为了实现文本中关键词关系的抽取，clone了github上的一个TensorFlow项目。该项目需要较高配置的GPU，本地跑不了，因此开始尝试寻找免费的算力资源。发现百度AI平台上面提供AI studio的算力平台，配置了Tesla V100-SXM2的GPU，算力超强。更重要的是，每天登录都可领12小时的算力卡。但是本平台只支持PaddlePaddle（飞桨）深度学习平台，于是开始搜索资料，尝试在其上面配置tensorflow-gpu。</p>
+<a id="more"></a>
+<h3 id="主要参考的教程"><a href="#主要参考的教程" class="headerlink" title="主要参考的教程"></a>主要参考的教程</h3><p><a href="https://www.zhihu.com/question/336485090" target="_blank" rel="noopener">知乎用户“杜俊”的回答</a></p>
+<p>这个知乎回答已经把主要的流程写出来了，但是我在照着做的时候，还是遇到了一些细节的问题，因此写这篇博客梳理一下。</p>
+<h3 id="预备步骤"><a href="#预备步骤" class="headerlink" title="预备步骤"></a>预备步骤</h3><p>在多次配置后发现，百度的机器比较玄学，每次启动的时候，机器配置都会发生改变：有时候是32G的显存，有时候是16G的显存；有时候是396.37版本的显卡驱动，有时候又是418.39的版本。这样的不确定性导致每次配置之前，都得注意其显卡驱动的版本（AI studio并不提供sudo权限，无法自行升级显卡驱动）。</p>
+<p>后来发现了，早期的鸟儿有虫吃！早上打开环境，更高几率获得32G的显存及418.39的版本的驱动。</p>
+<p>于是每次配置之前，使用以下命令查看NVIDIA驱动的版本：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nvidia-smi</span><br></pre></td></tr></table></figure>
+<p>然后会显示以下输出：（以我某次的输出为例）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Tue Mar  3 15:20:05 2020       </span><br><span class="line">+-----------------------------------------------------------------------------+</span><br><span class="line">| NVIDIA-SMI 396.37                 Driver Version: 396.37                    |</span><br><span class="line">|-------------------------------+----------------------+----------------------+</span><br><span class="line">| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |</span><br><span class="line">| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |</span><br><span class="line">|===============================+======================+======================|</span><br><span class="line">|   0  Tesla V100-SXM2...  On   | 00000000:00:0B.0 Off |                    0 |</span><br><span class="line">| N/A   28C    P0    40W / 300W |     10MiB / 32510MiB |      0%      Default |</span><br><span class="line">+-------------------------------+----------------------+----------------------+</span><br><span class="line">                                                                               </span><br><span class="line">+-----------------------------------------------------------------------------+</span><br><span class="line">| Processes:                                                       GPU Memory |</span><br><span class="line">|  GPU       PID   Type   Process name                             Usage      |</span><br><span class="line">|=============================================================================|</span><br><span class="line">|  No running processes found                                                 |</span><br><span class="line">+-----------------------------------------------------------------------------+</span><br></pre></td></tr></table></figure>
+<p>其中Driver Version: 396.37就是显卡驱动版本信息。</p>
+<p>另外，当后续跑代码的时候，也可以利用此命令来监控GPU的状态，验证GPU是否在工作。</p>
+<p>这里提供Nvidia驱动版本与CUDA版本的对应关系：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>CUDA Toolkit</th>
+<th>Linux x86_64 Driver Version</th>
+<th>Windows x86_64 Driver Version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CUDA 10.2.89</td>
+<td>&gt;= 440.33</td>
+<td>&gt;= 441.22</td>
+</tr>
+<tr>
+<td>CUDA 10.1 (10.1.105 general release, and updates)</td>
+<td>&gt;= 418.39</td>
+<td>&gt;= 418.96</td>
+</tr>
+<tr>
+<td>CUDA 10.0.130</td>
+<td>&gt;= 410.48</td>
+<td>&gt;= 411.31</td>
+</tr>
+<tr>
+<td>CUDA 9.2 (9.2.148 Update 1)</td>
+<td>&gt;= 396.37</td>
+<td>&gt;= 398.26</td>
+</tr>
+<tr>
+<td>CUDA 9.2 (9.2.88)</td>
+<td>&gt;= 396.26</td>
+<td>&gt;= 397.44</td>
+</tr>
+<tr>
+<td>CUDA 9.1 (9.1.85)</td>
+<td>&gt;= 390.46</td>
+<td>&gt;= 391.29</td>
+</tr>
+<tr>
+<td>CUDA 9.0 (9.0.76)</td>
+<td>&gt;= 384.81</td>
+<td>&gt;= 385.54</td>
+</tr>
+<tr>
+<td>CUDA 8.0 (8.0.61 GA2)</td>
+<td>&gt;= 375.26</td>
+<td>&gt;= 376.51</td>
+</tr>
+<tr>
+<td>CUDA 8.0 (8.0.44)</td>
+<td>&gt;= 367.48</td>
+<td>&gt;= 369.30</td>
+</tr>
+<tr>
+<td>CUDA 7.5 (7.5.16)</td>
+<td>&gt;= 352.31</td>
+<td>&gt;= 353.66</td>
+</tr>
+<tr>
+<td>CUDA 7.0 (7.0.28)</td>
+<td>&gt;= 346.46</td>
+<td>&gt;= 347.62</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>同时，tensorflow-gpu的版本与CUDA和CUDA版本之间也有对应：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center"><strong><a href="https://pypi.tuna.tsinghua.edu.cn/simple/tensorflow-gpu/" target="_blank" rel="noopener">Tensorflow-GPU</a></strong></th>
+<th><strong><a href="https://developer.nvidia.com/cuda-toolkit-archive" target="_blank" rel="noopener">CUDA</a></strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">2.0</td>
+<td>10.1</td>
+</tr>
+<tr>
+<td style="text-align:center">1.15</td>
+<td>10.0</td>
+</tr>
+<tr>
+<td style="text-align:center">1.14</td>
+<td>10.0</td>
+</tr>
+<tr>
+<td style="text-align:center">1.13</td>
+<td>10.0</td>
+</tr>
+<tr>
+<td style="text-align:center">1.12</td>
+<td>9.0</td>
+</tr>
+<tr>
+<td style="text-align:center">1.5</td>
+<td>9.0</td>
+</tr>
+<tr>
+<td style="text-align:center">1.4</td>
+<td>8.0</td>
+</tr>
+<tr>
+<td style="text-align:center">1.0</td>
+<td>8.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>这里值得注意的是，TensorFlow-GPU对CUDA的版本及其严格，必须完全与上表对应，否则都无法正常运算。比如TensorFlow-gpu 1.12，必须对应CUDA9.0，CUDA9.2也不行，import的时候会报错。</p>
+<p>另附：</p>
+<p>TensorFlow各版本的下载地址（清华源）：</p>
+<p><a href="https://pypi.tuna.tsinghua.edu.cn/simple/tensorflow-gpu/" target="_blank" rel="noopener">https://pypi.tuna.tsinghua.edu.cn/simple/tensorflow-gpu/</a></p>
+<p>CUDA各版本的下载地址：</p>
+<p><a href="https://developer.nvidia.com/cuda-toolkit-archive" target="_blank" rel="noopener">https://developer.nvidia.com/cuda-toolkit-archive</a></p>
+<p>CUDNN各版本的下载地址：</p>
+<p><a href="https://developer.nvidia.com/rdp/cudnn-archive" target="_blank" rel="noopener">https://developer.nvidia.com/rdp/cudnn-archive</a></p>
+<h3 id="主要步骤"><a href="#主要步骤" class="headerlink" title="主要步骤"></a>主要步骤</h3><p>需要安装正确版本的CUDA、cuDNN。这里以安装CUDA10.0为例。（注意：必须符合驱动版本要求）</p>
+<h4 id="下载并安装CUDA"><a href="#下载并安装CUDA" class="headerlink" title="下载并安装CUDA"></a>下载并安装CUDA</h4><p>下载CUDA10.0的安装包：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ wget https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_410.48_linux</span><br></pre></td></tr></table></figure>
+<p>获得一个cuda_10.0.130_410.48_linux可执行文件。</p>
+<p>执行以下命令安装cuda 10.0，实际就是在当前目录下，生成了一个cuda_10.0的库文件夹：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sh cuda_10.0.130_410.48_linux --silent --toolkit --toolkitpath=<span class="variable">$HOME</span>/cuda_10.0</span><br></pre></td></tr></table></figure>
+<h4 id="下载并导入cuDNN库文件"><a href="#下载并导入cuDNN库文件" class="headerlink" title="下载并导入cuDNN库文件"></a>下载并导入cuDNN库文件</h4><p>下载cuDNN v7.6.4, for CUDA 10.0:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ wget https://developer.download.nvidia.cn/compute/machine-learning/cudnn/secure/7.6.4.38/Production/10.0_20190923/cudnn-10.0-linux-x64-v7.6.4.38.tgz?RmkwolGzfXCe3BzgvLvAGvIyj5pIjHANLKL3MvnNYd0zxhgOfohxlIU9JjwUshKylDJdgSCbYTWtWYlDuBKE_omlbjg1GVZpRw_dt1VR095j1IcZcH_mkzcfViSViZgsvTD0PMOrD3sYj96AFFnV-dM_gwpoRzSnZAJMA_K010rhfdEvINFaYB9azWuJ42oUNzmsRgbtam8YUOkVKAbK5Agi3YVZY2ajGw</span><br><span class="line">$ mv cudnn-10.0-linux-x64-v7.6.4.38.tgz?RmkwolGzfXCe3BzgvLvAGvIyj5pIjHANLKL3MvnNYd0zxhgOfohxlIU9JjwUshKylDJdgSCbYTWtWYlDuBKE_omlbjg1GVZpRw_dt1VR095j1IcZcH_mkzcfViSViZgsvTD0PMOrD3sYj96AFFnV-dM_gwpoRzSnZAJMA_K010rhfdEvINFaYB9azWuJ42oUNzmsRgbtam8YUOkVKAbK5Agi3YVZY2ajGw cudnn-10.0.tgz</span><br></pre></td></tr></table></figure>
+<p>解压cudnn-10.0.tgz:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ tar zxvf cudnn-10.9.tgz</span><br></pre></td></tr></table></figure>
+<p>之后会生成一个名为cuda文件夹，执行以下命令，将cuDNN的库放进刚刚安装生成的cuda_10.0文件夹的对应目录：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ cp cuda/include/cudnn.h cuda_10.0/include/</span><br><span class="line">$ cp cuda/lib64/libcudnn* cuda_10.0/lib64/</span><br></pre></td></tr></table></figure>
+<h4 id="配置环境变量"><a href="#配置环境变量" class="headerlink" title="配置环境变量"></a>配置环境变量</h4><p>上述两步生成的cuda_10.0文件夹，会被Baidu Studio作为用户文件一直保存，因此以后每次登陆环境无需重新配置。</p>
+<p>但从这一步开始（包括后续步骤），每次启动服务器的时候都需重新配置。因此，最后可以写成一个.sh脚本文件，脚本文件的内容我会总结在最后。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ chmod a+r cuda_10.0/include/cudnn.h</span><br><span class="line">$ chmod a+r cuda_10.0/lib64/libcudnn*</span><br><span class="line">$ vim 环境变量    <span class="comment"># 保存并退出</span></span><br><span class="line">$ <span class="built_in">echo</span> -e <span class="string">'export PATH=$HOME/cuda_10.0/bin:$PATH\nexport LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/cuda_10.0/lib64'</span>&gt;~/环境变量</span><br><span class="line">$ <span class="built_in">source</span> ~/环境变量</span><br></pre></td></tr></table></figure>
+<h4 id="安装tensorflow-gpu"><a href="#安装tensorflow-gpu" class="headerlink" title="安装tensorflow-gpu"></a>安装tensorflow-gpu</h4><p>根据CUDA版本（对应关系见上文的表）以及自身需求，选择合适版本的tensorflow-gpu下载  <a href="https://pypi.tuna.tsinghua.edu.cn/simple/tensorflow-gpu/" target="_blank" rel="noopener">各版本下载地址</a></p>
+<p>另外还要注意tensorflow-gpu与python版本的对应关系，观察下载的.whl文件名即可判断其适配的python版本：</p>
+<p><img src="https://jamekuma.github.io/images/image-20200303201813126.png" alt="image-20200303201813126" style="zoom: 67%;" /></p>
+<p>此处以tensorflow-gpu 1.15.0，python 3.7为例。</p>
+<p>下载：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ wget https://pypi.tuna.tsinghua.edu.cn/packages/bc/72/d06017379ad4760dc58781c765376ce4ba5dcf3c08d37032eeefbccf1c51/tensorflow_gpu-1.15.0-cp37-cp37m-manylinux2010_x86_64.whl<span class="comment">#sha256=1344a3541e19e5b5cfde1c7b71fb02cb2f593262841a0e064df033619137f609</span></span><br></pre></td></tr></table></figure></p>
+<p>pip安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ pip install tensorflow_gpu-1.15.0-cp37-cp37m-manylinux2010_x86_64.whl</span><br></pre></td></tr></table></figure>
+<p>大功告成！</p>
+<p>最后利用下列python代码测试GPU是否在tensorflow下正常工作：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line">print(tf.test.is_gpu_available())</span><br></pre></td></tr></table></figure>
+<p>返回True则代表配置成功。</p>
+<h4 id="编写启动脚本"><a href="#编写启动脚本" class="headerlink" title="编写启动脚本"></a>编写启动脚本</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ vim start.sh</span><br></pre></td></tr></table></figure>
+<p>键入以下内容并保存：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/</span><br><span class="line">conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge</span><br><span class="line">conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/msys2/</span><br><span class="line">conda config --<span class="built_in">set</span> show_channel_urls yes</span><br><span class="line">conda create -n tf10.0 python=3.7</span><br><span class="line"><span class="built_in">source</span> activate tf10.0</span><br><span class="line">chmod a+r ~/cuda_10.0/include/cudnn.h</span><br><span class="line">chmod a+r ~/cuda_10.0/lib64/libcudnn*</span><br><span class="line"><span class="built_in">source</span> ~/环境变量</span><br><span class="line">chmod +x set_pip_source.sh</span><br><span class="line">./set_pip_source.sh</span><br><span class="line">pip install ~/tensorflow_gpu-1.15.0-cp37-cp37m-manylinux2010_x86_64.whl</span><br><span class="line">conda install scikit-learn</span><br></pre></td></tr></table></figure>
+<p>这里我用的是anoconda虚拟环境，所以多了一些conda配置。</p>
+<p>以后每次启动环境后，只需键入以下命令，即可配置完成：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">source</span> start.sh</span><br></pre></td></tr></table></figure>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><ul>
+<li><p><a href="https://www.zhihu.com/question/336485090" target="_blank" rel="noopener">知乎用户杜俊的回答</a> </p>
+</li>
+<li><p><a href="https://blog.csdn.net/mouse1598189/article/details/86695400" target="_blank" rel="noopener">sundaygeek的csdn博客</a> </p>
+</li>
+<li><a href="https://www.fatrabbids.com/2019/09/23/gpu%E7%89%88%E6%9C%ACtensorflow%E5%8F%8A%E5%AF%B9%E5%BA%94cuda%E5%92%8Ccudnn%E7%9A%84%E5%AE%89%E8%A3%85/" target="_blank" rel="noopener">Fat Rabbidsd的博客</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag"># 深度学习</a>
+              <a href="/tags/%E9%85%8D%E7%BD%AE%E7%8E%AF%E5%A2%83/" rel="tag"># 配置环境</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/01/2020-03-01-CF-1311B-%E9%99%90%E5%AE%9A%E4%BA%A4%E6%8D%A2%E6%8E%92%E5%BA%8F/" rel="prev" title="CodeForce 1311 B：WeirdSort">
+      <i class="fa fa-chevron-left"></i> CodeForce 1311 B：WeirdSort
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/03/2020-03-03-CF-1311D-%E4%B8%89%E4%B8%AA%E6%95%B4%E6%95%B0/" rel="next" title="CodeForce 1311 D：Three Integers">
+      CodeForce 1311 D：Three Integers <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#主要参考的教程"><span class="nav-number">1.</span> <span class="nav-text">主要参考的教程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#预备步骤"><span class="nav-number">2.</span> <span class="nav-text">预备步骤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主要步骤"><span class="nav-number">3.</span> <span class="nav-text">主要步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#下载并安装CUDA"><span class="nav-number">3.1.</span> <span class="nav-text">下载并安装CUDA</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#下载并导入cuDNN库文件"><span class="nav-number">3.2.</span> <span class="nav-text">下载并导入cuDNN库文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置环境变量"><span class="nav-number">3.3.</span> <span class="nav-text">配置环境变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装tensorflow-gpu"><span class="nav-number">3.4.</span> <span class="nav-text">安装tensorflow-gpu</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写启动脚本"><span class="nav-number">3.5.</span> <span class="nav-text">编写启动脚本</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Jame Kuma"
+      src="/images/showPhoto.jpg">
+  <p class="site-author-name" itemprop="name">Jame Kuma</p>
+  <div class="site-description" itemprop="description">“人类的赞歌是勇气的赞歌！”</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:jamekuma123@gmail.com" title="E-Mail → mailto:jamekuma123@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/jamekuma" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jamekuma" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/he-chu-re-chen-ai-2" title="知乎 → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;he-chu-re-chen-ai-2" rel="noopener" target="_blank"><i class="fa fa-fw fa-zhihu"></i>知乎</a>
+      </span>
+  </div>
+
+
+
+      </div>
+	  <br>
+	  <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=1397105439&auto=0&height=66"></iframe>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jame Kuma</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.1
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '3q5M6btUVzsQ99Sq8ewgDNcL-gzGzoHsz',
+      appKey     : 'i9dXaUIF8LQXbUGtgtNDnk6J',
+      placeholder: "欢迎批评指正！（免注册，不过最好输入一下昵称方便辨认哈）",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

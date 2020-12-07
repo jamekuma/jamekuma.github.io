@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jamekuma.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","width":270,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="状态定义有时要服务于剪枝策略  题目链接http:&#x2F;&#x2F;poj.org&#x2F;problem?id&#x3D;2362 题意输入M个棍子($4\le M\le 20$)，问这M个棍子是否能首尾相接形成一个正方形。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="POJ 2362：Square DFS剪枝">
+<meta property="og:url" content="https://jamekuma.github.io/2020/03/06/2020-03-06-POJ-2362/index.html">
+<meta property="og:site_name" content="Jame&#39;s Blog">
+<meta property="og:description" content="状态定义有时要服务于剪枝策略  题目链接http:&#x2F;&#x2F;poj.org&#x2F;problem?id&#x3D;2362 题意输入M个棍子($4\le M\le 20$)，问这M个棍子是否能首尾相接形成一个正方形。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-03-05T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-03-18T07:09:51.572Z">
+<meta property="article:author" content="Jame Kuma">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="搜索">
+<meta property="article:tag" content="DFS">
+<meta property="article:tag" content="POJ">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://jamekuma.github.io/2020/03/06/2020-03-06-POJ-2362/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>POJ 2362：Square DFS剪枝 | Jame's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jame's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/jamekuma" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jamekuma.github.io/2020/03/06/2020-03-06-POJ-2362/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/showPhoto.jpg">
+      <meta itemprop="name" content="Jame Kuma">
+      <meta itemprop="description" content="“人类的赞歌是勇气的赞歌！”">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jame's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          POJ 2362：Square DFS剪枝
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-06 00:00:00" itemprop="dateCreated datePublished" datetime="2020-03-06T00:00:00+08:00">2020-03-06</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">算法题解</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/03/06/2020-03-06-POJ-2362/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/03/06/2020-03-06-POJ-2362/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>状态定义有时要服务于剪枝策略</p>
+</blockquote>
+<h3 id="题目链接"><a href="#题目链接" class="headerlink" title="题目链接"></a>题目链接</h3><p><a href="http://poj.org/problem?id=2362" target="_blank" rel="noopener">http://poj.org/problem?id=2362</a></p>
+<h3 id="题意"><a href="#题意" class="headerlink" title="题意"></a>题意</h3><p>输入M个棍子($4\le M\le 20$)，问这M个棍子是否能首尾相接形成一个正方形。</p>
+<a id="more"></a>
+<h3 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h3><p>本质就是找一个数组的全排列，使得从头到尾能形成4段长度相等的区域。</p>
+<p>由于只需找到一个符合条件的排列，想到直接使用DFS。</p>
+<p>如果直接暴力搜索，复杂度是$O(n!)$的，显然会爆。必然需要剪枝。</p>
+<p>定义stick[M]数组为：所有木棍及其长度。</p>
+<h4 id="搜索状态的定义"><a href="#搜索状态的定义" class="headerlink" title="搜索状态的定义"></a>搜索状态的定义</h4><h5 id="基本的状态"><a href="#基本的状态" class="headerlink" title="基本的状态"></a>基本的状态</h5><p>假设木棍总长度为target，则正方形边长是side = target / 4。</p>
+<p>如果存在某个排列，那么在搜索到这个排列的过程中，应该有5个阶段：</p>
+<ul>
+<li>已组建完成0条边</li>
+<li>已组建完成1条边</li>
+<li>已组建完成2条边</li>
+<li>已组建完成3条边</li>
+<li>已组建完成4条边</li>
+</ul>
+<p>因此，在状态描述中，必须有<strong>已经完成多少条边</strong>这一状态，记为finished_side</p>
+<p>然后考虑上述每个阶段，都有一个<strong>当前边已有的长度</strong>这一状态，记为len</p>
+<p>（其实上述两种状态可以使用当前的总长度sum来表示，sum % side表示len，sum / side表示已经完成多少边，为清晰期间，还是分成两个量表示）</p>
+<p>visit数组标记已用过的木棍，用于表示<strong>当前状态下，还可以使用哪些木棍扩展子节点</strong>(visit值为false的点)</p>
+<h5 id="服务于剪枝的状态"><a href="#服务于剪枝的状态" class="headerlink" title="服务于剪枝的状态"></a>服务于剪枝的状态</h5><p>按道理来说，以上三个状态已经足够完成搜索了，但是如果仅仅这样搜索的话，无法完全支持后续的剪枝策略。这里引入另一个状态描述——<strong>当前状态下，用于构建子节点的木棍的起始下标</strong>，记为start_index。</p>
+<p>为何引入这个状态，在下文剪枝策略中描述。</p>
+<h4 id="剪枝策略"><a href="#剪枝策略" class="headerlink" title="剪枝策略"></a>剪枝策略</h4><p>首先是全局的判断（甚至称不上是剪枝）</p>
+<ul>
+<li>总长度不为4的倍数，肯定不行<del>··废话··</del></li>
+<li>最长的棍子大于边长，肯定不行</li>
+</ul>
+<p>然后几个重点的剪枝策略：</p>
+<ul>
+<li>当finished_side == 3时，就可直接判断为可行了，因为只要总长度是4的倍数，最后一条边一定能构建成功</li>
+<li>构建某条边时，如果长度等于fail_length的木棍构建正方形失败，那么所有长度为fail_length的木棍都不能用于构建  ====&gt; 剪去了在相同的长度木棍下重复搜索（也就是，每种长度的棍子，只需做一次拓展）<ul>
+<li>这里为了判断方便，可以事先将棍子排序，让相同长度的都在一起</li>
+</ul>
+</li>
+<li>如果本状态构造的边和父状态构造的边时同一条边，则只需扩展本状态后面（这里的“后面”指stick数组中）的木棍。<ul>
+<li><strong>这里解释了start_index这个状态存在的意义</strong></li>
+<li>每次扩展子状态i之前，判断是否开启了一条新边：如果不是，则子状态的扩展起点只需在后面即可（start_index=i +1）；如果是，则扩展起点需重置为0(start_index=0)。</li>
+</ul>
+</li>
+</ul>
+<p><strong>对最后一个剪枝策略的正确性作一个证明：</strong></p>
+<p>在构建同一条边的情况下，当前木棍(下标记做i)的前面的木棍(下标记做k)(k &lt; i)，无非两种状态：</p>
+<ul>
+<li>已经被选择了，visit[k]值为true。这样的话，本来就不该选</li>
+<li>未被选择，visit[k]值为false。按照不剪枝的策略，木棍k本来是要被用来扩展子节点的，为什么不呢？<ul>
+<li>由于每次都是按照stick数组的从前到后的顺序扩展的，k肯定在当前节点i的某个祖先节点扩展子节点时，曾经被选中过。且当时选中之后，k也曾把i拿去用于扩展子节点（即，选k又选i的情况，早就出现过了）。但显然那种情况是不可行的，否则早就成功返回了。因此，选择k肯定是不可行的。</li>
+</ul>
+</li>
+</ul>
+<p>但是当不是构建同一条边的时候，就应该从0开始重新找了。直观地看，构建上一条边舍弃的某些木棍，可能可以用于构建下一条边。</p>
+<h3 id="AC代码"><a href="#AC代码" class="headerlink" title="AC代码"></a>AC代码</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstring&gt; </span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt; </span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstdio&gt; </span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt; </span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>; </span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">long</span> <span class="keyword">long</span> ll; </span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> stick[<span class="number">25</span>];</span><br><span class="line"><span class="keyword">bool</span> visit[<span class="number">25</span>];</span><br><span class="line"><span class="keyword">int</span> target = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">int</span> side = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">int</span> M;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">dfs</span><span class="params">(<span class="keyword">int</span> start_index, <span class="keyword">int</span> finished_side, <span class="keyword">int</span> len)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (finished_side == <span class="number">3</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">int</span> last = <span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = start_index; i &lt; M; i++) &#123;</span><br><span class="line">        <span class="comment">// 如果 访问过/太长了/跟上次失败的一样长 就剪枝</span></span><br><span class="line">        <span class="keyword">if</span> (visit[i] || stick[i] + len &gt; side || stick[i] == last) &#123;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        visit[i] = <span class="literal">true</span>; <span class="comment">// 开始扩展i节点, 标记visit数组</span></span><br><span class="line">        <span class="comment">// 正好开启下一条边</span></span><br><span class="line">        <span class="keyword">if</span> (stick[i] + len == side) &#123;</span><br><span class="line">            <span class="keyword">if</span> (dfs(<span class="number">0</span>, finished_side + <span class="number">1</span>, <span class="number">0</span>)) &#123;  <span class="comment">// 下次的start_index = 0</span></span><br><span class="line">                <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 还是同一条边</span></span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 下次的start_index为i + 1</span></span><br><span class="line">            <span class="keyword">if</span> (dfs(i + <span class="number">1</span>, finished_side, len + stick[i])) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        last = stick[i];</span><br><span class="line">        visit[i] = <span class="literal">false</span>; <span class="comment">// 到达这里，说明上述的扩展不可行，恢复visit数组</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">cmp</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a &gt; b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> t;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">"%d"</span>, &amp;t);</span><br><span class="line">    <span class="keyword">while</span> (t--) &#123;</span><br><span class="line">        <span class="built_in">scanf</span>(<span class="string">"%d"</span>, &amp;M);</span><br><span class="line">        target = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> mmax = <span class="number">-1</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; M; i++) &#123;</span><br><span class="line">            <span class="built_in">scanf</span>(<span class="string">"%d"</span>, stick + i);</span><br><span class="line">            target += stick[i];</span><br><span class="line">            mmax = <span class="built_in">max</span>(mmax, stick[i]);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (target % <span class="number">4</span>) &#123;</span><br><span class="line">            <span class="built_in">puts</span>(<span class="string">"no"</span>);</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        side = target / <span class="number">4</span>;</span><br><span class="line">		<span class="keyword">if</span> (mmax &gt; side) &#123;</span><br><span class="line">            <span class="built_in">puts</span>(<span class="string">"no"</span>);</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">memset</span>(visit, <span class="literal">false</span>, <span class="keyword">sizeof</span>(visit));</span><br><span class="line">        sort(stick, stick + M, cmp);</span><br><span class="line">        <span class="keyword">if</span> (dfs(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)) &#123; <span class="comment">// 初始: 从0开始扩展、完成0条边、当前长度为0</span></span><br><span class="line">            <span class="built_in">puts</span>(<span class="string">"yes"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="built_in">puts</span>(<span class="string">"no"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/%E6%90%9C%E7%B4%A2/" rel="tag"># 搜索</a>
+              <a href="/tags/DFS/" rel="tag"># DFS</a>
+              <a href="/tags/POJ/" rel="tag"># POJ</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/03/2020-03-03-CF-1311D-%E4%B8%89%E4%B8%AA%E6%95%B4%E6%95%B0/" rel="prev" title="CodeForce 1311 D：Three Integers">
+      <i class="fa fa-chevron-left"></i> CodeForce 1311 D：Three Integers
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/09/2020-03-09-HYSBZ-1968/" rel="next" title="HYSBZ 1968：约数研究">
+      HYSBZ 1968：约数研究 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#题目链接"><span class="nav-number">1.</span> <span class="nav-text">题目链接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#题意"><span class="nav-number">2.</span> <span class="nav-text">题意</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#题解"><span class="nav-number">3.</span> <span class="nav-text">题解</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#搜索状态的定义"><span class="nav-number">3.1.</span> <span class="nav-text">搜索状态的定义</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#基本的状态"><span class="nav-number">3.1.1.</span> <span class="nav-text">基本的状态</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#服务于剪枝的状态"><span class="nav-number">3.1.2.</span> <span class="nav-text">服务于剪枝的状态</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#剪枝策略"><span class="nav-number">3.2.</span> <span class="nav-text">剪枝策略</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AC代码"><span class="nav-number">4.</span> <span class="nav-text">AC代码</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Jame Kuma"
+      src="/images/showPhoto.jpg">
+  <p class="site-author-name" itemprop="name">Jame Kuma</p>
+  <div class="site-description" itemprop="description">“人类的赞歌是勇气的赞歌！”</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:jamekuma123@gmail.com" title="E-Mail → mailto:jamekuma123@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/jamekuma" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jamekuma" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/he-chu-re-chen-ai-2" title="知乎 → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;he-chu-re-chen-ai-2" rel="noopener" target="_blank"><i class="fa fa-fw fa-zhihu"></i>知乎</a>
+      </span>
+  </div>
+
+
+
+      </div>
+	  <br>
+	  <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=1397105439&auto=0&height=66"></iframe>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jame Kuma</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.1
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '3q5M6btUVzsQ99Sq8ewgDNcL-gzGzoHsz',
+      appKey     : 'i9dXaUIF8LQXbUGtgtNDnk6J',
+      placeholder: "欢迎批评指正！（免注册，不过最好输入一下昵称方便辨认哈）",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

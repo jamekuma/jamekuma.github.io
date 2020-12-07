@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jamekuma.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","width":270,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="论文背景motivation针对某个退化模型训练的SR网络，如果换了退化模型，性能就会有很大下降（比方说训练集用双三次下采样构造，而测试时遇到其他的退化模型）。于是作者从广义采样中受到了启发，出了一种改进现有的CNN框架的方法，即使用一个校正滤波器，能把一张LR图像变化到其他核模糊下的LR图像(如双三次核)，进而提高test时SR网络的性能，具体分为非盲SR和盲SR两种情况：  在非盲SR中，LR">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读论文：Correction Filter for Single Image Super-Resolution：Robustifying Off-the-Shelf Deep Super-Resolvers">
+<meta property="og:url" content="https://jamekuma.github.io/2020/09/18/2020-09-18-Correction%20Filter%20for%20Single%20Image%20Super-Resolution%EF%BC%9ARobustifying%20Off-the-Shelf%20Deep%20Super-Resolvers/index.html">
+<meta property="og:site_name" content="Jame&#39;s Blog">
+<meta property="og:description" content="论文背景motivation针对某个退化模型训练的SR网络，如果换了退化模型，性能就会有很大下降（比方说训练集用双三次下采样构造，而测试时遇到其他的退化模型）。于是作者从广义采样中受到了启发，出了一种改进现有的CNN框架的方法，即使用一个校正滤波器，能把一张LR图像变化到其他核模糊下的LR图像(如双三次核)，进而提高test时SR网络的性能，具体分为非盲SR和盲SR两种情况：  在非盲SR中，LR">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204156.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204157.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204158.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204159.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204200.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204201.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204202.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204203.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204204.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204205.png">
+<meta property="article:published_time" content="2020-09-17T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-10-31T16:27:23.103Z">
+<meta property="article:author" content="Jame Kuma">
+<meta property="article:tag" content="图像超分辨">
+<meta property="article:tag" content="论文阅读">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204156.png">
+
+<link rel="canonical" href="https://jamekuma.github.io/2020/09/18/2020-09-18-Correction%20Filter%20for%20Single%20Image%20Super-Resolution%EF%BC%9ARobustifying%20Off-the-Shelf%20Deep%20Super-Resolvers/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>读论文：Correction Filter for Single Image Super-Resolution：Robustifying Off-the-Shelf Deep Super-Resolvers | Jame's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jame's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/jamekuma" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jamekuma.github.io/2020/09/18/2020-09-18-Correction%20Filter%20for%20Single%20Image%20Super-Resolution%EF%BC%9ARobustifying%20Off-the-Shelf%20Deep%20Super-Resolvers/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/showPhoto.jpg">
+      <meta itemprop="name" content="Jame Kuma">
+      <meta itemprop="description" content="“人类的赞歌是勇气的赞歌！”">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jame's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          读论文：Correction Filter for Single Image Super-Resolution：Robustifying Off-the-Shelf Deep Super-Resolvers
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-09-18 00:00:00" itemprop="dateCreated datePublished" datetime="2020-09-18T00:00:00+08:00">2020-09-18</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%A7%91%E7%A0%94/" itemprop="url" rel="index"><span itemprop="name">科研</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/09/18/2020-09-18-Correction%20Filter%20for%20Single%20Image%20Super-Resolution%EF%BC%9ARobustifying%20Off-the-Shelf%20Deep%20Super-Resolvers/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/09/18/2020-09-18-Correction%20Filter%20for%20Single%20Image%20Super-Resolution%EF%BC%9ARobustifying%20Off-the-Shelf%20Deep%20Super-Resolvers/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><h4 id="motivation"><a href="#motivation" class="headerlink" title="motivation"></a>motivation</h4><p>针对某个退化模型训练的SR网络，如果换了退化模型，性能就会有很大下降（比方说训练集用双三次下采样构造，而测试时遇到其他的退化模型）。于是作者从广义采样中受到了启发，出了一种改进现有的CNN框架的方法，即使用一个校正滤波器，能把一张LR图像变化到其他核模糊下的LR图像(如双三次核)，进而提高test时SR网络的性能，具体分为非盲SR和盲SR两种情况：</p>
+<ul>
+<li>在非盲SR中，LR图像的模糊核是已知的(但不一定和训练集的核匹配)，于是作者构造的滤波器，可以提供一个将其转换到指定退化核LR图像的校正滤波器，并且是<strong>闭合解</strong>。</li>
+<li>而在盲SR中，LR图像的模糊核是未知的，作者提出了一种能估计这张LR所需校正滤波器的算法。</li>
+</ul>
+<a id="more"></a>
+<h4 id="相关知识"><a href="#相关知识" class="headerlink" title="相关知识"></a>相关知识</h4><p>我查阅了相关文献，大致了解到广义采样的概念：</p>
+<p>所谓广义采样是相对于经典的Nyquist-Shannon采样理论的。</p>
+<h5 id="Nyquist-Shannon采样"><a href="#Nyquist-Shannon采样" class="headerlink" title="Nyquist-Shannon采样"></a>Nyquist-Shannon采样</h5><p>传统的Shannon采样是一种针对带限信号的等距理想采样，其处理过程如图所示。</p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204156.png" alt="image-20200919154641833" style="zoom:67%;" /></p>
+<p>输入的连续信号$x(t)$经过前置滤波器变为带限信号，以Nyquist采样率进行采样获得离散信号：</p>
+<script type="math/tex; mode=display">
+\tilde{x}(t)=x(t) \cdot \delta(t)=\sum_{n \in \mathbf{Z}} x(n T) \delta(t-n T)</script><p>为了便于前置滤波器的实现，降低带外无用信号频谱重叠的影响，实际上信号的采样频率往往要比Nyquist采样率高。而信号重构可通过理想低通滤波器来实现，在时域等同于采用无限长的非因果冲激响应，即sinc函数插值重构得到：</p>
+<script type="math/tex; mode=display">
+\hat{x}(t)=\sum_{n \in \mathbf{Z}} x(n T) \sin c(t / T-n)</script><p>物理上重构的实现只能通过非理想的低通滤波或时域上现在与过去时刻的采样值通过内插来实现，但无论是非理想的低通滤波或有限长度的插值均会产生重构误差。以线性调频信号为例，通过仿真说明采样与重构的关系。假设原始信号的脉宽为1 ms，带宽为30 kHz。采样频率取70 kHz,具体仿真结果见下图。</p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204157.png" alt="image-20200919155138597"></p>
+<p>可以看出，当采样频率为70kHz时基本上能够无失真地恢复原始信号,有重构误差是因为在Matlab中Sinc函数取值必须进行截断,对应频谱是非理想低通滤波器,从而造成误差。由图2(b).上图可知，重构误差随采样频率的增大而减小,当采样频率低于Nyquist 采样率(60 kHz)时，重构误差将迅速上升。图2(b)下图则表示重构误差随Sinc函数加窗截断后长度的增加而减小,当点数取无限长时理论误差为零。<strong>因此，Shannon采样的重构精度同时受采样频率与插值内核的长度影响,而工程实现上不可能采用过高的采样频率与过长的插值长度,这正是Shannon采样局限性的体现。</strong></p>
+<h5 id="广义采样"><a href="#广义采样" class="headerlink" title="广义采样"></a>广义采样</h5><p>由式(5)可以发现，${\sin c(t-n), n \in Z}$其实是一个线性无关且相互正交的函数族。即sinc函数在时间轴上的平移函数族构成了所有带限函数组成的函数空间的一组正交基。这里定义一个基本近似空间$V$即</p>
+<script type="math/tex; mode=display">
+V(\varphi)=\left\{s(x)=\sum_{k \in \mathbf{Z}} c(k) \varphi(x-k): c \in l_{2}\right\}</script><p>表示空间V内任意的连续函数s(x)都能够表示为系数c(k)的序列。</p>
+<p>信号的采样及重构，实际上就是对给定的信号，通过选取合适的基，使信号在这组基下的投影具有所需要的性质。如果在某个基下不符合要求，那么就将其变换到另一个基下表示。与Shannon采样对应，这里给出广义采样的处理框架如图所示：</p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204158.png" alt="image-20200919155417433" style="zoom:67%;" /></p>
+<p><strong>将连续信号与基函数求内积、采样并经过一个数字校正滤波器（校正滤波器的作用是将与采样核相关联的采样系数，变换为与重构核相匹配的系数），得到其在该基底上的离散展开系数，再由广义上的重构公式即可恢复原始信号。</strong></p>
+<p><strong>广义采样理论提供了一种框架和条件，在这种框架和条件下，在一定的基采样后的信号可以在不同的基上重建。</strong></p>
+<h3 id="方法详述"><a href="#方法详述" class="headerlink" title="方法详述"></a>方法详述</h3><p>对于退化过程，$\mathbf{x} \in \mathbb{R}^{n}$，$\mathbf{y} \in \mathbb{R}^{m}$，$n&gt;m$：</p>
+<script type="math/tex; mode=display">
+\mathbf{y}=(\mathbf{x} * \mathbf{k}) \downarrow_\alpha</script><p>作者写成一个线性变换的形式：</p>
+<script type="math/tex; mode=display">
+\mathbf{y}=\mathcal{S}^{*} \mathbf{x}</script><p>其中，$\mathcal{S}^{<em>}: \mathbb{R}^{n} \rightarrow \mathbb{R}^{m}$。即把模糊+下采样整合在一起，即$\mathcal{S}^{</em>}$对应了真实的下采样核的退化过程：</p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204159.png" alt="image-20200919164149529" style="zoom:67%;" /></p>
+<p>令$\mathcal{R}^{<em>}$为双三次下采样退化过程对应的线性变换，即$\mathbf{y}_{b i c u b}=\mathcal{R}^{</em>} \mathbf{x}$。</p>
+<h4 id="非盲SR时的闭合解"><a href="#非盲SR时的闭合解" class="headerlink" title="非盲SR时的闭合解"></a>非盲SR时的闭合解</h4><p>定义$\mathcal{S}$与$\mathcal{R}$分别为为$\mathcal{S}^{<em>}$与$\mathcal{R}^{</em>}$的伴随算子。作者假设$\mathbf{x}$能从$\mathcal{R}^{<em>} \mathbf{x}$使用算子$\mathcal{R}\left(\mathcal{R}^{</em>} \mathcal{R}\right)^{-1}$恢复：</p>
+<script type="math/tex; mode=display">
+\mathbf{x}=\mathcal{R}\left(\mathcal{R}^{*} \mathcal{R}\right)^{-1} \mathcal{R}^{*} \mathbf{x}</script><p>即利用了$\mathcal{R}^{<em>}$的伪逆，可从从$\mathbf{y}_{\text {bicub}}=\mathcal{R}^{</em>} \mathbf{x}$恢复出原HR图像。</p>
+<p>然后作者表示，对于不是双三次退化的LR图像$\mathbf y$，可以引入一个估计过程：</p>
+<script type="math/tex; mode=display">
+\hat{\mathbf{x}}=\mathcal{R} \mathcal{H} \mathbf{y}</script><p>即先对$\mathbf y$作一个变换$\mathcal H$，在经过原始的超分辨过程$\mathcal R$。</p>
+<p>作者证明了$\mathcal{H}=\left(\mathcal{S}^{<em>} \mathcal{R}\right)^{-1}: \mathbb{R}^{m} \rightarrow \mathbb{R}^{m}$，（前提是$\operatorname{null}\left(\mathcal{S}^{</em>}\right) \cap \operatorname{range}(\mathcal{R})={0}$）：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\hat{\mathbf{x}} &=\mathcal{R} \mathcal{H} \mathbf{y} \\
+&=\mathcal{R} \mathcal{H} \mathcal{S}^{*} \mathbf{x} \\
+&=\mathcal{R} \mathcal{H} \mathcal{S}^{*} \mathcal{R}\left(\mathcal{R}^{*} \mathcal{R}\right)^{-1} \mathcal{R}^{*} \mathbf{x}
+\end{aligned}\\
+\begin{aligned}
+\hat{\mathbf{x}} &=\mathcal{R}\left(\mathcal{S}^{*} \mathcal{R}\right)^{-1} \mathcal{S}^{*} \mathcal{R}\left(\mathcal{R}^{*} \mathcal{R}\right)^{-1} \mathcal{R}^{*} \mathbf{x} \\
+&=\mathcal{R}\left(\mathcal{R}^{*} \mathcal{R}\right)^{-1} \mathcal{R}^{*} \mathbf{x}=\mathbf{x}
+\end{aligned}</script><p>据此，作者给出校正滤波器的初始版本$\mathbf h_0$：</p>
+<script type="math/tex; mode=display">
+\mathbf{h}_{0}=\operatorname{IDFT}\left\{\frac{1}{\operatorname{DFT}\left\{\left(\mathbf{k} * \operatorname{flip}\left(\mathbf{k}_{\text {bicub}}\right)\right) \downarrow_{\alpha}\right\}}\right\}</script><p>但是对于$\hat{\mathbf{x}}=\mathcal{R} \mathcal{H} \mathbf{y}$这个估计过程，是没有用到任何的自然图像的先验的。而对于一个使用双三次下采样的数据集训练好的CNN网络$f$，估计过程可以写为$\hat{\mathbf{x}}=f(\mathbf{h} <em> \mathbf{y})$。$f$学到了$\mathcal{R}\left(\mathcal{R}^{</em>} \mathcal{R}\right)^{-1}$这一$\mathcal{R}^{<em>} $的反过程作为先验。所以在网络$f$中，他其实隐含的完成了$\left(\mathcal{R}^{</em>} \mathcal{R}\right)^{-1}$的过程，于是在对$\mathbf y$进行滤波的时候，先要加上$\mathcal{R}^{*} \mathcal{R}$的过程，即：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\mathbf{h} &=\operatorname{IDFT}\left\{\frac{\operatorname{DFT}\left\{\left(\mathbf{k}_{\text {bicub}} * \operatorname{flip}\left(\mathbf{k}_{\text {bicub}}\right)\right) \downarrow_{\alpha}\right\}}{\operatorname{DFT}\left\{\left(\mathbf{k} * \operatorname{flip}\left(\mathbf{k}_{\text {bicub}}\right)\right) \downarrow_{\alpha}\right\}}\right\} \\
+& \triangleq \operatorname{IDFT}\left\{\frac{F_{\text {numer}}}{F_{\text {denom}}}\right\}
+\end{aligned}</script><p>作者表示，为了数值稳定性，式子改成了这样：</p>
+<script type="math/tex; mode=display">
+\mathbf{h}=\operatorname{IDFT}\left\{F_{n u m e r} \cdot \frac{F_{\text {denom}}^{*}}{\left|F_{\text {denom}}\right|^{2}+\epsilon}\right\}</script><h4 id="盲SR的估计算法"><a href="#盲SR的估计算法" class="headerlink" title="盲SR的估计算法"></a>盲SR的估计算法</h4><p>对于盲SR，作者表示，任务变成了既要估计模糊核$\mathbf k$又要估计校正滤波器$\mathbf h$。作者提出了一个估计$\mathbf k$的目标函数：</p>
+<script type="math/tex; mode=display">
+\xi(\mathbf{k})=\left\|\mathbf{y}-\mathcal{S}^{*} f(\mathcal{H} \mathbf{y})\right\|_{\mathrm{Hub}}+\left\|\mathbf{m}_{\mathrm{cen}} \cdot \mathbf{k}\right\|_{1}+\|\mathbf{k}\|_{1}</script><p>$\left|\ \right|<em>{\mathrm{Hub}}$表示Huber loss，$\mathcal H$就对应的(12)式中的滤波器，$\mathbf{m}</em>{\mathrm{cen}}(x, y)=1-\mathrm{e}^{-\frac{\left(x^{2}+y^{2}\right)}{32 \alpha^{2}}}$。最后两项是正则化因子:最后一项促进k的稀疏性，倒数第二项用于集中k的密度(？)。</p>
+<p>具体求$\mathbf k$的过程，是把其作为一个线性CNN的参数去优化：$\mathbf{k}=\mathbf{k}<em>{0} * \mathbf{k}</em>{1} <em> \mathbf{k}_{2} </em> \mathbf{k}_{3}$.</p>
+<p>具体算法如下：</p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204200.png" alt="image-20200919174149913" style="zoom:67%;" /></p>
+<p>在每次迭代中，都得到了$\mathbf k$和校正滤波器$\mathbf h$的估计值。</p>
+<h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204201.png" alt="image-20200919174356439"></p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204202.png" alt="image-20200919174411673"></p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204203.png" alt="image-20200919174337073" style="zoom:67%;" /></p>
+<p>盲的过程：</p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204204.png" alt="image-20200919174438482"></p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204205.png" alt="image-20200919192138900" style="zoom:67%;" /></p>
+<h3 id="总结与思考"><a href="#总结与思考" class="headerlink" title="总结与思考"></a>总结与思考</h3><ul>
+<li><p>校正滤波器就对应了广义采样中的数字校正滤波器；而不同的模糊核就视作了不同的采样基底。</p>
+</li>
+<li><p>从整体来看，把LR转换成“干净”退化模式（比如双三次）的思路，和以前看的利用GAN转换domain的想法类似，但是是从完全不同的角度。</p>
+</li>
+<li><p>本文把SR问题视作一种信号采样-恢复的过程，是我之前没见过的角度。而我之前没有学过信息论，对相关知识了解较少，花了大量时间去查阅相关资料与文献。以后应该把相关知识系统性的学一下。</p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%9B%BE%E5%83%8F%E8%B6%85%E5%88%86%E8%BE%A8/" rel="tag"># 图像超分辨</a>
+              <a href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" rel="tag"># 论文阅读</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/09/14/2020-09-14-Stochastic%20Frequency%20Masking%20to%20Improve%20Super-Resolution%20and%20Denoising%20Networks/" rel="prev" title="读论文：Stochastic Frequency Masking to Improve Super-Resolution and Denoising Networks">
+      <i class="fa fa-chevron-left"></i> 读论文：Stochastic Frequency Masking to Improve Super-Resolution and Denoising Networks
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/10/11/2020-10-11-Analyzing%20Inverse%20Problems%20with%20Invertible%20Neural%20Networks/" rel="next" title="读论文：Analyzing Inverse Problems with Invertible Neural Networks">
+      读论文：Analyzing Inverse Problems with Invertible Neural Networks <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#论文背景"><span class="nav-number">1.</span> <span class="nav-text">论文背景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#motivation"><span class="nav-number">1.1.</span> <span class="nav-text">motivation</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#相关知识"><span class="nav-number">1.2.</span> <span class="nav-text">相关知识</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Nyquist-Shannon采样"><span class="nav-number">1.2.1.</span> <span class="nav-text">Nyquist-Shannon采样</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#广义采样"><span class="nav-number">1.2.2.</span> <span class="nav-text">广义采样</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法详述"><span class="nav-number">2.</span> <span class="nav-text">方法详述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#非盲SR时的闭合解"><span class="nav-number">2.1.</span> <span class="nav-text">非盲SR时的闭合解</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#盲SR的估计算法"><span class="nav-number">2.2.</span> <span class="nav-text">盲SR的估计算法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验结果"><span class="nav-number">3.</span> <span class="nav-text">实验结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结与思考"><span class="nav-number">4.</span> <span class="nav-text">总结与思考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Jame Kuma"
+      src="/images/showPhoto.jpg">
+  <p class="site-author-name" itemprop="name">Jame Kuma</p>
+  <div class="site-description" itemprop="description">“人类的赞歌是勇气的赞歌！”</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:jamekuma123@gmail.com" title="E-Mail → mailto:jamekuma123@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/jamekuma" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jamekuma" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/he-chu-re-chen-ai-2" title="知乎 → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;he-chu-re-chen-ai-2" rel="noopener" target="_blank"><i class="fa fa-fw fa-zhihu"></i>知乎</a>
+      </span>
+  </div>
+
+
+
+      </div>
+	  <br>
+	  <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=1397105439&auto=0&height=66"></iframe>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jame Kuma</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.1
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '3q5M6btUVzsQ99Sq8ewgDNcL-gzGzoHsz',
+      appKey     : 'i9dXaUIF8LQXbUGtgtNDnk6J',
+      placeholder: "欢迎批评指正！（免注册，不过最好输入一下昵称方便辨认哈）",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

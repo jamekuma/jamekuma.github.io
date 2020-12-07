@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jamekuma.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","width":270,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="论文背景作者表示，SR问题本来就是一个ill-posed的问题，可是大多数工作忽略了这一点，只致力于去学一个单图像到单图像的映射。而作者利用了基于标准化流(Normalizing Flow)的方法，去学一个LR到HR分布的映射（学习与输入LR图像相对应的真实HR图像的分布，即可以看做是给定LR图像，HR的条件概率分布），同时还表明在去噪、复原的任务中也能发挥作用。 所谓标准化流(Normalizi">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读论文：SRFlow：Learning the Super-Resolution Space with Normalizing Flow">
+<meta property="og:url" content="https://jamekuma.github.io/2020/09/04/2020-09-04-SRFlow%EF%BC%9ALearning%20the%20Super-Resolution%20Space%20with%20Normalizing%20Flow/index.html">
+<meta property="og:site_name" content="Jame&#39;s Blog">
+<meta property="og:description" content="论文背景作者表示，SR问题本来就是一个ill-posed的问题，可是大多数工作忽略了这一点，只致力于去学一个单图像到单图像的映射。而作者利用了基于标准化流(Normalizing Flow)的方法，去学一个LR到HR分布的映射（学习与输入LR图像相对应的真实HR图像的分布，即可以看做是给定LR图像，HR的条件概率分布），同时还表明在去噪、复原的任务中也能发挥作用。 所谓标准化流(Normalizi">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204120.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204121.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204122.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204123.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204124.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204125.png">
+<meta property="article:published_time" content="2020-09-03T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-11-21T05:11:49.701Z">
+<meta property="article:author" content="Jame Kuma">
+<meta property="article:tag" content="图像超分辨">
+<meta property="article:tag" content="论文阅读">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204120.png">
+
+<link rel="canonical" href="https://jamekuma.github.io/2020/09/04/2020-09-04-SRFlow%EF%BC%9ALearning%20the%20Super-Resolution%20Space%20with%20Normalizing%20Flow/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>读论文：SRFlow：Learning the Super-Resolution Space with Normalizing Flow | Jame's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jame's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/jamekuma" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jamekuma.github.io/2020/09/04/2020-09-04-SRFlow%EF%BC%9ALearning%20the%20Super-Resolution%20Space%20with%20Normalizing%20Flow/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/showPhoto.jpg">
+      <meta itemprop="name" content="Jame Kuma">
+      <meta itemprop="description" content="“人类的赞歌是勇气的赞歌！”">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jame's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          读论文：SRFlow：Learning the Super-Resolution Space with Normalizing Flow
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-09-04 00:00:00" itemprop="dateCreated datePublished" datetime="2020-09-04T00:00:00+08:00">2020-09-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%A7%91%E7%A0%94/" itemprop="url" rel="index"><span itemprop="name">科研</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/09/04/2020-09-04-SRFlow%EF%BC%9ALearning%20the%20Super-Resolution%20Space%20with%20Normalizing%20Flow/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/09/04/2020-09-04-SRFlow%EF%BC%9ALearning%20the%20Super-Resolution%20Space%20with%20Normalizing%20Flow/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>作者表示，SR问题本来就是一个ill-posed的问题，可是大多数工作忽略了这一点，只致力于去学一个单图像到单图像的映射。而作者利用了基于标准化流(Normalizing Flow)的方法，去学一个LR到<strong>HR分布</strong>的映射（学习与输入LR图像相对应的真实HR图像的分布，即可以看做是给定LR图像，HR的条件概率分布），同时还表明在去噪、复原的任务中也能发挥作用。</p>
+<p>所谓标准化流(Normalizing Flow)的方法，是用来拟合一些复杂概率分布的。实际上就是学一个可逆神经网络$f<em>{\theta}$，使用它的逆过程$f</em>{\theta}^{- 1}$把一个简单的分布(比如高斯分布、均匀分布等)$p<em>{\mathbf{z}}(\mathbf{z})$变成$\mathbf{y} = f</em>{\theta}^{- 1}(\mathbf{z})$。</p>
+<a id="more"></a>
+<h3 id="主要方法"><a href="#主要方法" class="headerlink" title="主要方法"></a>主要方法</h3><h4 id="SR中的条件标准化流"><a href="#SR中的条件标准化流" class="headerlink" title="SR中的条件标准化流"></a>SR中的条件标准化流</h4><p>设$\mathbf{x}$是LR图像，$\mathbf{y}$是HR图像。本文要求确定LR图像下，HR图像的条件概率分布$p<em>{\mathbf{y|x}}(\mathbf{y|x,\theta})$。提供的训练数据是LR-HR图像对${(\mathbf{x}</em>{i},\mathbf{y}<em>{i})}</em>{i = 1}^{M}$</p>
+<p>根据标准化流的思想，要使用一个可逆神经网络$f<em>{\theta}$去拟合这个分布$p</em>{\mathbf{y|x}}$，$f<em>{\theta}$把一个HR-LR图像对映射到一个隐变量$z$上：$\mathbf{z} = f</em>{\theta}(\mathbf{y;x})$。而要求这个网络在任意$\mathbf{x}$的条件下，对于$\mathbf{y}$是可逆的，即$\mathbf{y} = f_{\theta}^{- 1}(\mathbf{z;x})$。使用概率论中的随机变量代换，可以得到以下式子：</p>
+<script type="math/tex; mode=display">
+p_{\mathbf{y} \mid \mathbf{x}}(\mathbf{y} \mid \mathbf{x},\mathbf{\theta}) = p_{\mathbf{z}}\left( f_{\mathbf{\theta}}(\mathbf{y};\mathbf{x}) \right)\left| \det\frac{\partial f_{\mathbf{\theta}}}{\partial\mathbf{y}}(\mathbf{y};\mathbf{x}) \right|</script><p>也就是给定HR图像$\mathbf{y}$和LR图像$\mathbf{x}$，最大化这个$p_{\mathbf{y} \mid \mathbf{x}}(\mathbf{y} \mid \mathbf{x},\mathbf{\theta})$就可。写成负对数：</p>
+<script type="math/tex; mode=display">
+\mathcal{L}(\mathbf{\theta};\mathbf{x},\mathbf{y}) = - \log p_{\mathbf{y} \mid \mathbf{x}}(\mathbf{y} \mid \mathbf{x},\mathbf{\theta}) = - \log p_{\mathbf{z}}\left( f_{\mathbf{\theta}}(\mathbf{y};\mathbf{x}) \right) - \log\left| \det\frac{\partial f_{\mathbf{\theta}}}{\partial\mathbf{y}}(\mathbf{y};\mathbf{x}) \right|</script><p>即可作为损失函数进行训练了。要想在拟合的分布中采样也很简单，就使用符合预定的分布的$\mathbf{z}$代入$\mathbf{y} = f_{\mathbf{\theta}}^{- 1}(\mathbf{z};\mathbf{x})$即可。</p>
+<p>把以上(3)式的第二项改写成每一层可逆模块串接的形式：</p>
+<script type="math/tex; mode=display">
+\mathcal{L}(\mathbf{\theta};\mathbf{x},\mathbf{y}) = - \log p_{\mathbf{z}}(\mathbf{z}) - \sum_{n = 0}^{N - 1}\log\left| \det\frac{\partial f_{\mathbf{\theta}}^{n}}{\partial\mathbf{h}^{n}}\left( \mathbf{h}^{n};g_{\mathbf{\theta}}(\mathbf{x}) \right) \right|</script><p>其中，$\mathbf{h}^{n + 1} = f<em>{\mathbf{\theta}}^{n}\left( \mathbf{h}^{n};g</em>{\mathbf{\theta}}(\mathbf{x}) \right)$，且$\mathbf{h}^{0} = \mathbf{y}$、$\mathbf{h}^{N} = \mathbf{z}$。这样，只需在每一层上计算特定的雅克比行列式，而不是全体一起计算。而且加入了一个CNN网络$g_{\theta}$来学习LR图像最适合作为条件的表示。</p>
+<h4 id="条件流层-Conditional-Flow-Layers"><a href="#条件流层-Conditional-Flow-Layers" class="headerlink" title="条件流层(Conditional Flow Layers)"></a>条件流层(Conditional Flow Layers)</h4><h5 id="条件仿射耦合-Conditional-Affine-Coupling"><a href="#条件仿射耦合-Conditional-Affine-Coupling" class="headerlink" title="条件仿射耦合(Conditional Affine Coupling)"></a>条件仿射耦合(Conditional Affine Coupling)</h5><script type="math/tex; mode=display">
+\mathbf{h}_{A}^{n + 1} = \mathbf{h}_{A}^{n},\quad\mathbf{h}_{B}^{n + 1} = \exp\left( f_{\mathbf{\theta},\mathbf{s}}^{n}\left( \mathbf{h}_{A}^{n};\mathbf{u} \right) \right) \cdot \mathbf{h}_{B}^{n} + f_{\mathbf{\theta},\mathbf{b}}^{n}\left( \mathbf{h}_{A}^{n};\mathbf{u} \right)</script><p>$\mathbf{h}^{n} = \left( \mathbf{h}<em>{A}^{n},\mathbf{h}</em>{B}^{n} \right)$是特征图，A和B是其通道上的分离。这样就能通过仿射变换实现可逆。同时，雅克比矩阵是一个三角阵，他的行列式的对数形式容易写成$\sum<em>{\text{ijk}}^{}f</em>{\mathbf{\theta},s}^{n}\left( \mathbf{h}<em>{A}^{n};\mathbf{u} \right)</em>{\text{ijk}}$</p>
+<h5 id="仿射注入-Affine-Injector"><a href="#仿射注入-Affine-Injector" class="headerlink" title="仿射注入(Affine Injector)"></a>仿射注入(Affine Injector)</h5><p>对于上一节的设计，要求$f_{\mathbf{\theta}}^{n}$是可逆的，而且可以处理雅克比行列式。于是作者做了以下设计，称之为仿射注入器(Affine Injector)：</p>
+<script type="math/tex; mode=display">
+\mathbf{h}^{n + 1} = \exp\left( f_{\mathbf{\theta},s}^{n}(\mathbf{u}) \right) \cdot \mathbf{h}^{n} + f_{\mathbf{\theta},b}(\mathbf{u})</script><p>其中$\mathbf{u} = g<em>{\theta}(\mathbf{x})$，易得其实可逆的：$\mathbf{h}^{n} = \exp\left( - f</em>{\mathbf{\theta},s}^{n}(\mathbf{u}) \right) \cdot \left( \mathbf{h}^{n + 1} - f_{\mathbf{\theta},b}^{n}(\mathbf{u}) \right)$</p>
+<p>同时，雅克比矩阵是一个三角阵，他的行列式的对数形式容易写成$\sum<em>{\text{ijk}}^{}f</em>{\mathbf{\theta},s}^{n}\left( \mathbf{h}<em>{A}^{n};\mathbf{u} \right)</em>{\text{ijk}}$</p>
+<h4 id="网络结构"><a href="#网络结构" class="headerlink" title="网络结构"></a>网络结构</h4><p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204120.png" alt="image-20200917170228257"></p>
+<h4 id="其他的应用"><a href="#其他的应用" class="headerlink" title="其他的应用"></a>其他的应用</h4><h5 id="LR一致的Style-Transfer"><a href="#LR一致的Style-Transfer" class="headerlink" title="LR一致的Style Transfer"></a>LR一致的Style Transfer</h5><p>即把一张HR图像下采样成LR图像，进而控制隐变量$\mathbf{z}$转移成不同风格的HR图像</p>
+<h5 id="Latent-Space-Normalization"><a href="#Latent-Space-Normalization" class="headerlink" title="Latent Space Normalization"></a>Latent Space Normalization</h5><p>在上述的SR任务中，核心是：把<strong>任意</strong>符合<strong>给定要求</strong>（\”要求\”即LR图像）的HR图像映射到一个隐含空间(即z)，而为了匹配LR图像中那些”共有的低频特征”，这个z被”标准化”为某一分布。</p>
+<p>作者提出，原始的$\widetilde{\mathcal{Z}}$可以被标准化为另外一个分布$\widehat{\mathcal{Z}}$：</p>
+<script type="math/tex; mode=display">
+\widehat{z} = \frac{\widehat{\sigma}}{\widetilde{\sigma}}(\widetilde{z} - \widetilde{\mu}) + \widehat{\mu},\quad\forall\widetilde{z} \in \widetilde{\mathcal{Z}}</script><p>其中$\widetilde{\sigma}$与$\widetilde{\mu}$是原始分布的经验标准差和经验均值。进而通过逆过程实现图像风格的迁移$\widehat{\mathbf{y}} = f_{\mathbf{\theta}}^{- 1}(\widehat{\mathbf{z}},\mathbf{x})$</p>
+<p>后面是这种标准化的两个具体应用。</p>
+<h5 id="Image-Content-Transfer"><a href="#Image-Content-Transfer" class="headerlink" title="Image Content Transfer"></a>Image Content Transfer</h5><p>首先有一张待迁移的HR图片$\mathbf{y}$，我们把它下采样$\mathbf{x} = d<em>{\downarrow}(\mathbf{y})$。然后我们可以直接在$\mathbf{y}$上进行篡改（或许改的很拙劣），得到$\widetilde{\mathbf{y}}$。现在我们为了使$\widetilde{\mathbf{y}}$看起来不那么拙劣，我们首先把其对应的隐分布表示出来$\widetilde{\mathbf{z}} = f</em>{\mathbf{\theta}}(\widetilde{\mathbf{y}};\mathbf{x})$（注意，这里用到的”要求”是原始的$\mathbf{y}$的下采样版本），再使用上述的Latent Space Normalization，从而得到迁移后的图片</p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204121.png" alt="image-20200917170248004"></p>
+<h5 id="Image-Restoration"><a href="#Image-Restoration" class="headerlink" title="Image Restoration"></a>Image Restoration</h5><p>一种使用SR实现图像复原的朴素思想是，利用一些下采样方法，把噪声图像中的噪声去除，再使用SR方法进行复原。但是在下采样的过程中丢失了很多细节。</p>
+<p>而使用上述的思想就可以避免这种问题。可以把退化的图像、退化图像的下采样版本都放进$f<em>{\theta}$里：$\widetilde{\mathbf{z}} = f</em>{\mathbf{\theta}}(\widetilde{\mathbf{y}};\mathbf{x})$，然后对$\widetilde{\mathbf{z}}$进行标准化为$\widehat{\mathbf{z}}$，进而得到复原的图像$\widehat{\mathbf{y}} = f<em>{\mathbf{\theta}}^{- 1}(\widehat{\mathbf{z}},\mathbf{x})$。完整的复原过程描述为：$\widehat{\mathbf{y}} = f</em>{\mathbf{\theta}}^{- 1}\left( \phi\left( f<em>{\mathbf{\theta}}\left( \widetilde{\mathbf{y}};d</em>{\downarrow}(\widetilde{\mathbf{y}}) \right) \right),d_{\downarrow}(\widetilde{\mathbf{y}}) \right)$.</p>
+<p>直观来说，这个方法是把一个退化图像映射到了分布$p_{\mathbf{y} \mid \mathbf{x}}(\mathbf{y} \mid \mathbf{x},\mathbf{\theta})$中最接近的图片，因为这个分布训练的时候，是没有引入退化的，所以就能得到对应的”干净”的HR图片。</p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204122.png" alt="image-20200917170257774"></p>
+<h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204123.png" alt="image-20200917170303654"></p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204124.png" alt="image-20200917170309522"></p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204125.png" alt="image-20200917170315063"></p>
+<h3 id="总结与思考"><a href="#总结与思考" class="headerlink" title="总结与思考"></a>总结与思考</h3><p>这篇文章与以往大多数超分不一样，它产生的是一个HR图片的分布，而不是单张图片。让我第一次了解到了标准化流的思想，收获很大。</p>
+<p>感觉这篇和那篇Invertible Image Rescaling有异曲同工的地方，都使用了一个可逆网络，都是把信息隐藏在一个隐变量中。不同的是，Invertible Image Rescaling是把图像缩小时的丢失的<strong>高频信息</strong>放在了z中；而本文所求得的”HR图片分布”中的不同样本却对应了同一种z分布，这反映了不同HR样本中的相同的低频内容，从某种意义上是把LR图像中的<strong>低频特征</strong>放在了z中。</p>
+<p>我觉得这篇文章很惊艳的部分在于，利用隐变量的标准化，把这个超分框架推广到了图像风格迁移、图像复原上面。其中”寻找分布$p_{\mathbf{y} \mid \mathbf{x}}(\mathbf{y} \mid \mathbf{x},\mathbf{\theta})$中，与目标图像最接近的干净图片”的思想，也非常亮眼。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%9B%BE%E5%83%8F%E8%B6%85%E5%88%86%E8%BE%A8/" rel="tag"># 图像超分辨</a>
+              <a href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" rel="tag"># 论文阅读</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/08/28/2020-08-28-Deep%20Learning%20for%20Image%20Super-resolution%EF%BC%9AA%20Survey/" rel="prev" title="读综述：Deep Learning for Image Super-resolution：A Survey">
+      <i class="fa fa-chevron-left"></i> 读综述：Deep Learning for Image Super-resolution：A Survey
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/09/14/2020-09-14-Stochastic%20Frequency%20Masking%20to%20Improve%20Super-Resolution%20and%20Denoising%20Networks/" rel="next" title="读论文：Stochastic Frequency Masking to Improve Super-Resolution and Denoising Networks">
+      读论文：Stochastic Frequency Masking to Improve Super-Resolution and Denoising Networks <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#论文背景"><span class="nav-number">1.</span> <span class="nav-text">论文背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主要方法"><span class="nav-number">2.</span> <span class="nav-text">主要方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#SR中的条件标准化流"><span class="nav-number">2.1.</span> <span class="nav-text">SR中的条件标准化流</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#条件流层-Conditional-Flow-Layers"><span class="nav-number">2.2.</span> <span class="nav-text">条件流层(Conditional Flow Layers)</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#条件仿射耦合-Conditional-Affine-Coupling"><span class="nav-number">2.2.1.</span> <span class="nav-text">条件仿射耦合(Conditional Affine Coupling)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#仿射注入-Affine-Injector"><span class="nav-number">2.2.2.</span> <span class="nav-text">仿射注入(Affine Injector)</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#网络结构"><span class="nav-number">2.3.</span> <span class="nav-text">网络结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#其他的应用"><span class="nav-number">2.4.</span> <span class="nav-text">其他的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#LR一致的Style-Transfer"><span class="nav-number">2.4.1.</span> <span class="nav-text">LR一致的Style Transfer</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Latent-Space-Normalization"><span class="nav-number">2.4.2.</span> <span class="nav-text">Latent Space Normalization</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Image-Content-Transfer"><span class="nav-number">2.4.3.</span> <span class="nav-text">Image Content Transfer</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Image-Restoration"><span class="nav-number">2.4.4.</span> <span class="nav-text">Image Restoration</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验结果"><span class="nav-number">3.</span> <span class="nav-text">实验结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结与思考"><span class="nav-number">4.</span> <span class="nav-text">总结与思考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Jame Kuma"
+      src="/images/showPhoto.jpg">
+  <p class="site-author-name" itemprop="name">Jame Kuma</p>
+  <div class="site-description" itemprop="description">“人类的赞歌是勇气的赞歌！”</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:jamekuma123@gmail.com" title="E-Mail → mailto:jamekuma123@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/jamekuma" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jamekuma" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/he-chu-re-chen-ai-2" title="知乎 → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;he-chu-re-chen-ai-2" rel="noopener" target="_blank"><i class="fa fa-fw fa-zhihu"></i>知乎</a>
+      </span>
+  </div>
+
+
+
+      </div>
+	  <br>
+	  <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=1397105439&auto=0&height=66"></iframe>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jame Kuma</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.1
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '3q5M6btUVzsQ99Sq8ewgDNcL-gzGzoHsz',
+      appKey     : 'i9dXaUIF8LQXbUGtgtNDnk6J',
+      placeholder: "欢迎批评指正！（免注册，不过最好输入一下昵称方便辨认哈）",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

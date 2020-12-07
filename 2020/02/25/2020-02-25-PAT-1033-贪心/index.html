@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jamekuma.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","width":270,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="加油站问题  题目链接PAT：https:&#x2F;&#x2F;pintia.cn&#x2F;problem-sets&#x2F;994805342720868352&#x2F;problems&#x2F;994805458722734080 牛客：https:&#x2F;&#x2F;www.nowcoder.com&#x2F;practice&#x2F;f7eba38f7cd24c45982831e0f38518f9?tpId&#x3D;63&amp;tqId&#x3D;29602&amp;tPage&#x3D;2&amp;a">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PAT 1033：To Fill or Not to Fill 贪心">
+<meta property="og:url" content="https://jamekuma.github.io/2020/02/25/2020-02-25-PAT-1033-%E8%B4%AA%E5%BF%83/index.html">
+<meta property="og:site_name" content="Jame&#39;s Blog">
+<meta property="og:description" content="加油站问题  题目链接PAT：https:&#x2F;&#x2F;pintia.cn&#x2F;problem-sets&#x2F;994805342720868352&#x2F;problems&#x2F;994805458722734080 牛客：https:&#x2F;&#x2F;www.nowcoder.com&#x2F;practice&#x2F;f7eba38f7cd24c45982831e0f38518f9?tpId&#x3D;63&amp;tqId&#x3D;29602&amp;tPage&#x3D;2&amp;a">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-02-24T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-03-18T07:10:27.661Z">
+<meta property="article:author" content="Jame Kuma">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="贪心">
+<meta property="article:tag" content="PAT">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://jamekuma.github.io/2020/02/25/2020-02-25-PAT-1033-%E8%B4%AA%E5%BF%83/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>PAT 1033：To Fill or Not to Fill 贪心 | Jame's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jame's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/jamekuma" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jamekuma.github.io/2020/02/25/2020-02-25-PAT-1033-%E8%B4%AA%E5%BF%83/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/showPhoto.jpg">
+      <meta itemprop="name" content="Jame Kuma">
+      <meta itemprop="description" content="“人类的赞歌是勇气的赞歌！”">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jame's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          PAT 1033：To Fill or Not to Fill 贪心
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-02-25 00:00:00" itemprop="dateCreated datePublished" datetime="2020-02-25T00:00:00+08:00">2020-02-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">算法题解</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/02/25/2020-02-25-PAT-1033-%E8%B4%AA%E5%BF%83/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/02/25/2020-02-25-PAT-1033-%E8%B4%AA%E5%BF%83/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>加油站问题</p>
+</blockquote>
+<h3 id="题目链接"><a href="#题目链接" class="headerlink" title="题目链接"></a>题目链接</h3><p>PAT：<a href="https://pintia.cn/problem-sets/994805342720868352/problems/994805458722734080" target="_blank" rel="noopener">https://pintia.cn/problem-sets/994805342720868352/problems/994805458722734080</a></p>
+<p>牛客：<a href="https://www.nowcoder.com/practice/f7eba38f7cd24c45982831e0f38518f9?tpId=63&amp;tqId=29602&amp;tPage=2&amp;ru=/kaoyan/retest/9001&amp;qru=/ta/zju-kaoyan/question-ranking" target="_blank" rel="noopener">https://www.nowcoder.com/practice/f7eba38f7cd24c45982831e0f38518f9?tpId=63&amp;tqId=29602&amp;tPage=2&amp;ru=/kaoyan/retest/9001&amp;qru=/ta/zju-kaoyan/question-ranking</a></p>
+<h3 id="题意"><a href="#题意" class="headerlink" title="题意"></a>题意</h3><p>一条线段，起点到终点的距离是D，从起点开始路上有N个加油站，每个加油站的油价都不一样。现在一辆车的油箱容量是Cmax，每单位的油可以跑Davg的路程。现在给定N个加油站各自离起点的距离Di、油价Pi(钱/单位油)。问汽车能否顺利到达终点。如果能，采取怎样的加油策略，花费最少；如果不能，最多能走多少距离。</p>
+<a id="more"></a>
+<h3 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h3><h4 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h4><p>到达不了终点的情况很好判定：在某两个加油站之间的路程，加满了油也无法通过。此时加满油最多能走的路程+上一个加油站的位置，就是最多能走的距离。</p>
+<p>下面考虑在一定能到达情况下，花费最少的策略：</p>
+<p>总路程是一定的，每单位的油能跑的路程也是一定的。所以最终使用的油的总量也是定值。直观来看，应该在保证能够继续前行的前提下，在更便宜的加油站加更多的油。</p>
+<p>先粗略分析一下，当路过每个加油站的时候，决定是否加油、加多少油的因素有：</p>
+<ul>
+<li><p>首先得保证能在油尽之前到达下一个加油站</p>
+</li>
+<li><p>其次，如果加油太多，会不会因为前方有更便宜的加油站，导致不划算？</p>
+<p>===&gt;毕竟如果有更便宜的加油站，到那里留着更大的空间（带着空油箱去）加更多的油，才是更划算的决策</p>
+</li>
+<li><p>反之，如果加油太少，会不会因为前方可到达的加油站都比较贵，导致不划算？</p>
+<p>===&gt;为了继续前进，必须到前方可到达的加油站之一进行加油，如果他们都比目前的贵，为何不趁现在多加一点油（加满）？</p>
+</li>
+</ul>
+<h4 id="采用的贪心策略"><a href="#采用的贪心策略" class="headerlink" title="采用的贪心策略"></a>采用的贪心策略</h4><p>依据上述的分析，先给出贪心策略（后面证明其正确性）：</p>
+<ul>
+<li><p>到达某个加油站时，检查后面可到达的加油站的范围（加满油可到达的加油站的范围）</p>
+</li>
+<li><p>若找到了第一个（离当前加油站最近的）价格低于当前加油站价格的加油站st[next]</p>
+<ul>
+<li>检查当前的油量</li>
+<li>若不够到达st[next]，则加油到刚好到达那个加油站,前往st[next],开始下一轮选择</li>
+<li>若够到达，则不加油，直接前往st[next],开始下一轮选择</li>
+</ul>
+</li>
+<li><p>若每一个可到达的加油站都比当前的贵</p>
+<ul>
+<li>检查是否能直接到达终点</li>
+<li>若能直接到达终点<ul>
+<li>检查当前油量是否能到达终点</li>
+<li>若能，则直接前往终点</li>
+<li>若不能，则加油至正好能到达终点</li>
+</ul>
+</li>
+<li>若不能直接到达终点<ul>
+<li>在当前加油站加满油</li>
+<li>直接前往后面加油站中油价最低的,开始下一轮选择</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="最优子结构"><a href="#最优子结构" class="headerlink" title="最优子结构"></a>最优子结构</h4><p><strong>对子问题进行定义：</strong>当前到达第i个加油站，油箱内的剩余油量是gas，求到达终点的最低代价，记做二元组(i, gas)。此最低代价记作S(i, gas)。</p>
+<p><strong>对求解每个子问题时候的”选择”进行定义：</strong>选择加add的油，下一次前往第j个加油站，记做二元组(add,j)。对于每个子问题(i, gas)，都有一个选择的取值集合$C$_$S(i,gas)$ (Choose_set的简写)，满足选择的合理性（不能超过油箱、加油后能到达所选择的加油站）：</p>
+<script type="math/tex; mode=display">
+C\_S(i,gas) =\{(add,j)\Big| i \le j, \ \frac {st[j].dist-st[i].dist}{Davg} \le add+gas\le Cmax \}</script><p>若原问题的解是最优的，那么当做出选择之后，会得到一个子问题，这个的子问题的解一定是最优的。（若不是最优的，则换成最优的，而选择的代价没有改变，进而得到的新的原问题是更优的，与原本的原问题最优的假设矛盾，反证成立）===&gt;最优子结构得证</p>
+<p>所以能够得到以下递推式：</p>
+<script type="math/tex; mode=display">
+S(i,gas)=\min_{(add,j)\in C\_S(i,gas)}\{add\cdot st[i].price + S(j, gas-\frac{st[j].dist-st[i].dist}{Davg}) \}</script><h4 id="贪心选择性"><a href="#贪心选择性" class="headerlink" title="贪心选择性"></a>贪心选择性</h4><p>这个形式化证明起来比较繁琐，这里简要说明<del>（口胡）</del></p>
+<ul>
+<li><p>当后续加油站有更便宜的</p>
+<ul>
+<li>为何要用第一个更便宜的，而不是后面的更便宜的（如果有）<ul>
+<li>粗证：假设不用第一个，那么需要花更多的油到达后面的，行驶这整个部分的油，都是来自与较高价格的油。而用第一个的话，可以在后续段中使用更低价格的油。</li>
+</ul>
+</li>
+<li>为何要加油至能正好到达：<ul>
+<li>粗证：假设加更多的油，相当于多加了一部分高价油，而本来这部分油可以被 在到达便宜加油站之后加的油替换掉。因此只需保证能到达这个“第一个更便宜的加油站即可”</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>如果后续加油站没有更便宜的</p>
+<ul>
+<li><p>若能直接到终点</p>
+<ul>
+<li>为何尽量直接到达终点<ul>
+<li>粗证：既然后面的加油站都比较贵，与其在它们那里停靠加油，不如直接在当前（更便宜的）加油站加满到终点所需的油。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>若不能直接到终点： </p>
+<ul>
+<li><p>为何要加满</p>
+<ul>
+<li>粗证：为了继续前进，必须在后续加油站的其中一个停靠。最后总得在某个更贵的站点补充油，所以为了能在后续更贵的站点补更少的油，此时应该加得尽可能多。</li>
+</ul>
+</li>
+<li><p>为何要停在后续最低价的加油站</p>
+<ul>
+<li>粗证：为了继续前进，必须在后续加油站的其中一个停靠。既然停靠的话，应该找更便宜的停靠，进而寻找接下来的机会。  <em>(注：我感觉这段证明真的口胡，但没有严谨证明的思路，恳请大家指点)</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="AC代码"><a href="#AC代码" class="headerlink" title="AC代码"></a>AC代码</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Station</span> &#123;</span></span><br><span class="line">    <span class="keyword">double</span> price;</span><br><span class="line">    <span class="keyword">int</span> dist;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">bool</span> <span class="keyword">operator</span>&lt;(<span class="keyword">const</span> Station&amp; s)&#123;</span><br><span class="line">        <span class="keyword">return</span> dist &lt; s.dist;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Station st[<span class="number">505</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> Cmax, D, Davg, N;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> (~<span class="built_in">scanf</span>(<span class="string">"%d %d %d %d"</span>, &amp;Cmax, &amp;D, &amp;Davg, &amp;N)) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; N; i++) &#123;</span><br><span class="line">            <span class="built_in">scanf</span>(<span class="string">"%lf %d"</span>, &amp;(st[i].price), &amp;(st[i].dist));</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        sort(st, st + N);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 第N + 1个加油站为终点</span></span><br><span class="line">        st[N].price = <span class="number">0</span>;</span><br><span class="line">        st[N].dist = D;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">int</span> loc = <span class="number">0</span>;   <span class="comment">// 当前是第几个加油站</span></span><br><span class="line">        <span class="keyword">double</span> gas = <span class="number">0</span>;   <span class="comment">// 当前油量</span></span><br><span class="line">        <span class="keyword">double</span> dist = <span class="number">0</span>;  <span class="comment">// 当前行驶距离</span></span><br><span class="line">        <span class="keyword">double</span> pay = <span class="number">0</span>;   <span class="comment">// 当前累计付款</span></span><br><span class="line">        <span class="keyword">bool</span> ach = <span class="literal">true</span>;   <span class="comment">// 标记是否能够到达目的地</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (st[<span class="number">0</span>].dist != <span class="number">0</span>) &#123; <span class="comment">// 第一个加油站不在0位置，一定到不了</span></span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"The maximum travel distance = 0.00\n"</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (loc &lt; N) &#123;</span><br><span class="line">            <span class="keyword">bool</span> hasNext = <span class="literal">false</span>;  <span class="comment">// 从当前加油站出去，是否能到达下个加油站</span></span><br><span class="line">            <span class="keyword">bool</span> minor = <span class="literal">false</span>;    <span class="comment">/*当前加油站后面能到达</span></span><br><span class="line"><span class="comment">                                      的所有加油站中，是否有比当前价格低的*/</span></span><br><span class="line">            <span class="keyword">double</span> mmin = DBL_MAX; </span><br><span class="line">            <span class="keyword">int</span> next = loc;    <span class="comment">// 下次加油的加油站序号</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> i = loc + <span class="number">1</span>;   </span><br><span class="line">            <span class="comment">// 开始向后检索当前能够到达的加油站  </span></span><br><span class="line">            <span class="comment">// 最多检查到st[N](终点), 以便最后一个加油站的判定</span></span><br><span class="line">            <span class="keyword">while</span> (i &lt;= N &amp;&amp; st[i].dist - st[loc].dist &lt;= Cmax * Davg) &#123;</span><br><span class="line">                <span class="keyword">if</span> (!hasNext) hasNext = <span class="literal">true</span>;   <span class="comment">// 能进入循环, 代表能继续往后走</span></span><br><span class="line">                <span class="keyword">if</span> (i &lt; N)&#123;   <span class="comment">// 不包括终点</span></span><br><span class="line">                    <span class="comment">// 寻找离当前加油站最近的价格低的加油站</span></span><br><span class="line">                    <span class="keyword">if</span> (st[i].price &lt; st[loc].price) &#123;</span><br><span class="line">                        minor = <span class="literal">true</span>;   <span class="comment">// 标记"有价格比当前低的"</span></span><br><span class="line">                        next = i;       <span class="comment">// 将其设为下一次加油的点</span></span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="comment">// 同时统计所有能到达的加油站中, 价格最低的</span></span><br><span class="line">                    <span class="keyword">if</span> (st[i].price &lt; mmin) &#123;</span><br><span class="line">                        mmin = st[i].price;</span><br><span class="line">                        next = i;</span><br><span class="line">                    &#125; </span><br><span class="line">                &#125;</span><br><span class="line">                i++;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 如果当前加油站无法到达任何后续的加油站, 则无法到达终点</span></span><br><span class="line">            <span class="keyword">if</span> (!hasNext) &#123;</span><br><span class="line">                ach = <span class="literal">false</span>;</span><br><span class="line">                dist += Cmax * Davg; <span class="comment">// 这一小段最多行驶这么多</span></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 如果后续可到达的加油站中, 没有比当前价格低的</span></span><br><span class="line">            <span class="keyword">if</span> (!minor) &#123;</span><br><span class="line">                <span class="comment">// 若直接可以到达终点, 下次就直接到终点</span></span><br><span class="line">                <span class="keyword">if</span> (D - st[loc].dist &lt;= Cmax * Davg) &#123;</span><br><span class="line">                    <span class="comment">// 如果油不够到终点, 就加到正好够到达终点</span></span><br><span class="line">                    <span class="keyword">if</span> (gas * Davg &lt; D - st[loc].dist) &#123;</span><br><span class="line">                        pay += ((<span class="keyword">double</span>)(D - st[loc].dist) / Davg - gas) * st[loc].price;</span><br><span class="line">                        gas = (<span class="keyword">double</span>)(D - st[loc].dist) / Davg;</span><br><span class="line">                    &#125;</span><br><span class="line">                    gas -= (<span class="keyword">double</span>)(st[N].dist - st[loc].dist) / Davg;</span><br><span class="line">                    dist = D;</span><br><span class="line">                    loc = N;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 不能到达终点, 就加满油, 然后到达可到的的加油站中价格最低的</span></span><br><span class="line">                <span class="keyword">else</span> &#123;</span><br><span class="line">                    pay += (Cmax - gas) * st[loc].price;</span><br><span class="line">                    gas = Cmax;</span><br><span class="line"></span><br><span class="line">                    gas -= (<span class="keyword">double</span>)(st[next].dist - st[loc].dist) / Davg;</span><br><span class="line">                    dist = st[next].dist;</span><br><span class="line">                    loc = next;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 有价格低于当前加油站的</span></span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 油不够, 就加到正好够到那个加油站</span></span><br><span class="line">                <span class="keyword">if</span> (gas * Davg &lt; st[next].dist - st[loc].dist) &#123;</span><br><span class="line">                    pay += ((<span class="keyword">double</span>)(st[next].dist - st[loc].dist) / Davg  - gas) * st[loc].price;</span><br><span class="line">                    gas = (<span class="keyword">double</span>)(st[next].dist - st[loc].dist) / Davg;</span><br><span class="line">                &#125;</span><br><span class="line">                </span><br><span class="line">                gas -= (<span class="keyword">double</span>)(st[next].dist - st[loc].dist) / Davg;</span><br><span class="line">                dist = st[next].dist;</span><br><span class="line">                loc = next;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (ach) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"%.2f\n"</span>, pay);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"The maximum travel distance = %.2f\n"</span>, dist);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/%E8%B4%AA%E5%BF%83/" rel="tag"># 贪心</a>
+              <a href="/tags/PAT/" rel="tag"># PAT</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/23/2020-02-23-CF-555B-%E8%B4%AA%E5%BF%83/" rel="prev" title="CodeForce 555 B：Case of Fugitive 贪心">
+      <i class="fa fa-chevron-left"></i> CodeForce 555 B：Case of Fugitive 贪心
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/02/28/2020-02-28-HDU-2064-%E6%B1%89%E8%AF%BA%E5%A1%94/" rel="next" title="HDU 2064：汉诺塔Ⅲ 递归">
+      HDU 2064：汉诺塔Ⅲ 递归 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#题目链接"><span class="nav-number">1.</span> <span class="nav-text">题目链接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#题意"><span class="nav-number">2.</span> <span class="nav-text">题意</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#题解"><span class="nav-number">3.</span> <span class="nav-text">题解</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#分析"><span class="nav-number">3.1.</span> <span class="nav-text">分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#采用的贪心策略"><span class="nav-number">3.2.</span> <span class="nav-text">采用的贪心策略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#最优子结构"><span class="nav-number">3.3.</span> <span class="nav-text">最优子结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#贪心选择性"><span class="nav-number">3.4.</span> <span class="nav-text">贪心选择性</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AC代码"><span class="nav-number">4.</span> <span class="nav-text">AC代码</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Jame Kuma"
+      src="/images/showPhoto.jpg">
+  <p class="site-author-name" itemprop="name">Jame Kuma</p>
+  <div class="site-description" itemprop="description">“人类的赞歌是勇气的赞歌！”</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:jamekuma123@gmail.com" title="E-Mail → mailto:jamekuma123@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/jamekuma" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jamekuma" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/he-chu-re-chen-ai-2" title="知乎 → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;he-chu-re-chen-ai-2" rel="noopener" target="_blank"><i class="fa fa-fw fa-zhihu"></i>知乎</a>
+      </span>
+  </div>
+
+
+
+      </div>
+	  <br>
+	  <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=1397105439&auto=0&height=66"></iframe>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jame Kuma</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.1
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '3q5M6btUVzsQ99Sq8ewgDNcL-gzGzoHsz',
+      appKey     : 'i9dXaUIF8LQXbUGtgtNDnk6J',
+      placeholder: "欢迎批评指正！（免注册，不过最好输入一下昵称方便辨认哈）",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
