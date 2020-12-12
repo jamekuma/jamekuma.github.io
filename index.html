@@ -163,7 +163,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jamekuma.github.io/2020/12/07/hello-world/">
+    <link itemprop="mainEntityOfPage" href="https://jamekuma.github.io/2020/12/11/2020-12-11-Pre-Trained%20Image%20Processing%20Transformer/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/showPhoto.jpg">
@@ -177,7 +177,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2020/12/07/hello-world/" class="post-title-link" itemprop="url">Hello World</a>
+            <a href="/2020/12/11/2020-12-11-Pre-Trained%20Image%20Processing%20Transformer/" class="post-title-link" itemprop="url">读论文：Pre-Trained Image Processing Transformer</a>
         </h1>
 
         <div class="post-meta">
@@ -187,7 +187,16 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-12-07 11:50:16" itemprop="dateCreated datePublished" datetime="2020-12-07T11:50:16+08:00">2020-12-07</time>
+              <time title="创建时间：2020-12-11 00:00:00" itemprop="dateCreated datePublished" datetime="2020-12-11T00:00:00+08:00">2020-12-11</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%A7%91%E7%A0%94/" itemprop="url" rel="index"><span itemprop="name">科研</span></a>
+                </span>
             </span>
 
           
@@ -199,8 +208,8 @@
       </span>
       <span class="post-meta-item-text">Valine：</span>
     
-    <a title="valine" href="/2020/12/07/hello-world/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/12/07/hello-world/" itemprop="commentCount"></span>
+    <a title="valine" href="/2020/12/11/2020-12-11-Pre-Trained%20Image%20Processing%20Transformer/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/12/11/2020-12-11-Pre-Trained%20Image%20Processing%20Transformer/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -215,16 +224,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
-
+          <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3>
       
     </div>
 
@@ -304,7 +304,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="本文的大致思路"><a href="#本文的大致思路" class="headerlink" title="本文的大致思路"></a>本文的大致思路</h2>
+          <h3 id="简述"><a href="#简述" class="headerlink" title="简述"></a>简述</h3><p>本文提出的方法要完成的任务是在超低分辨率下的超分辨，正视超分辨的ill-posed属性，从一张LR图像中恢复出多张可能的HR图像。这个方法被作者称为VarSR。</p>
+<p>主要思路是：通过最小化在HR与LR的KL散度来连接LR图像与HR图像间的表示能力，从而把LR图像和HR图像同时encode到同一个隐变量特征空间。然后SR模块的输入是这个隐变量，生成一个与Ground-truth HR之间的像素/感知上的相似的SR结果。<strong>由于HR图像的多样性程度高于LR图像，因此HR图像的潜在变量要比LR图像密集得多。</strong>所以在推理过程中，从隐变量空间中多次取样，从而产生多种SR图像。整个过程如下图所示。</p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201209171949200.png" alt="image-20201209171949200" style="zoom: 50%;" /></p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/11/24/2020-11-24-VarSR%20Variational%20Super-Resolution%20Network%20for%20Very%20Low%20Resolution%20Images/#more" rel="contents">
