@@ -224,8 +224,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>作者表示，SR问题本来就是一个ill-posed的问题，可是大多数工作忽略了这一点，只致力于去学一个单图像到单图像的映射。而作者利用了基于标准化流(Normalizing Flow)的方法，去学一个LR到<strong>HR分布</strong>的映射（学习与输入LR图像相对应的真实HR图像的分布，即可以看做是给定LR图像，HR的条件概率分布），同时还表明在去噪、复原的任务中也能发挥作用。</p>
-<p>所谓标准化流(Normalizing Flow)的方法，是用来拟合一些复杂概率分布的。实际上就是学一个可逆神经网络$f<em>{\theta}$，使用它的逆过程$f</em>{\theta}^{- 1}$把一个简单的分布(比如高斯分布、均匀分布等)$p<em>{\mathbf{z}}(\mathbf{z})$变成$\mathbf{y} = f</em>{\theta}^{- 1}(\mathbf{z})$。</p>
+          <h3 id="论文背景">论文背景</h3>
+<p>作者表示，SR问题本来就是一个ill-posed的问题，可是大多数工作忽略了这一点，只致力于去学一个单图像到单图像的映射。而作者利用了基于标准化流(Normalizing Flow)的方法，去学一个LR到<strong>HR分布</strong>的映射（学习与输入LR图像相对应的真实HR图像的分布，即可以看做是给定LR图像，HR的条件概率分布），同时还表明在去噪、复原的任务中也能发挥作用。</p>
+<p>所谓标准化流(Normalizing Flow)的方法，是用来拟合一些复杂概率分布的。实际上就是学一个可逆神经网络<span class="math inline">\(f_{\theta}\)</span>，使用它的逆过程<span class="math inline">\(f_{\theta}^{- 1}\)</span>把一个简单的分布(比如高斯分布、均匀分布等)<span class="math inline">\(p_{\mathbf{z}}(\mathbf{z})\)</span>变成<span class="math inline">\(\mathbf{y} = f_{\theta}^{- 1}(\mathbf{z})\)</span>。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/09/04/2020-09-04-SRFlow%EF%BC%9ALearning%20the%20Super-Resolution%20Space%20with%20Normalizing%20Flow/#more" rel="contents">
@@ -490,7 +491,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>这篇文章的主要思想是利用对偶学习的思想去训练SR网络，涉及到了很多对偶学习的概念，在这里做一些归纳。</p>
+          <h3 id="论文背景">论文背景</h3>
+<p>这篇文章的主要思想是利用对偶学习的思想去训练SR网络，涉及到了很多对偶学习的概念，在这里做一些归纳。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/08/06/2020-08-06-Closed-loop-Matters%EF%BC%9ADual-Regression-Networks-for-Single-Image-Super-Resolution/#more" rel="contents">
@@ -578,7 +580,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>图像超分的方法主要分为两类：一类是单图像超分(SISR)，比如SRCNN，VDSR,RCAN等；另外一类是基于参考图像的超分方法(RefSR)。因为高分辨率图像在退化过程中会丢失很多细节和纹理信息，所以传统的单图像超分方法会产生模糊的结果；为了恢复更多的纹理信息，有研究者使用GANs来实现图像超分(SRGAN,ESRGAN等)，但是GANs所带来的伪影artifacts却很难避免。<br>第二类方法通过Ref图像来实现图像超分取得了很好的结果，该方法通过从Ref 图像上迁移HR的纹理信息来获得视觉上可观的效果。本文的方法属于第二类，通过查询Ref 图像上<strong>合理</strong>纹理信息，将其融入到最终的超分结果。<strong>不同于以往的该类方法，本文能够有效的避免错误的纹理迁移。</strong></p>
+          <h3 id="论文背景">论文背景</h3>
+<p>图像超分的方法主要分为两类：一类是单图像超分(SISR)，比如SRCNN，VDSR,RCAN等；另外一类是基于参考图像的超分方法(RefSR)。因为高分辨率图像在退化过程中会丢失很多细节和纹理信息，所以传统的单图像超分方法会产生模糊的结果；为了恢复更多的纹理信息，有研究者使用GANs来实现图像超分(SRGAN,ESRGAN等)，但是GANs所带来的伪影artifacts却很难避免。 第二类方法通过Ref图像来实现图像超分取得了很好的结果，该方法通过从Ref 图像上迁移HR的纹理信息来获得视觉上可观的效果。本文的方法属于第二类，通过查询Ref 图像上<strong>合理</strong>纹理信息，将其融入到最终的超分结果。<strong>不同于以往的该类方法，本文能够有效的避免错误的纹理迁移。</strong></p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/08/04/2020-08-04-Learning-Texture-Transformer-Network-for-Image-Super-Resolution/#more" rel="contents">
@@ -666,8 +669,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>  这是CVPR 2020的一篇超分工作。</p>
-<p>  最开始的超分技术，基于的都是固定的下采样制造的训练数据集(比如双三次)，不适于在真实场景下的超分辨。对此，目前主要有以下两种解决思路：</p>
+          <h3 id="论文背景">论文背景</h3>
+<p>这是CVPR 2020的一篇超分工作。</p>
+<p>最开始的超分技术，基于的都是固定的下采样制造的训练数据集(比如双三次)，不适于在真实场景下的超分辨。对此，目前主要有以下两种解决思路：</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/07/30/2020-07-30-Unpaired-Image-Super-Resolution-using-Pseudo-Supervision/#more" rel="contents">
@@ -844,17 +848,17 @@
 
       
           <p>一般ACM或者笔试题的时间限制是1秒或2秒。</p>
-<p>在这种情况下，C++代码中的操作次数控制在 $10^7$为最佳。</p>
+<p>在这种情况下，C++代码中的操作次数控制在 <span class="math inline">\(10^7\)</span>为最佳。</p>
 <p><strong>下面给出在不同数据范围下，代码的时间复杂度和算法该如何选择：</strong></p>
-<p>$n≤30$, 指数级别, dfs+剪枝，状态压缩dp</p>
-<p>$n≤100$  =&gt;  $O(n^3)$，floyd，dp</p>
-<p>$n≤10^3$  =&gt;  $O(n^2)$，$O(n^2log\ n)$，dp，二分</p>
-<p>$n≤10^4$  =&gt; $ O(n∗\sqrt n)$，块状链表</p>
-<p>$n≤10^5$  =&gt; $O(n*log\ n)$ =&gt; 各种sort，线段树、树状数组、set/map、heap、dijkstra+heap、spfa、求凸包、求半平面交、二分</p>
-<p>$n≤10^6$  =&gt; $O(n)$  =&gt;  hash、双指针扫描、kmp、AC自动机。以及常数较小的 $O(n*log\ n)$ 算法sort、树状数组、heap、dijkstra、spfa</p>
-<p>$n≤10^7$  =&gt;  $O(n)$，双指针扫描、kmp、AC自动机、线性筛素数</p>
-<p>$n≤10^9$  =&gt;  $O(\sqrt n)$，判断质数</p>
-<p>$n≤10^{18}$ =&gt;  $O(log\ n)$，最大公约数</p>
+<p><span class="math inline">\(n≤30\)</span>, 指数级别, dfs+剪枝，状态压缩dp</p>
+<p><span class="math inline">\(n≤100\)</span> =&gt; <span class="math inline">\(O(n^3)\)</span>，floyd，dp</p>
+<p><span class="math inline">\(n≤10^3\)</span> =&gt; <span class="math inline">\(O(n^2)\)</span>，<span class="math inline">\(O(n^2log\ n)\)</span>，dp，二分</p>
+<p><span class="math inline">\(n≤10^4\)</span> =&gt; $ O(n∗n)$，块状链表</p>
+<p><span class="math inline">\(n≤10^5\)</span> =&gt; <span class="math inline">\(O(n*log\ n)\)</span> =&gt; 各种sort，线段树、树状数组、set/map、heap、dijkstra+heap、spfa、求凸包、求半平面交、二分</p>
+<p><span class="math inline">\(n≤10^6\)</span> =&gt; <span class="math inline">\(O(n)\)</span> =&gt; hash、双指针扫描、kmp、AC自动机。以及常数较小的 <span class="math inline">\(O(n*log\ n)\)</span> 算法sort、树状数组、heap、dijkstra、spfa</p>
+<p><span class="math inline">\(n≤10^7\)</span> =&gt; <span class="math inline">\(O(n)\)</span>，双指针扫描、kmp、AC自动机、线性筛素数</p>
+<p><span class="math inline">\(n≤10^9\)</span> =&gt; <span class="math inline">\(O(\sqrt n)\)</span>，判断质数</p>
+<p><span class="math inline">\(n≤10^{18}\)</span> =&gt; <span class="math inline">\(O(log\ n)\)</span>，最大公约数</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/04/12/2020-04-12-%E6%A0%B9%E6%8D%AE%E6%95%B0%E6%8D%AE%E8%8C%83%E5%9B%B4%E5%8F%8D%E6%8E%A8%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%8F%8A%E7%AE%97%E6%B3%95%E5%86%85%E5%AE%B9/#more" rel="contents">
@@ -942,10 +946,18 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="同余关系"><a href="#同余关系" class="headerlink" title="同余关系"></a>同余关系</h3><h4 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h4><p>数学中同余关系是一种等价关系。当两个整数a, b除以同一个正整数n，若得到相同的余数，则这两个整数同余。记做$a\equiv b\ \ \pmod n$.</p>
-<h4 id="性质"><a href="#性质" class="headerlink" title="性质"></a>性质</h4><p><strong>整除性：</strong>a，b相减能被n整除</p>
+          <h3 id="同余关系">同余关系</h3>
+<h4 id="定义">定义</h4>
+<p>数学中同余关系是一种等价关系。当两个整数a, b除以同一个正整数n，若得到相同的余数，则这两个整数同余。记做<span class="math inline">\(a\equiv b\ \ \pmod n\)</span>.</p>
+<h4 id="性质">性质</h4>
+<p><strong>整除性：</strong>a，b相减能被n整除</p>
 <p><strong>传递性：</strong>等价关系的共有特性</p>
-<p>$<br>\left.\begin{array}{l}<br>a \equiv b(\bmod m) \<br>b \equiv c(\bmod m)<br>\end{array}\right} \Rightarrow a \equiv c \quad(\bmod m)<br>$</p>
+$ .
+<span class="math display">\[\begin{array}{l}
+a \equiv b(\bmod m) \\
+b \equiv c(\bmod m)
+\end{array}\]</span>
+<p>} a c (m) $</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/04/12/2020-04-12-%E5%87%A0%E4%B8%AA%E6%95%B0%E8%AE%BA%E7%BB%93%E8%AE%BA%E7%9A%84%E6%80%BB%E7%BB%93/#more" rel="contents">
@@ -1034,15 +1046,17 @@
 
       
           <blockquote>
-<p>排列==&gt;多个环     简单的gcd、lcm关系   </p>
+<p>排列==&gt;多个环 简单的gcd、lcm关系</p>
 </blockquote>
-<h3 id="题目链接"><a href="#题目链接" class="headerlink" title="题目链接"></a>题目链接</h3><p><a href="https://codeforces.com/contest/1327/problem/D" target="_blank" rel="noopener">https://codeforces.com/contest/1327/problem/D</a></p>
-<h3 id="题目大意"><a href="#题目大意" class="headerlink" title="题目大意"></a>题目大意</h3><p>引入几个定义：</p>
-<p><strong>排列的乘法：</strong>如果$a$、$b$是两个排列，那么定义排列$c=a\times b$，其中$\forall 1\le i\le n\ \ c[i] = b[a[i]]$。</p>
-<p><strong>排列$p$的$k$次幂为：</strong>$p^k=\underbrace{p \times p \times \dots \times p}_{k \text{ times}}$</p>
-<p>给定n，给定一个数字1~n的排列$p_1,p_2,…,p_n$，对于每个$p[i]$，有一个“颜色”$c[i]$。</p>
-<p><strong>“无限路径”：</strong>对于排列$p$，存在一个序列$i, p[i], p[p[i]], p[p[p[i]]] \dots$拥有相同的颜色$c[i] = c[p[i]] = c[p[p[i]]] = \dots$，则称排列$p$<strong>具有无限路径</strong>。</p>
-<p>问：对于已知的排列$p$，求最小的$k$，使得$p^k$具有无限路径。</p>
+<h3 id="题目链接">题目链接</h3>
+<p><a href="https://codeforces.com/contest/1327/problem/D" target="_blank" rel="noopener" class="uri">https://codeforces.com/contest/1327/problem/D</a></p>
+<h3 id="题目大意">题目大意</h3>
+<p>引入几个定义：</p>
+<p><strong>排列的乘法：</strong>如果<span class="math inline">\(a\)</span>、<span class="math inline">\(b\)</span>是两个排列，那么定义排列<span class="math inline">\(c=a\times b\)</span>，其中<span class="math inline">\(\forall 1\le i\le n\ \ c[i] = b[a[i]]\)</span>。</p>
+<p><strong>排列<span class="math inline">\(p\)</span>的<span class="math inline">\(k\)</span>次幂为：</strong><span class="math inline">\(p^k=\underbrace{p \times p \times \dots \times p}_{k \text{ times}}\)</span></p>
+<p>给定n，给定一个数字1~n的排列<span class="math inline">\(p_1,p_2,...,p_n\)</span>，对于每个<span class="math inline">\(p[i]\)</span>，有一个“颜色”<span class="math inline">\(c[i]\)</span>。</p>
+<p><strong>“无限路径”：</strong>对于排列<span class="math inline">\(p\)</span>，存在一个序列<span class="math inline">\(i, p[i], p[p[i]], p[p[p[i]]] \dots\)</span>拥有相同的颜色<span class="math inline">\(c[i] = c[p[i]] = c[p[p[i]]] = \dots\)</span>，则称排列<span class="math inline">\(p\)</span><strong>具有无限路径</strong>。</p>
+<p>问：对于已知的排列<span class="math inline">\(p\)</span>，求最小的<span class="math inline">\(k\)</span>，使得<span class="math inline">\(p^k\)</span>具有无限路径。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/03/26/2020-03-26-CF-1327D/#more" rel="contents">

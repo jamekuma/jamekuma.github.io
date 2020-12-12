@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"jamekuma.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","width":270,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="论文背景图像超分的方法主要分为两类：一类是单图像超分(SISR)，比如SRCNN，VDSR,RCAN等；另外一类是基于参考图像的超分方法(RefSR)。因为高分辨率图像在退化过程中会丢失很多细节和纹理信息，所以传统的单图像超分方法会产生模糊的结果；为了恢复更多的纹理信息，有研究者使用GANs来实现图像超分(SRGAN,ESRGAN等)，但是GANs所带来的伪影artifacts却很难避免。第二类方">
+  <meta name="description" content="论文背景 图像超分的方法主要分为两类：一类是单图像超分(SISR)，比如SRCNN，VDSR,RCAN等；另外一类是基于参考图像的超分方法(RefSR)。因为高分辨率图像在退化过程中会丢失很多细节和纹理信息，所以传统的单图像超分方法会产生模糊的结果；为了恢复更多的纹理信息，有研究者使用GANs来实现图像超分(SRGAN,ESRGAN等)，但是GANs所带来的伪影artifacts却很难避免。 第">
 <meta property="og:type" content="article">
 <meta property="og:title" content="读论文：Learning Texture Transformer Network for Image Super-Resolution">
 <meta property="og:url" content="https://jamekuma.github.io/2020/08/04/2020-08-04-Learning-Texture-Transformer-Network-for-Image-Super-Resolution/index.html">
 <meta property="og:site_name" content="Jame&#39;s Blog">
-<meta property="og:description" content="论文背景图像超分的方法主要分为两类：一类是单图像超分(SISR)，比如SRCNN，VDSR,RCAN等；另外一类是基于参考图像的超分方法(RefSR)。因为高分辨率图像在退化过程中会丢失很多细节和纹理信息，所以传统的单图像超分方法会产生模糊的结果；为了恢复更多的纹理信息，有研究者使用GANs来实现图像超分(SRGAN,ESRGAN等)，但是GANs所带来的伪影artifacts却很难避免。第二类方">
+<meta property="og:description" content="论文背景 图像超分的方法主要分为两类：一类是单图像超分(SISR)，比如SRCNN，VDSR,RCAN等；另外一类是基于参考图像的超分方法(RefSR)。因为高分辨率图像在退化过程中会丢失很多细节和纹理信息，所以传统的单图像超分方法会产生模糊的结果；为了恢复更多的纹理信息，有研究者使用GANs来实现图像超分(SRGAN,ESRGAN等)，但是GANs所带来的伪影artifacts却很难避免。 第">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808101919.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808101926.png">
@@ -247,22 +247,26 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>图像超分的方法主要分为两类：一类是单图像超分(SISR)，比如SRCNN，VDSR,RCAN等；另外一类是基于参考图像的超分方法(RefSR)。因为高分辨率图像在退化过程中会丢失很多细节和纹理信息，所以传统的单图像超分方法会产生模糊的结果；为了恢复更多的纹理信息，有研究者使用GANs来实现图像超分(SRGAN,ESRGAN等)，但是GANs所带来的伪影artifacts却很难避免。<br>第二类方法通过Ref图像来实现图像超分取得了很好的结果，该方法通过从Ref 图像上迁移HR的纹理信息来获得视觉上可观的效果。本文的方法属于第二类，通过查询Ref 图像上<strong>合理</strong>纹理信息，将其融入到最终的超分结果。<strong>不同于以往的该类方法，本文能够有效的避免错误的纹理迁移。</strong></p>
+        <h3 id="论文背景">论文背景</h3>
+<p>图像超分的方法主要分为两类：一类是单图像超分(SISR)，比如SRCNN，VDSR,RCAN等；另外一类是基于参考图像的超分方法(RefSR)。因为高分辨率图像在退化过程中会丢失很多细节和纹理信息，所以传统的单图像超分方法会产生模糊的结果；为了恢复更多的纹理信息，有研究者使用GANs来实现图像超分(SRGAN,ESRGAN等)，但是GANs所带来的伪影artifacts却很难避免。 第二类方法通过Ref图像来实现图像超分取得了很好的结果，该方法通过从Ref 图像上迁移HR的纹理信息来获得视觉上可观的效果。本文的方法属于第二类，通过查询Ref 图像上<strong>合理</strong>纹理信息，将其融入到最终的超分结果。<strong>不同于以往的该类方法，本文能够有效的避免错误的纹理迁移。</strong></p>
 <a id="more"></a>
-<h3 id="方法详述"><a href="#方法详述" class="headerlink" title="方法详述"></a>方法详述</h3><h4 id="四个主要模块"><a href="#四个主要模块" class="headerlink" title="四个主要模块"></a>四个主要模块</h4><p>如下图所示，本文提出了四个模块：可学习的纹理提取器模块(Learnable Texture Extractor), 相关性嵌入模块(Relevance Embedding)，硬注意力模块(Hard Attention)，软注意力模块(Soft Attention)。</p>
+<h3 id="方法详述">方法详述</h3>
+<h4 id="四个主要模块">四个主要模块</h4>
+<p>如下图所示，本文提出了四个模块：可学习的纹理提取器模块(Learnable Texture Extractor), 相关性嵌入模块(Relevance Embedding)，硬注意力模块(Hard Attention)，软注意力模块(Soft Attention)。</p>
 <p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808101919.png" alt="image-20200808003441653" style="zoom:67%;" /></p>
-<p><strong>可学习的纹理提取器模块：</strong><br>对于纹理信息提取，目前主流方法是使用VGG网络来提取一些浅层的特征来作为纹理信息。但是，VGG网络的训练目标是以语义为导向的图像类别标签，其高层的语义信息与低层的纹理信息有很大的差异，所以这种方式有明显的缺陷。<strong>本文提出了一种可学习的纹理提取器，其本质是一个浅层的卷积神经网络</strong>。随着训练的不断推进，该提取器不断更新自己的参数，最终可以提取到最适合超分的纹理信息，为后面的纹理迁移和纹理合成提供了很好的基础，最终生成高质量的超分结果。</p>
+<p><strong>可学习的纹理提取器模块：</strong> 对于纹理信息提取，目前主流方法是使用VGG网络来提取一些浅层的特征来作为纹理信息。但是，VGG网络的训练目标是以语义为导向的图像类别标签，其高层的语义信息与低层的纹理信息有很大的差异，所以这种方式有明显的缺陷。<strong>本文提出了一种可学习的纹理提取器，其本质是一个浅层的卷积神经网络</strong>。随着训练的不断推进，该提取器不断更新自己的参数，最终可以提取到最适合超分的纹理信息，为后面的纹理迁移和纹理合成提供了很好的基础，最终生成高质量的超分结果。</p>
 <p>注：对 Ref 图片做双三次（bicubic）下采样，再做双三次上采样，目的是为了和 LR保持域一致（即都是经过双三次变换得到的）</p>
 <p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808101926.png" alt="image-20200808004957589" style="zoom: 67%;" /></p>
-<p><strong>相关性嵌入模块：</strong><br>本文提出的纹理Transformer有Q，K，V三个要素，分别表示从低分辨率图像所提取的纹理特征信息(用来进行纹理检索)，高分辨率参考图像经过先下采样再上采样得到的与低分辨率图像分布一致的图像纹理信息(用来进行纹理检索)和原参考图像的纹理信息(用来进行纹理迁移)。<strong>将Q和K分别提取特征块，然后以内积的方式计算Q和K中的特征块两两之间的相关性</strong>。内积越大表示这两个特征块之间的相关性越强，可迁移的高频纹理信息越多。反之，内积越小的地方代表这两个特征块之间的相关性越弱，可迁移的高频纹理信息就越少。该模块输出的是一个硬注意力图 H 和软注意力图 S。</p>
+<p><strong>相关性嵌入模块：</strong> 本文提出的纹理Transformer有Q，K，V三个要素，分别表示从低分辨率图像所提取的纹理特征信息(用来进行纹理检索)，高分辨率参考图像经过先下采样再上采样得到的与低分辨率图像分布一致的图像纹理信息(用来进行纹理检索)和原参考图像的纹理信息(用来进行纹理迁移)。<strong>将Q和K分别提取特征块，然后以内积的方式计算Q和K中的特征块两两之间的相关性</strong>。内积越大表示这两个特征块之间的相关性越强，可迁移的高频纹理信息越多。反之，内积越小的地方代表这两个特征块之间的相关性越弱，可迁移的高频纹理信息就越少。该模块输出的是一个硬注意力图 H 和软注意力图 S。</p>
 <p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808102016.png" alt="image-20200808005108730" style="zoom:67%;" /></p>
-<p><strong>硬注意力模块：</strong><br>利用硬注意力图 H 中记录的位置，从V中迁移对应位置的特征块，组合成迁移纹理特征图 T，其中 T 的每个位置包含参考图像中最相似的位置的高频纹理特征。T接着与骨干网络中的特征 F 进行级联，通过一个卷积层得到融合后的特征。</p>
-<p><strong>软注意力模块：</strong><br>将上述融合后的特征与软注意力图进行对应位置作点乘，此时相关性强的纹理信息能够赋予相对更大的权重；相关性弱的纹理信息因为权重小而得到抑制，这样能够更好的迁移高频纹理信息的特征。</p>
+<p><strong>硬注意力模块：</strong> 利用硬注意力图 H 中记录的位置，从V中迁移对应位置的特征块，组合成迁移纹理特征图 T，其中 T 的每个位置包含参考图像中最相似的位置的高频纹理特征。T接着与骨干网络中的特征 F 进行级联，通过一个卷积层得到融合后的特征。</p>
+<p><strong>软注意力模块：</strong> 将上述融合后的特征与软注意力图进行对应位置作点乘，此时相关性强的纹理信息能够赋予相对更大的权重；相关性弱的纹理信息因为权重小而得到抑制，这样能够更好的迁移高频纹理信息的特征。</p>
 <p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808102027.png" alt="image-20200808005410271" style="zoom:67%;" /></p>
 <p><strong>跨尺度特征融合：</strong></p>
 <p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808102031.png" alt="image-20200808003335200" style="zoom:67%;" /></p>
 <p>上图将本文所提出的纹理transformer应用于x1,x2,x4三个尺度，并将不同尺度间的特征通过上采样或者带步长的卷积进行交叉融合。这样，可将参考图像的信息运用到不同的尺度，进而提高网络的特征表达能力，提高图像生成的质量。</p>
-<h4 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h4><p><strong>总的损失函数</strong></p>
+<h4 id="损失函数">损失函数</h4>
+<p><strong>总的损失函数</strong></p>
 <p>损失函数比较常规，由重建损失+对抗损失+感知损失构成：</p>
 <p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808102037.png" alt="image-20200808003757153" style="zoom:67%;" /></p>
 <p>重建损失使用L1 损失：</p>
@@ -271,10 +275,14 @@
 <p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808102047.png" alt="image-20200808004017320" style="zoom:67%;" /></p>
 <p>感知损失如下：</p>
 <p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808102116.png" alt="image-20200808003944923" style="zoom:67%;" /></p>
-<h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><h4 id="数值效果和视觉效果"><a href="#数值效果和视觉效果" class="headerlink" title="数值效果和视觉效果"></a>数值效果和视觉效果</h4><p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808102137.png" alt="image-20200808004100714" style="zoom:67%;" /></p>
+<h3 id="实验结果">实验结果</h3>
+<h4 id="数值效果和视觉效果">数值效果和视觉效果</h4>
+<p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808102137.png" alt="image-20200808004100714" style="zoom:67%;" /></p>
 <p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808102143.png" alt="image-20200808004124347" style="zoom:67%;" /></p>
-<h4 id="消融实验"><a href="#消融实验" class="headerlink" title="消融实验"></a>消融实验</h4><p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808102154.png" alt="image-20200808004237454" style="zoom:67%;" /></p>
-<h3 id="总结与思考"><a href="#总结与思考" class="headerlink" title="总结与思考"></a>总结与思考</h3><ul>
+<h4 id="消融实验">消融实验</h4>
+<p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808102154.png" alt="image-20200808004237454" style="zoom:67%;" /></p>
+<h3 id="总结与思考">总结与思考</h3>
+<ul>
 <li>不同于我之前接触的SISR，这篇研究的是RefSR， RefSR 能有效利用来自 HR 参照图像的丰富纹理，来补充 LR 图像中缺失的细节，从而缓解不适定问题；</li>
 <li>查阅资料得知，Q (query), K(key), V (value)这些思想，最早是应用于NLP的transform中，作者将其用于图像生成任务。对于此类跨研究方向的idea迁移，以后也需多加关注。</li>
 </ul>

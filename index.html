@@ -224,7 +224,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3>
+          <h3 id="论文背景">论文背景</h3>
+
       
     </div>
 
@@ -304,7 +305,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="简述"><a href="#简述" class="headerlink" title="简述"></a>简述</h3><p>本文提出的方法要完成的任务是在超低分辨率下的超分辨，正视超分辨的ill-posed属性，从一张LR图像中恢复出多张可能的HR图像。这个方法被作者称为VarSR。</p>
+          <h3 id="简述">简述</h3>
+<p>本文提出的方法要完成的任务是在超低分辨率下的超分辨，正视超分辨的ill-posed属性，从一张LR图像中恢复出多张可能的HR图像。这个方法被作者称为VarSR。</p>
 <p>主要思路是：通过最小化在HR与LR的KL散度来连接LR图像与HR图像间的表示能力，从而把LR图像和HR图像同时encode到同一个隐变量特征空间。然后SR模块的输入是这个隐变量，生成一个与Ground-truth HR之间的像素/感知上的相似的SR结果。<strong>由于HR图像的多样性程度高于LR图像，因此HR图像的潜在变量要比LR图像密集得多。</strong>所以在推理过程中，从隐变量空间中多次取样，从而产生多种SR图像。整个过程如下图所示。</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201209171949200.png" alt="image-20201209171949200" style="zoom: 50%;" /></p>
           <!--noindex-->
@@ -395,7 +397,8 @@
 
       
           <a id="more"></a>
-<h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>这里，作者照例总结了几个生成模型：</p>
+<h3 id="论文背景">论文背景</h3>
+<p>这里，作者照例总结了几个生成模型：</p>
 <ul>
 <li>自回归模型(Autoregressive models)：简易，但并行化不够</li>
 <li>变分编码器(VAEs)：对数据的对数似然的<strong>下界</strong>进行优化，相较于变分编码器，有并行化的优势，但优化起来比较困难</li>
@@ -403,64 +406,76 @@
 </ul>
 <p>基于流的生成模型有如下的优点：</p>
 <ul>
-<li>精确隐变量推理和对数似然评价<ul>
+<li>精确隐变量推理和对数似然评价
+<ul>
 <li>在VAEs中，只能推断出数据点对应的隐变量的<strong>估计值</strong>。在可逆生成模型中，这可以在没有近似的情况下精确地实现。这不仅可以导致准确的推断，还可以优化数据的精确对数似然值，而不是数据的下界</li>
-</ul>
-</li>
-<li>高效的推理与训练<ul>
+</ul></li>
+<li>高效的推理与训练
+<ul>
 <li>在自回归模型，如Pixel-CNN中，难以并行化。而基于流的生成模型解决了这个问题</li>
-</ul>
-</li>
-<li>隐空间对下游任务有用<ul>
+</ul></li>
+<li>隐空间对下游任务有用
+<ul>
 <li>在自回归模型中，隐层的边缘分布是未知的，这使得执行有效的数据操作更加困难。在GANs中，数据点通常不能直接表示在潜在空间中，因为GAN没有Encoder。</li>
-</ul>
-</li>
-<li>内存节省<ul>
+</ul></li>
+<li>内存节省
+<ul>
 <li>正如RevNet论文(Gomez et al.，2017)中所解释的，可逆神经网络中计算梯度需要的记忆量是恒定的，而不是线性的。</li>
+</ul></li>
 </ul>
-</li>
-</ul>
-<h3 id="问题定义"><a href="#问题定义" class="headerlink" title="问题定义"></a>问题定义</h3><p>$\mathbf x$是一个高维向量，分布$\mathbf{x} \sim p^{*}(\mathbf{x})$是未知的。我们收集了一个独立同分布的数据集$\mathcal{D}$，要选择一个模型$p_{\boldsymbol \theta}(\mathbf x)$的参数$\theta$。对于离散的数据$\mathbf x$，以对数似然形式构建的目标函数为:</p>
-<script type="math/tex; mode=display">
-\mathcal{L}(\mathcal{D})=\frac{1}{N} \sum_{i=1}^{N}-\log p_{\boldsymbol{\theta}}\left(\mathbf{x}^{(i)}\right)</script><p>上述目标函数使用小批量数据的随机梯度下降进行优化。</p>
-<p>而生成过程被描述为：</p>
-<script type="math/tex; mode=display">
+<!-- more -->
+<h3 id="问题定义">问题定义</h3>
+<p><span class="math inline">\(\mathbf x\)</span>是一个高维向量，分布<span class="math inline">\(\mathbf{x} \sim p^{*}(\mathbf{x})\)</span>是未知的。我们收集了一个独立同分布的数据集<span class="math inline">\(\mathcal{D}\)</span>，要选择一个模型<span class="math inline">\(p_{\boldsymbol \theta}(\mathbf x)\)</span>的参数<span class="math inline">\(\theta\)</span>。对于离散的数据<span class="math inline">\(\mathbf x\)</span>，以对数似然形式构建的目标函数为: <span class="math display">\[
+\mathcal{L}(\mathcal{D})=\frac{1}{N} \sum_{i=1}^{N}-\log p_{\boldsymbol{\theta}}\left(\mathbf{x}^{(i)}\right)
+\]</span> 上述目标函数使用小批量数据的随机梯度下降进行优化。</p>
+<p>而生成过程被描述为： <span class="math display">\[
 \begin{array}{l}
 \mathbf{z} \sim p_{\boldsymbol{\theta}}(\mathbf{z}) \\
 \mathbf{x}=\mathbf{g}_{\boldsymbol{\theta}}(\mathbf{z})
-\end{array}</script><p>$\mathbf z$是一个隐变量，有着一个易于处理的简单分布$p<em>{\boldsymbol{\theta}}(\mathbf{z})$，比如多变量高斯分布$p</em>{\boldsymbol{\theta}}(\mathbf{z})=\mathcal{N}(\mathbf{z} ; 0, \mathbf{I})$。而$\mathbf g(\cdot)$是可逆的：$\mathbf{z}=\mathbf{f}<em>{\boldsymbol{\theta}}(\mathbf{x})=\mathbf{g}</em>{\boldsymbol \theta}^{-1}(\mathbf{x})$。</p>
-<p>而作者这次关注的主要问题是，当$\mathbf f$由一个变换序列组合而成：$\mathbf{f}=\mathbf{f}<em>{1} \circ \mathbf{f}</em>{2} \circ \cdots \circ \mathbf{f}_{K}$，那么$\mathbf x$与$\mathbf z$之间的关系表示为：</p>
-<script type="math/tex; mode=display">
-\mathbf{x} \stackrel{\mathbf{f}_{1}}{\longleftrightarrow} \mathbf{h}_{1} \stackrel{\mathbf{f}_{2}}{\longleftrightarrow} \mathbf{h}_{2} \cdots \stackrel{\mathbf{f}_{K}}{\longleftrightarrow} \mathbf{z}</script><p>根据变量代换公式，原本的密度可以表示为：</p>
-<script type="math/tex; mode=display">
+\end{array}
+\]</span> <span class="math inline">\(\mathbf z\)</span>是一个隐变量，有着一个易于处理的简单分布<span class="math inline">\(p_{\boldsymbol{\theta}}(\mathbf{z})\)</span>，比如多变量高斯分布<span class="math inline">\(p_{\boldsymbol{\theta}}(\mathbf{z})=\mathcal{N}(\mathbf{z} ; 0, \mathbf{I})\)</span>。而<span class="math inline">\(\mathbf g(\cdot)\)</span>是可逆的：<span class="math inline">\(\mathbf{z}=\mathbf{f}_{\boldsymbol{\theta}}(\mathbf{x})=\mathbf{g}_{\boldsymbol \theta}^{-1}(\mathbf{x})\)</span>。</p>
+<p>而作者这次关注的主要问题是，当<span class="math inline">\(\mathbf f\)</span>由一个变换序列组合而成：<span class="math inline">\(\mathbf{f}=\mathbf{f}_{1} \circ \mathbf{f}_{2} \circ \cdots \circ \mathbf{f}_{K}\)</span>，那么<span class="math inline">\(\mathbf x\)</span>与<span class="math inline">\(\mathbf z\)</span>之间的关系表示为： <span class="math display">\[
+\mathbf{x} \stackrel{\mathbf{f}_{1}}{\longleftrightarrow} \mathbf{h}_{1} \stackrel{\mathbf{f}_{2}}{\longleftrightarrow} \mathbf{h}_{2} \cdots \stackrel{\mathbf{f}_{K}}{\longleftrightarrow} \mathbf{z}
+\]</span> 根据变量代换公式，原本的密度可以表示为： <span class="math display">\[
 \begin{aligned}
-\log p_{\boldsymbol{\theta}}(\mathbf{x}) &=\log p_{\boldsymbol{\theta}}(\mathbf{z})+\log |\operatorname{det}(d \mathbf{z} / d \mathbf{x})| \\
-&=\log p_{\boldsymbol{\theta}}(\mathbf{z})+\sum_{i=1}^{K} \log \left|\operatorname{det}\left(d \mathbf{h}_{i} / d \mathbf{h}_{i-1}\right)\right|
-\end{aligned}</script><p>为了方便，我们设置$\mathbf{h}<em>{0} \triangleq \mathbf{x} , \mathbf{h}</em>{K} \triangleq \mathbf{z}$。虽然这个雅克比行列式看起来很吓人，但是它的值对于某些变换的选择计算起来却出奇的简单。其基本思想是选择其雅可比矩阵为三角矩阵的变换，这样一来其对数雅克比就很简单：</p>
-<script type="math/tex; mode=display">
-\log \left|\operatorname{det}\left(d \mathbf{h}_{i} / d \mathbf{h}_{i-1}\right)\right|=\operatorname{sum}\left(\log \left|\operatorname{diag}\left(d \mathbf{h}_{i} / d \mathbf{h}_{i-1}\right)\right|\right)</script><h3 id="主要方法"><a href="#主要方法" class="headerlink" title="主要方法"></a>主要方法</h3><h4 id="可逆1x1卷积"><a href="#可逆1x1卷积" class="headerlink" title="可逆1x1卷积"></a>可逆1x1卷积</h4><p>如题目所述，这篇文章的主要重点为1x1可逆卷积。</p>
+\log p_{\boldsymbol{\theta}}(\mathbf{x}) &amp;=\log p_{\boldsymbol{\theta}}(\mathbf{z})+\log |\operatorname{det}(d \mathbf{z} / d \mathbf{x})| \\
+&amp;=\log p_{\boldsymbol{\theta}}(\mathbf{z})+\sum_{i=1}^{K} \log \left|\operatorname{det}\left(d \mathbf{h}_{i} / d \mathbf{h}_{i-1}\right)\right|
+\end{aligned}
+\]</span></p>
+<p>为了方便，我们设置<span class="math inline">\(\mathbf{h}_{0} \triangleq \mathbf{x} , \mathbf{h}_{K} \triangleq \mathbf{z}\)</span>。虽然这个雅克比行列式看起来很吓人，但是它的值对于某些变换的选择计算起来却出奇的简单。其基本思想是选择其雅可比矩阵为三角矩阵的变换，这样一来其对数雅克比就很简单： <span class="math display">\[
+\log \left|\operatorname{det}\left(d \mathbf{h}_{i} / d \mathbf{h}_{i-1}\right)\right|=\operatorname{sum}\left(\log \left|\operatorname{diag}\left(d \mathbf{h}_{i} / d \mathbf{h}_{i-1}\right)\right|\right)
+\]</span></p>
+<h3 id="主要方法">主要方法</h3>
+<h4 id="可逆1x1卷积">可逆1x1卷积</h4>
+<p>如题目所述，这篇文章的主要重点为1x1可逆卷积。</p>
 <p><strong>置换矩阵</strong></p>
 <p>对向量的置换操作，可以用矩阵乘法来描述，比如原来向量是 [1,2,3,4]，分别交换第一、二和第三、四两个数，得到 [2,1,4,3]，这个操作可以用矩阵乘法来描述：</p>
 <p><img src="https://image.jiqizhixin.com/uploads/editor/2c6ffd2f-0341-4f33-91ea-0566b85dcefb/1535347013381.png" alt="img" style="zoom:50%;" /></p>
-<p>其中右端第一项是“由单位矩阵不断交换两行或两列最终得到的矩阵”称为置换矩阵。 </p>
-<p><strong>一般化置换</strong> </p>
-<p>既然这样，那很自然的想法就是：为什么不将置换矩阵换成一般的可训练的参数矩阵呢？所谓 1x1 可逆卷积，就是这个想法的结果。 </p>
-<p>一开始提出 flow 模型的思路时就已经明确指出，flow 模型中的变换要满足两个条件：一是可逆，二是雅可比行列式容易计算。如果直接写出变换：</p>
-<script type="math/tex; mode=display">
-h=xW</script><p>那么它就只是一个普通的没有 bias 的全连接层，并不能保证满足这两个条件。为此，要做一些准备工作。首先，让 h 和 x 的维度一样，也就是说 W 是一个方阵，这是最基本的设置；其次，由于这只是一个线性变换，因此它的雅可比矩阵就是$\left[\frac{\partial h}{\partial x}\right]=W$，所以它的行列式就是 det <em>W</em>，因此需要把 −log |det <em>W</em>| 这一项加入到 loss 中；最后，初始化时为了保证 W 的可逆性，一般使用“随机正交矩阵”初始化。</p>
+<p>其中右端第一项是“由单位矩阵不断交换两行或两列最终得到的矩阵”称为置换矩阵。</p>
+<p><strong>一般化置换</strong></p>
+<p>既然这样，那很自然的想法就是：为什么不将置换矩阵换成一般的可训练的参数矩阵呢？所谓 1x1 可逆卷积，就是这个想法的结果。</p>
+<p>一开始提出 flow 模型的思路时就已经明确指出，flow 模型中的变换要满足两个条件：一是可逆，二是雅可比行列式容易计算。如果直接写出变换： <span class="math display">\[
+h=xW
+\]</span> 那么它就只是一个普通的没有 bias 的全连接层，并不能保证满足这两个条件。为此，要做一些准备工作。首先，让 h 和 x 的维度一样，也就是说 W 是一个方阵，这是最基本的设置；其次，由于这只是一个线性变换，因此它的雅可比矩阵就是<span class="math inline">\(\left[\frac{\partial h}{\partial x}\right]=W\)</span>，所以它的行列式就是 det <em>W</em>，因此需要把 −log |det <em>W</em>| 这一项加入到 loss 中；最后，初始化时为了保证 W 的可逆性，一般使用“随机正交矩阵”初始化。</p>
 <p><strong>利用LU分解</strong></p>
-<p>由于算矩阵的行列式运算量特别大，还容易溢出。而 Glow 给出了一个非常巧妙的解决方案：LU 分解的逆运用。具体来说，是因为任意矩阵都可以分解为：</p>
-<script type="math/tex; mode=display">
-W = PLU</script><p>其中 P 是一个置换矩阵，也就是前面说的 shuffle 的等价矩阵；L 是一个下三角阵，对角线元素全为 1；U 是一个上三角阵。这种形式的分解称为 LU 分解。如果知道这种矩阵的表达形式，显然求雅可比行列式是很容易的，它等于：</p>
-<script type="math/tex; mode=display">
-\log |\operatorname{det} \boldsymbol{W}|=\sum \log |\operatorname{diag}(\boldsymbol{U})|</script><p> 本文中给出的技巧：先随机生成一个正交矩阵，然后做 LU 分解，得到 P,L,U，固定 P，也固定 U 的对角线的正负号，然后约束 L 为对角线全 1 的下三角阵，U 为上三角阵，优化训练 L,U 的其余参数。 </p>
-<h4 id="Actnorm"><a href="#Actnorm" class="headerlink" title="Actnorm"></a>Actnorm</h4><p>RealNVP 中用到了 BN 层，而 Glow 中提出了名为 Actnorm 的层来取代 BN。不过，所谓 Actnorm 层事实上只不过是 NICE 中的尺度变换层的一般化，也就是 (5) 式提到的缩放平移变换：</p>
-<script type="math/tex; mode=display">
-\hat{z}=\frac{z-\boldsymbol{\mu}}{\boldsymbol{\sigma}}</script><p>其中 μ,σ 都是训练参数。Glow 在论文中提出的创新点是用初始的 batch 的均值和方差去初始化 μ,σ 这两个参数。</p>
+<p>由于算矩阵的行列式运算量特别大，还容易溢出。而 Glow 给出了一个非常巧妙的解决方案：LU 分解的逆运用。具体来说，是因为任意矩阵都可以分解为： <span class="math display">\[
+W = PLU
+\]</span> 其中 P 是一个置换矩阵，也就是前面说的 shuffle 的等价矩阵；L 是一个下三角阵，对角线元素全为 1；U 是一个上三角阵。这种形式的分解称为 LU 分解。如果知道这种矩阵的表达形式，显然求雅可比行列式是很容易的，它等于： <span class="math display">\[
+\log |\operatorname{det} \boldsymbol{W}|=\sum \log |\operatorname{diag}(\boldsymbol{U})|
+\]</span></p>
+<p>本文中给出的技巧：先随机生成一个正交矩阵，然后做 LU 分解，得到 P,L,U，固定 P，也固定 U 的对角线的正负号，然后约束 L 为对角线全 1 的下三角阵，U 为上三角阵，优化训练 L,U 的其余参数。</p>
+<h4 id="actnorm">Actnorm</h4>
+<p>RealNVP 中用到了 BN 层，而 Glow 中提出了名为 Actnorm 的层来取代 BN。不过，所谓 Actnorm 层事实上只不过是 NICE 中的尺度变换层的一般化，也就是 (5) 式提到的缩放平移变换： <span class="math display">\[
+\hat{z}=\frac{z-\boldsymbol{\mu}}{\boldsymbol{\sigma}}
+\]</span> 其中 μ,σ 都是训练参数。Glow 在论文中提出的创新点是用初始的 batch 的均值和方差去初始化 μ,σ 这两个参数。</p>
 <p>相比于加性耦合层，仿射耦合层多了一个尺度变换层，从而计算量翻了一倍。但事实上相比加性耦合，仿射耦合效果的提升并不高（尤其是加入了 Actnorm 后），<strong>所以要训练大型的模型，为了节省资源，一般都只用加性耦合</strong>，比如 Glow 训练 256x256 的高清人脸生成模型，就只用到了加性耦合。</p>
-<h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><p>使用Glow训练人脸：</p>
-<p><img src="C:\Users\xjy\AppData\Roaming\Typora\typora-user-images\image-20201107161822636.png" alt="image-20201107161822636"></p>
-<h3 id="总结与思考"><a href="#总结与思考" class="headerlink" title="总结与思考"></a>总结与思考</h3><p>整体来看，Glow 模型在 RealNVP 的基础上引入了 1x1 可逆卷积来代替前面说的打乱通道轴的操作，并且对 RealNVP 的原始模型做了简化和规范，使得它更易于理解和使用。</p>
+<h3 id="实验结果">实验结果</h3>
+<p>使用Glow训练人脸：</p>
+<figure>
+<img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:22:32.png" alt="image-20201107161822636" /><figcaption aria-hidden="true">image-20201107161822636</figcaption>
+</figure>
+<h3 id="总结与思考">总结与思考</h3>
+<p>整体来看，Glow 模型在 RealNVP 的基础上引入了 1x1 可逆卷积来代替前面说的打乱通道轴的操作，并且对 RealNVP 的原始模型做了简化和规范，使得它更易于理解和使用。</p>
 
       
     </div>
@@ -541,38 +556,41 @@ W = PLU</script><p>其中 P 是一个置换矩阵，也就是前面说的 shuffl
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>RealNVP的全称，real-valued non-volume preserving ，可以翻译为“真实值非体积保持”。对于无监督学习来说，感兴趣的数据通常是高维的、高度结构化的，因此该领域的挑战是构建足够强大的模型，以捕获其复杂性，但仍然是可训练的。作者通过引入实值非体积保持(real NVP)转换来解决这一挑战，这是一种易于处理但表现能力强的高维数据建模方法。</p>
-<p><img src="C:\Users\xjy\AppData\Roaming\Typora\typora-user-images\image-20201106194258145.png" alt="image-20201106194258145" style="zoom:67%;" /></p>
+          <h3 id="论文背景">论文背景</h3>
+<p>RealNVP的全称，real-valued non-volume preserving ，可以翻译为“真实值非体积保持”。对于无监督学习来说，感兴趣的数据通常是高维的、高度结构化的，因此该领域的挑战是构建足够强大的模型，以捕获其复杂性，但仍然是可训练的。作者通过引入实值非体积保持(real NVP)转换来解决这一挑战，这是一种易于处理但表现能力强的高维数据建模方法。</p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48.png" alt="image-20201106194258145" style="zoom:67%;" /></p>
 <p>基本思想是把数据空间映射到隐空间z，如上图所示。</p>
 <p>以前的相关工作：</p>
 <ul>
-<li>受限玻尔兹曼机、深度玻尔兹曼机<ul>
+<li>受限玻尔兹曼机、深度玻尔兹曼机
+<ul>
 <li>通过利用两方的条件独立性来训练模型结构，可以对潜在变量进行有效的精确或近似后验推断。然而，由于潜在变量的相关边际分布的难处理性。训练、评估和抽样程序必须使用Mean Field inference 和马尔可夫链蒙特卡洛法。对于此类复杂模型，收敛时间往往是不确定的。另外，各种近似也限制了其性能</li>
-</ul>
-</li>
-<li>有向概率图模型<ul>
+</ul></li>
+<li>有向概率图模型
+<ul>
 <li>在推理过程中的各种近似，限制了性能</li>
-</ul>
-</li>
-<li>自回归模型<ul>
+</ul></li>
+<li>自回归模型
+<ul>
 <li>避免引入隐变量，从而消除各种近似。</li>
 <li>RNN、LSTM</li>
 <li>非并行，慢</li>
-</ul>
-</li>
-<li>GAN<ul>
+</ul></li>
+<li>GAN
+<ul>
 <li>度量生成样本的多样性的指标不明确</li>
 <li>训练不稳定</li>
+</ul></li>
 </ul>
-</li>
-</ul>
-<p>而作者提出的方法，可以训练这样一个生成网络$g$，它将潜在变量$z \sim p<em>Z$映射到样本$x \sim p</em>{X}$，理论上不需要像GANs那样使用鉴别器网络，也不需要像变分自编码器那样使用近似推理。的确，如果g是双射，可以利用变量的变化公式，通过极大似然对其进行训练：</p>
-<script type="math/tex; mode=display">
-p_{X}(x)=p_{Z}(z)\left|\operatorname{det}\left(\frac{\partial g(z)}{\partial z^{T}}\right)\right|^{-1}</script><h3 id="主要方法"><a href="#主要方法" class="headerlink" title="主要方法"></a>主要方法</h3><p>上周读的NICE，也是这个作者之前的工作，作者表示，自己在NICE的基础上，定义了一个更强大的双射函数类，它支持精确和可处理的概率密度评估与推理。代价函数不依赖于固定的形式重构代价（比如L2损失等），因此可以产生更加非平滑的样本。另外，这次提出的方法可以使用batch normalization、ResBlock等，从而构建一个具有多个抽象层次的深度多尺度架构（a very deep multi-scale architecture with multiple levels of abstraction）。</p>
-<h4 id="耦合层"><a href="#耦合层" class="headerlink" title="耦合层"></a>耦合层</h4><p>Real NVP的耦合层相较于NICE的有很大的不同：</p>
-<p><img src="C:\Users\xjy\AppData\Roaming\Typora\typora-user-images\image-20201106203733407.png" alt="image-20201106203733407" style="zoom:67%;" /></p>
-<p>写成式子：</p>
-<script type="math/tex; mode=display">
+<p>而作者提出的方法，可以训练这样一个生成网络<span class="math inline">\(g\)</span>，它将潜在变量<span class="math inline">\(z \sim p_Z\)</span>映射到样本<span class="math inline">\(x \sim p_{X}\)</span>，理论上不需要像GANs那样使用鉴别器网络，也不需要像变分自编码器那样使用近似推理。的确，如果g是双射，可以利用变量的变化公式，通过极大似然对其进行训练： <span class="math display">\[
+p_{X}(x)=p_{Z}(z)\left|\operatorname{det}\left(\frac{\partial g(z)}{\partial z^{T}}\right)\right|^{-1}
+\]</span></p>
+<h3 id="主要方法">主要方法</h3>
+<p>上周读的NICE，也是这个作者之前的工作，作者表示，自己在NICE的基础上，定义了一个更强大的双射函数类，它支持精确和可处理的概率密度评估与推理。代价函数不依赖于固定的形式重构代价（比如L2损失等），因此可以产生更加非平滑的样本。另外，这次提出的方法可以使用batch normalization、ResBlock等，从而构建一个具有多个抽象层次的深度多尺度架构（a very deep multi-scale architecture with multiple levels of abstraction）。</p>
+<h4 id="耦合层">耦合层</h4>
+<p>Real NVP的耦合层相较于NICE的有很大的不同：</p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48-1.png" alt="image-20201106203733407" style="zoom:67%;" /></p>
+<p>写成式子： <span class="math display">\[
 \begin{aligned}
 \left\{\begin{array}{l}
 y_{1: d}=x_{1: d} \\
@@ -582,54 +600,57 @@ y_{d+1: D}=x_{1: 1: D} \odot \exp \left(s\left(x_{1: d}\right)\right)+t\left(x_{
 x_{1: d}=y_{1: d} \\
 x_{d+1: D}=\left(y_{d+1: D}-t\left(y_{1: d}\right)\right) \odot \exp \left(-s\left(y_{1: d}\right)\right)
 \end{array}\right.
-\end{aligned}</script><p>与NICE同理，其雅克比行列式也是易于计算的：</p>
-<script type="math/tex; mode=display">
+\end{aligned}
+\]</span></p>
+<p>与NICE同理，其雅克比行列式也是易于计算的： <span class="math display">\[
 \frac{\partial y}{\partial x^{T}}=\left[\begin{array}{cc}
-\mathbb{I}_{d} & 0 \\
-\frac{\partial y_{d+1: D}}{\partial x_{1: d}^{T}} & \operatorname{diag}\left(\exp \left[s\left(x_{1: d}\right)\right]\right)
-\end{array}\right]=\exp \left[\sum_{j} s\left(x_{1: d}\right)_{j}\right]</script><p> <strong>计算耦合层的逆并不需要计算s或t的逆，因此这些函数可以任意复杂且难以求逆。</strong></p>
-<h4 id="Mask-Convolution"><a href="#Mask-Convolution" class="headerlink" title="Mask Convolution"></a>Mask Convolution</h4><p>另外，在实际实现中，可以使用一个Masked convolution，即使用一个二值化的mask $b$：</p>
-<script type="math/tex; mode=display">
-y=b \odot x+(1-b) \odot(x \odot \exp (s(b \odot x))+t(b \odot x))</script><p>对于mask，有以下两种模式：</p>
+\mathbb{I}_{d} &amp; 0 \\
+\frac{\partial y_{d+1: D}}{\partial x_{1: d}^{T}} &amp; \operatorname{diag}\left(\exp \left[s\left(x_{1: d}\right)\right]\right)
+\end{array}\right]=\exp \left[\sum_{j} s\left(x_{1: d}\right)_{j}\right]
+\]</span> <strong>计算耦合层的逆并不需要计算s或t的逆，因此这些函数可以任意复杂且难以求逆。</strong></p>
+<h4 id="mask-convolution">Mask Convolution</h4>
+<p>另外，在实际实现中，可以使用一个Masked convolution，即使用一个二值化的mask <span class="math inline">\(b\)</span>： <span class="math display">\[
+y=b \odot x+(1-b) \odot(x \odot \exp (s(b \odot x))+t(b \odot x))
+\]</span> 对于mask，有以下两种模式：</p>
 <ul>
 <li>棋盘格掩蔽(checkerboard masking)</li>
 <li>通道掩蔽(channel-wise masking)</li>
 </ul>
-<p><img src="C:\Users\xjy\AppData\Roaming\Typora\typora-user-images\image-20201106212224230.png" alt="image-20201106212224230" style="zoom: 50%;" /></p>
-<h4 id="耦合层的整合"><a href="#耦合层的整合" class="headerlink" title="耦合层的整合"></a>耦合层的整合</h4><p>尽管耦合层功能强大，但它们的前向转换保留了一些组件(比如$x_{1: d}$)。可以通过将耦合层组合为<strong>交替模式</strong>来克服这一困难，这样，在一个耦合层中保持不变的组件，将在下一个耦合层中更新:</p>
-<p><img src="C:\Users\xjy\AppData\Roaming\Typora\typora-user-images\image-20201106212608981.png" alt="image-20201106212608981" style="zoom: 50%;" /></p>
-<p>另外，多个耦合层的雅克比行列式只需累乘即可：</p>
-<script type="math/tex; mode=display">
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48-2.png" alt="image-20201106212224230" style="zoom: 50%;" /></p>
+<h4 id="耦合层的整合">耦合层的整合</h4>
+<p>尽管耦合层功能强大，但它们的前向转换保留了一些组件(比如<span class="math inline">\(x_{1: d}\)</span>)。可以通过将耦合层组合为<strong>交替模式</strong>来克服这一困难，这样，在一个耦合层中保持不变的组件，将在下一个耦合层中更新:</p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48-3.png" alt="image-20201106212608981" style="zoom: 50%;" /></p>
+<p>另外，多个耦合层的雅克比行列式只需累乘即可： <span class="math display">\[
 \begin{aligned}
-\frac{\partial\left(f_{b} \circ f_{a}\right)}{\partial x_{a}^{T}}\left(x_{a}\right) &=\frac{\partial f_{a}}{\partial x_{a}^{T}}\left(x_{a}\right) \cdot \frac{\partial f_{b}}{\partial x_{b}^{T}}\left(x_{b}=f_{a}\left(x_{a}\right)\right) \\
-\operatorname{det}(A \cdot B) &=\operatorname{det}(A) \operatorname{det}(B)
-\end{aligned}</script><h4 id="多尺度结构-Multi-scale-architecture"><a href="#多尺度结构-Multi-scale-architecture" class="headerlink" title="多尺度结构(Multi-scale architecture)"></a>多尺度结构(Multi-scale architecture)</h4><p>(这一部分我看的不是很懂)</p>
+\frac{\partial\left(f_{b} \circ f_{a}\right)}{\partial x_{a}^{T}}\left(x_{a}\right) &amp;=\frac{\partial f_{a}}{\partial x_{a}^{T}}\left(x_{a}\right) \cdot \frac{\partial f_{b}}{\partial x_{b}^{T}}\left(x_{b}=f_{a}\left(x_{a}\right)\right) \\
+\operatorname{det}(A \cdot B) &amp;=\operatorname{det}(A) \operatorname{det}(B)
+\end{aligned}
+\]</span></p>
+<h4 id="多尺度结构multi-scale-architecture">多尺度结构(Multi-scale architecture)</h4>
+<p>(这一部分我看的不是很懂)</p>
 <p>作者通过squeeze操作实现了一个多尺度的架构:对于每个通道，将图像分割成形状为2×2×c的子正方形，然后将其重新塑形为形状为1×1×4c的子正方形。squeeze操作将一个s×s×c张量转化为一个2s×2s×4c张量，有效地交换了通道数与空间大小的关系。</p>
 <p>在每个尺度上，将几个操作组合成如下序列：我们首先应用三个耦合层，交替使用checkerboard masking，然后执行squeeze操作，最后应用三个耦合层，交替使用channel-wise masking。</p>
 <p>在所有耦合层中传播一个D维向量将是很麻烦的，因为计算和内存成本，以及需要训练的参数的数量。由于这个原因，作者遵循VGG中的设计选择，并定期提出一半的尺寸：</p>
-<p><img src="C:\Users\xjy\AppData\Roaming\Typora\typora-user-images\image-20201106214810116.png" alt="image-20201106214810116" style="zoom:67%;" /></p>
-<h4 id="Batch-normalization"><a href="#Batch-normalization" class="headerlink" title="Batch normalization"></a>Batch normalization</h4><p>批处理归一化的影响很容易包含在雅可比矩阵的计算中，因为它是对每个维度的线性调整。也就是说，给定估计的批处理统计量：</p>
-<script type="math/tex; mode=display">
-x \mapsto \frac{x-\tilde{\mu}}{\sqrt{\tilde{\sigma}^{2}+\epsilon}}</script><p>我们具有雅克比矩阵：</p>
-<script type="math/tex; mode=display">
-\left(\prod_{i}\left(\tilde{\sigma}_{i}^{2}+\epsilon\right)\right)^{-\frac{1}{2}}</script><h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><p><img src="C:\Users\xjy\AppData\Roaming\Typora\typora-user-images\image-20201106220750676.png" alt="image-20201106220750676" style="zoom:67%;" /></p>
-<h3 id="总结与思考"><a href="#总结与思考" class="headerlink" title="总结与思考"></a>总结与思考</h3><ul>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48-4.png" alt="image-20201106214810116" style="zoom:67%;" /></p>
+<h4 id="batch-normalization">Batch normalization</h4>
+<p>批处理归一化的影响很容易包含在雅可比矩阵的计算中，因为它是对每个维度的线性调整。也就是说，给定估计的批处理统计量： <span class="math display">\[
+x \mapsto \frac{x-\tilde{\mu}}{\sqrt{\tilde{\sigma}^{2}+\epsilon}}
+\]</span> 我们具有雅克比矩阵： <span class="math display">\[
+\left(\prod_{i}\left(\tilde{\sigma}_{i}^{2}+\epsilon\right)\right)^{-\frac{1}{2}}
+\]</span></p>
+<h3 id="实验结果">实验结果</h3>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48-5.png" alt="image-20201106220750676" style="zoom:67%;" /></p>
+<h3 id="总结与思考">总结与思考</h3>
+<ul>
 <li><p>这篇是作者在本人的NICE工作的基础上的一篇完善工作，主要进步在于：</p>
 <ul>
-<li><p>改善了仿射层的结构</p>
-</li>
-<li><p>使用了mask卷积保证了推理过程中所有信息都被处理</p>
-</li>
-<li><p>考虑了多尺度的结构</p>
-</li>
-<li><p>RealNVP 的雅可比行列式不再恒等于 1，行列式的几何意义就是体积，所以行列式等于 1 就意味着体积没有变化，而仿射耦合层的行列式不等于 1 就意味着体积有所变化，所谓“非体积保持”。 </p>
-</li>
-</ul>
-</li>
-<li><p>第一篇 NICE 中，作者提出了加性耦合层。后面也提到了乘性耦合层，只不过没有用上；而在 RealNVP 中，加性和乘性耦合层结合在一起，成为一个一般的“仿射耦合层”。</p>
-</li>
-<li><p>本文的mask卷积实质上就是对两个耦合层直接的信息实施一种可逆的打乱，比NICE中的单纯交换分区中两个子集的角色的做法要更优</p>
-</li>
+<li><p>改善了仿射层的结构</p></li>
+<li><p>使用了mask卷积保证了推理过程中所有信息都被处理</p></li>
+<li><p>考虑了多尺度的结构</p></li>
+<li><p>RealNVP 的雅可比行列式不再恒等于 1，行列式的几何意义就是体积，所以行列式等于 1 就意味着体积没有变化，而仿射耦合层的行列式不等于 1 就意味着体积有所变化，所谓“非体积保持”。</p></li>
+</ul></li>
+<li><p>第一篇 NICE 中，作者提出了加性耦合层。后面也提到了乘性耦合层，只不过没有用上；而在 RealNVP 中，加性和乘性耦合层结合在一起，成为一个一般的“仿射耦合层”。</p></li>
+<li><p>本文的mask卷积实质上就是对两个耦合层直接的信息实施一种可逆的打乱，比NICE中的单纯交换分区中两个子集的角色的做法要更优</p></li>
 </ul>
 
       
@@ -887,8 +908,9 @@ x \mapsto \frac{x-\tilde{\mu}}{\sqrt{\tilde{\sigma}^{2}+\epsilon}}</script><p>�
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>对于一般的盲超分方法，一般都分为两步：</p>
-<ol>
+          <h3 id="论文背景">论文背景</h3>
+<p>对于一般的盲超分方法，一般都分为两步：</p>
+<ol type="1">
 <li>从LR图像中估计一个模糊核</li>
 <li>基于估计的模糊核，估计SR图像</li>
 </ol>
@@ -985,8 +1007,9 @@ x \mapsto \frac{x-\tilde{\mu}}{\sqrt{\tilde{\sigma}^{2}+\epsilon}}</script><p>�
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>在分析一个复杂物理系统时，常见的问题是不能直接测量我们感兴趣的<strong>系统参数</strong>。对于许多这样的系统，科学家们已经发展出复杂的理论来解释，测量值y是如何从隐藏的系统参数x中产生的。我们将把这种映射称为<strong>前向过程</strong>。然而，其<strong>逆过程</strong>需要从测量中推断出系统的隐藏状态。然而，因为关键信息在正向过程中丢失了，逆过程是不适定问题(ill-posed，即许多种系统参数x都可产生同一个测量值y)。</p>
-<p>给定一个测量值时，这种逆过程的解往往有多个，所以作者提出，解决逆过程时，<strong>必须给出一个在以某个观察为条件的，系统参数的条件后验概率分布，即$p(\mathbf{x|y})$。</strong>针对这一任务本文提出了可逆神经网络(invertible neural networks, INNs)。</p>
+          <h3 id="论文背景">论文背景</h3>
+<p>在分析一个复杂物理系统时，常见的问题是不能直接测量我们感兴趣的<strong>系统参数</strong>。对于许多这样的系统，科学家们已经发展出复杂的理论来解释，测量值y是如何从隐藏的系统参数x中产生的。我们将把这种映射称为<strong>前向过程</strong>。然而，其<strong>逆过程</strong>需要从测量中推断出系统的隐藏状态。然而，因为关键信息在正向过程中丢失了，逆过程是不适定问题(ill-posed，即许多种系统参数x都可产生同一个测量值y)。</p>
+<p>给定一个测量值时，这种逆过程的解往往有多个，所以作者提出，解决逆过程时，<strong>必须给出一个在以某个观察为条件的，系统参数的条件后验概率分布，即<span class="math inline">\(p(\mathbf{x|y})\)</span>。</strong>针对这一任务本文提出了可逆神经网络(invertible neural networks, INNs)。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/10/11/2020-10-11-Analyzing%20Inverse%20Problems%20with%20Invertible%20Neural%20Networks/#more" rel="contents">
@@ -1074,7 +1097,9 @@ x \mapsto \frac{x-\tilde{\mu}}{\sqrt{\tilde{\sigma}^{2}+\epsilon}}</script><p>�
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><h4 id="motivation"><a href="#motivation" class="headerlink" title="motivation"></a>motivation</h4><p>针对某个退化模型训练的SR网络，如果换了退化模型，性能就会有很大下降（比方说训练集用双三次下采样构造，而测试时遇到其他的退化模型）。于是作者从广义采样中受到了启发，出了一种改进现有的CNN框架的方法，即使用一个校正滤波器，能把一张LR图像变化到其他核模糊下的LR图像(如双三次核)，进而提高test时SR网络的性能，具体分为非盲SR和盲SR两种情况：</p>
+          <h3 id="论文背景">论文背景</h3>
+<h4 id="motivation">motivation</h4>
+<p>针对某个退化模型训练的SR网络，如果换了退化模型，性能就会有很大下降（比方说训练集用双三次下采样构造，而测试时遇到其他的退化模型）。于是作者从广义采样中受到了启发，出了一种改进现有的CNN框架的方法，即使用一个校正滤波器，能把一张LR图像变化到其他核模糊下的LR图像(如双三次核)，进而提高test时SR网络的性能，具体分为非盲SR和盲SR两种情况：</p>
 <ul>
 <li>在非盲SR中，LR图像的模糊核是已知的(但不一定和训练集的核匹配)，于是作者构造的滤波器，可以提供一个将其转换到指定退化核LR图像的校正滤波器，并且是<strong>闭合解</strong>。</li>
 <li>而在盲SR中，LR图像的模糊核是未知的，作者提出了一种能估计这张LR所需校正滤波器的算法。</li>
@@ -1167,7 +1192,8 @@ x \mapsto \frac{x-\tilde{\mu}}{\sqrt{\tilde{\sigma}^{2}+\epsilon}}</script><p>�
 
       
           <p>这篇算是一篇超分辨/去噪的数据增强方面的文章，与以往的数据增强不同的是，它是在频域的角度设置了数据增强方法。</p>
-<h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>作者指出，基于学习的超分辨/去噪的CNN网络，总是基于一个庞大的数据集来训练。而这个数据集往往是通过把ground-truth图片经过一个模糊核/有限的模糊核集合进行退化构造出LR图片。但是在测试过程中，往往需要针对一个未知模糊核的LR图像来进行SR，或是对一个未知等级的噪声进行denoising。<strong>作者指出，现有的SR模型都对有限的退化模型产生了过拟合。</strong>作者在频域中分析了这一点。进一步地，作者更加形式化地揭示了SR过程中隐含的一种条件学习——“在已知低频的情况下学习高频”。据此，作者提出了本文的主要工作——随机频率掩蔽(Stochastic Frequency Masking, SFM)。</p>
+<h3 id="论文背景">论文背景</h3>
+<p>作者指出，基于学习的超分辨/去噪的CNN网络，总是基于一个庞大的数据集来训练。而这个数据集往往是通过把ground-truth图片经过一个模糊核/有限的模糊核集合进行退化构造出LR图片。但是在测试过程中，往往需要针对一个未知模糊核的LR图像来进行SR，或是对一个未知等级的噪声进行denoising。<strong>作者指出，现有的SR模型都对有限的退化模型产生了过拟合。</strong>作者在频域中分析了这一点。进一步地，作者更加形式化地揭示了SR过程中隐含的一种条件学习——“在已知低频的情况下学习高频”。据此，作者提出了本文的主要工作——随机频率掩蔽(Stochastic Frequency Masking, SFM)。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/09/14/2020-09-14-Stochastic%20Frequency%20Masking%20to%20Improve%20Super-Resolution%20and%20Denoising%20Networks/#more" rel="contents">
