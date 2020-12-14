@@ -33,7 +33,7 @@
 <meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201213202631010.png">
 <meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201213202733752.png">
 <meta property="article:published_time" content="2020-12-10T16:00:00.000Z">
-<meta property="article:modified_time" content="2020-12-14T11:52:15.766Z">
+<meta property="article:modified_time" content="2020-12-14T11:55:18.126Z">
 <meta property="article:author" content="Jame Kuma">
 <meta property="article:tag" content="图像超分辨">
 <meta property="article:tag" content="论文阅读">
@@ -258,9 +258,7 @@
 <p>在CV的high level任务中，AlexNet、VGGNet、ResNet等在ImageNet数据集上训练的模型已经很常用了。而在NLP中，各种基于Transformer的预训练模型也很常见，比如BERT、GPT-3等。</p>
 <p>把Transformer引入CV的研究也有很多，但基本都致力于解决图像分类，目标检测等high level任务中。而与这些High level任务不同的是，Image Processing问题的输入和输出都是一幅图像，所以显然不能直接使用他们的预训练模型。</p>
 <p>在本工作中，作者提出了一个用于解决Image Process问题的预训练模型，这个模型使用了Transformer的结构，取名为Image Processing Transformer（IPT）。主要框架如下图：</p>
-<figure>
-<img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201213191954911.png" alt="image-20201213191954911" /><figcaption aria-hidden="true">image-20201213191954911</figcaption>
-</figure>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201213191954911.png" style="zoom:67%;" /></p>
 <h3 id="方法详述">方法详述</h3>
 <h4 id="ipt的结构">IPT的结构</h4>
 <p>整个结构分为四个部分：Head、Encoder、Decoder、Tail。如上图所示，Encoder、Decoder是公用的，而Head、Tail是任务特异性的。</p>
