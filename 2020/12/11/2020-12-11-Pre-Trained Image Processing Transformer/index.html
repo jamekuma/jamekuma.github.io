@@ -20,25 +20,25 @@
     var CONFIG = {"hostname":"jamekuma.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","width":270,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="这篇文章把Transformer应用到low level视觉中，并且把多种low level视觉问题（去噪、超分辨、去雨）放在一起，设计一个预训练模型来统一解决这些问题。 论文背景 图像处理（Image Processing）是计算机视觉系统的底层部分（low level）的一个组成部分。多种图像处理问题都是相关的，自然想到一个基于某个大的数据集预训练(pre-trained)的模型，很可能对">
+  <meta name="description" content="这篇文章把Transformer应用到low level视觉中，并且把多种low level视觉问题（去噪、超分辨、去雨）放在一起，设计一个预训练模型来统一解决这些问题。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="读论文：Pre-Trained Image Processing Transformer">
 <meta property="og:url" content="https://jamekuma.github.io/2020/12/11/2020-12-11-Pre-Trained%20Image%20Processing%20Transformer/index.html">
 <meta property="og:site_name" content="Jame&#39;s Blog">
-<meta property="og:description" content="这篇文章把Transformer应用到low level视觉中，并且把多种low level视觉问题（去噪、超分辨、去雨）放在一起，设计一个预训练模型来统一解决这些问题。 论文背景 图像处理（Image Processing）是计算机视觉系统的底层部分（low level）的一个组成部分。多种图像处理问题都是相关的，自然想到一个基于某个大的数据集预训练(pre-trained)的模型，很可能对">
+<meta property="og:description" content="这篇文章把Transformer应用到low level视觉中，并且把多种low level视觉问题（去噪、超分辨、去雨）放在一起，设计一个预训练模型来统一解决这些问题。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="c:/Users/Jame%20Kuma/AppData/Roaming/Typora/typora-user-images/image-20201213191954911.png">
-<meta property="og:image" content="c:/Users/Jame%20Kuma/AppData/Roaming/Typora/typora-user-images/image-20201213202531504.png">
-<meta property="og:image" content="c:/Users/Jame%20Kuma/AppData/Roaming/Typora/typora-user-images/image-20201213202617373.png">
-<meta property="og:image" content="c:/Users/Jame%20Kuma/AppData/Roaming/Typora/typora-user-images/image-20201213202631010.png">
-<meta property="og:image" content="c:/Users/Jame%20Kuma/AppData/Roaming/Typora/typora-user-images/image-20201213202733752.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201213191954911.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201213202531504.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201213202617373.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201213202631010.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201213202733752.png">
 <meta property="article:published_time" content="2020-12-10T16:00:00.000Z">
-<meta property="article:modified_time" content="2020-12-13T12:31:56.833Z">
+<meta property="article:modified_time" content="2020-12-14T11:52:15.766Z">
 <meta property="article:author" content="Jame Kuma">
 <meta property="article:tag" content="图像超分辨">
 <meta property="article:tag" content="论文阅读">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="c:/Users/Jame%20Kuma/AppData/Roaming/Typora/typora-user-images/image-20201213191954911.png">
+<meta name="twitter:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201213191954911.png">
 
 <link rel="canonical" href="https://jamekuma.github.io/2020/12/11/2020-12-11-Pre-Trained%20Image%20Processing%20Transformer/">
 
@@ -241,6 +241,7 @@
 
       
         <p>这篇文章把Transformer应用到low level视觉中，并且把多种low level视觉问题（去噪、超分辨、去雨）放在一起，设计一个预训练模型来统一解决这些问题。</p>
+<a id="more"></a>
 <h3 id="论文背景">论文背景</h3>
 <p>图像处理（Image Processing）是计算机视觉系统的底层部分（low level）的一个组成部分。多种图像处理问题都是相关的，自然想到一个基于某个大的数据集预训练(pre-trained)的模型，很可能对其他的图像处理问题有帮助。但是目前几乎没有研究是把预训练模型应用到Image Processing领域的。</p>
 <p>预训练模型，一般用于具有以下两个特征的视觉问题：</p>
@@ -258,7 +259,7 @@
 <p>把Transformer引入CV的研究也有很多，但基本都致力于解决图像分类，目标检测等high level任务中。而与这些High level任务不同的是，Image Processing问题的输入和输出都是一幅图像，所以显然不能直接使用他们的预训练模型。</p>
 <p>在本工作中，作者提出了一个用于解决Image Process问题的预训练模型，这个模型使用了Transformer的结构，取名为Image Processing Transformer（IPT）。主要框架如下图：</p>
 <figure>
-<img src="C:\Users\Jame%20Kuma\AppData\Roaming\Typora\typora-user-images\image-20201213191954911.png" alt="image-20201213191954911" /><figcaption aria-hidden="true">image-20201213191954911</figcaption>
+<img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201213191954911.png" alt="image-20201213191954911" /><figcaption aria-hidden="true">image-20201213191954911</figcaption>
 </figure>
 <h3 id="方法详述">方法详述</h3>
 <h4 id="ipt的结构">IPT的结构</h4>
@@ -313,11 +314,11 @@ l\left(f_{D_{i_{1}}}^{j}, f_{D_{i_{2}}}^{j}\right)=-\log \frac{\exp \left(d\left
 \mathcal{L}_{I P T}=\lambda \cdot \mathcal{L}_{\text {contrastive}}+\mathcal{L}_{\text {supervised}}
 \]</span></p>
 <h3 id="实验结果">实验结果</h3>
-<p><img src="C:\Users\Jame Kuma\AppData\Roaming\Typora\typora-user-images\image-20201213202531504.png" alt="image-20201213202531504" style="zoom:50%;" /></p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201213202531504.png" alt="image-20201213202531504" style="zoom:50%;" /></p>
 <p>在各个任务上都达到了SOTA：</p>
-<p><img src="C:\Users\Jame Kuma\AppData\Roaming\Typora\typora-user-images\image-20201213202617373.png" alt="image-20201213202617373" style="zoom:67%;" /></p>
-<p><img src="C:\Users\Jame Kuma\AppData\Roaming\Typora\typora-user-images\image-20201213202631010.png" alt="image-20201213202631010" style="zoom:50%;" /></p>
-<p><img src="C:\Users\Jame Kuma\AppData\Roaming\Typora\typora-user-images\image-20201213202733752.png" alt="image-20201213202733752" style="zoom:67%;" /></p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201213202617373.png" alt="image-20201213202617373" style="zoom:67%;" /></p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201213202631010.png" alt="image-20201213202631010" style="zoom:50%;" /></p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201213202733752.png" alt="image-20201213202733752" style="zoom:67%;" /></p>
 <h3 id="总结与思考">总结与思考</h3>
 <ul>
 <li><p>利用Transformer的强大表示能力+ImageNet的海量数据，作者成功达到的多个low level问题的SOTA，真的很吃惊，虽然源码没有放出来，但是放出来也很难复现整个训练过程（32张V100.。。）</p></li>
