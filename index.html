@@ -224,7 +224,89 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="论文背景">论文背景</h3>
+          <p>这篇文章把Transformer应用到low level视觉中，并且把多种low level视觉问题（去噪、超分辨、去雨）放在一起，设计一个预训练模型来统一解决这些问题。</p>
+<h3 id="论文背景">论文背景</h3>
+<p>图像处理（Image Processing）是计算机视觉系统的底层部分（low level）的一个组成部分。多种图像处理问题都是相关的，自然想到一个基于某个大的数据集预训练(pre-trained)的模型，很可能对其他的图像处理问题有帮助。但是目前几乎没有研究是把预训练模型应用到Image Processing领域的。</p>
+<p>预训练模型，一般用于具有以下两个特征的视觉问题：</p>
+<ol type="1">
+<li>与任务相关的数据量很有限</li>
+<li>在测试数据输入之前，模型是不知道要完成哪个任务的</li>
+</ol>
+<p>而对于图像处理问题来说：</p>
+<ul>
+<li>问题(1)往往表现在很多数据是私有的/收费的。此外，各种不一致的因素（如相机参数、光照、天气等）也会进一步干扰捕捉到的训练数据的分布。</li>
+<li>问题(2)表现在，对于不同的图像处理任务，其输入输出形式是有差别的（如超分和去噪的输出尺度就不一样等）</li>
+</ul>
+<p>因此，预训练模型应用到图像处理领域是很有价值的。</p>
+<p>在CV的high level任务中，AlexNet、VGGNet、ResNet等在ImageNet数据集上训练的模型已经很常用了。而在NLP中，各种基于Transformer的预训练模型也很常见，比如BERT、GPT-3等。</p>
+<p>把Transformer引入CV的研究也有很多，但基本都致力于解决图像分类，目标检测等high level任务中。而与这些High level任务不同的是，Image Processing问题的输入和输出都是一幅图像，所以显然不能直接使用他们的预训练模型。</p>
+<p>在本工作中，作者提出了一个用于解决Image Process问题的预训练模型，这个模型使用了Transformer的结构，取名为Image Processing Transformer（IPT）。主要框架如下图：</p>
+<figure>
+<img src="C:\Users\Jame%20Kuma\AppData\Roaming\Typora\typora-user-images\image-20201213191954911.png" alt="image-20201213191954911" /><figcaption aria-hidden="true">image-20201213191954911</figcaption>
+</figure>
+<h3 id="方法详述">方法详述</h3>
+<h4 id="ipt的结构">IPT的结构</h4>
+<p>整个结构分为四个部分：Head、Encoder、Decoder、Tail。如上图所示，Encoder、Decoder是公用的，而Head、Tail是任务特异性的。</p>
+<h5 id="head">Head</h5>
+<p>头部由三个卷积层组成，总的实现<span class="math inline">\(\mathbb{R}^{3 \times H \times W}\rightarrow \mathbb{R}^{C \times H \times W}\)</span>。</p>
+<h5 id="encoder">Encoder</h5>
+<p>把头部提取的特征拆解成一个个patch，每个patch就是一个“word”（类似NLP中的Transformer）。即对于一个特征图<span class="math inline">\(f_{H} \in \mathbb{R}^{C \times H \times W}\)</span>，拆成patch序列<span class="math inline">\(f_{p_{i}} \in \mathbb{R}^{P^{2} \times C}, i=\{1, \ldots, N\}\)</span>，其中<span class="math inline">\(N=\frac{H W}{P^{2}}\)</span>就是Patch的个数。</p>
+<p>另外，如同Transformer中的位置编码，为了维持信息，也设置了位置编码<span class="math inline">\(E_{p_{i}} \in \mathbb{R}^{P^{2} \times C}\)</span>，最后丢进编码器的是<span class="math inline">\(E_{p_{i}}+f_{p}\)</span>。</p>
+<p>编码器的结构就使用了Transformer论文中的结构。编码器的输入尺寸也是<span class="math inline">\(\mathbb{R}^{P^{2} \times C}\)</span>。总的结构形式化如下： <span class="math display">\[
+\begin{array}{l}
+y_{0}=\left[E_{p_{1}}+f_{p_{1}}, E_{p_{2}}+f_{p_{2}}, \ldots, E_{p_{N}}+f_{p_{N}}\right] \\
+q_{i}=k_{i}=v_{i}=\mathrm{LN}\left(y_{i-1}\right) \\
+y_{i}^{\prime}=\operatorname{MSA}\left(q_{i}, k_{i}, v_{i}\right)+y_{i-1} \\
+y_{i}=\operatorname{FFN}\left(\mathrm{LN}\left(y_{i}^{\prime}\right)\right)+y_{i}^{\prime}, \quad i=1, \ldots, l \\
+{\left[f_{E_{1}}, f_{E_{2}}, \ldots, f_{E_{N}}\right]=y_{l}}
+\end{array}
+\]</span> MSA为传统Transformer模型中的multi-head self-attention模块，FFN包含两个全连接层。</p>
+<h5 id="decoder">Decoder</h5>
+<p>Decoder的结构也类似： <span class="math display">\[
+\begin{array}{l}
+z_{0}=\left[f_{E_{1}}, f_{E_{2}}, \ldots, f_{E_{N}}\right] \\
+q_{i}=k_{i}=\mathrm{LN}\left(z_{i-1}\right)+E_{t}, v_{i}=\mathrm{LN}\left(z_{i-1}\right) \\
+z_{i}^{\prime}=\operatorname{MSA}\left(q_{i}, k_{i}, v_{i}\right)+z_{i-1} \\
+q_{i}^{\prime}=\mathrm{LN}\left(z_{i}^{\prime}\right)+E_{t}, k_{i}^{\prime}=v_{i}^{\prime}=\mathrm{LN}\left(z_{0}\right) \\
+z_{i}^{\prime \prime}=\operatorname{MSA}\left(q_{i}^{\prime}, k_{i}^{\prime}, v_{i}^{\prime}\right)+z_{i}^{\prime} \\
+z_{i}=\mathrm{FFN}\left(\mathrm{LN}\left(z_{i}^{\prime \prime}\right)\right)+z_{i}^{\prime \prime}, \\
+{\left[f_{D_{1}}, f_{D_{2}}, \ldots, f_{D_{N}}\right]=y_{l}}
+\end{array}
+\]</span></p>
+<h5 id="tail">Tail</h5>
+<p>尾部的结构按照任务的不同有差异。超分辨模型则有一个上采样的操作。</p>
+<h4 id="在imagenet数据集上的预训练">在ImageNet数据集上的预训练</h4>
+<p>在训练中，作者引入了两种学习的方式，一种是经典的图像恢复中的监督学习；另一个称为对比学习（contrastive learning）。</p>
+<h5 id="监督学习">监督学习</h5>
+<p>基本操作就是把ImageNet数据集中的各种语义信息全部去除，针对不同的Image Processing问题，使用不同的退化模型构造成对数据集：SR使用双三次退化；denoising加高斯噪声等。</p>
+<p>整个过程形式化如下： <span class="math display">\[
+\begin{array}{l}
+I_{\text {corrupted}}=\boldsymbol{f}\left(I_{\text {clean}}\right)\\
+\mathcal{L}_{\text {supervised}}=\sum_{i=1}^{N_{t}} L_{1}\left(\operatorname{IPT}\left(I_{\text {corrupted}}^{i}\right), I_{\text {clean}}\right)
+\end{array}
+\]</span> 具体实现过程中，对于每一个Batch，随机选择一个图像处理task（如SR、denoising、deraining）对应的成对数据集进行训练。</p>
+<h5 id="对比学习">对比学习</h5>
+<p>由于IPT模型要用于多个任务，所以为了强化它的泛化能力，引入对比学习，从而引入不同图像的不同patch之间的关系信息。例如，从相同的特征图中裁剪出来的patch更有可能聚在一起，它们更应该被嵌入到相似的位置中。</p>
+<p>形式化地，对于每张图<span class="math inline">\(x_j\)</span>，它所在的Batch为<span class="math inline">\(X=\left\{x_{1}, x_{2}, \ldots, x_{B}\right\}\)</span>，其Decode的结果为<span class="math inline">\(f_{D_{i}}^{j} \in \mathbb{R}^{P^{2} \times C}, i=\{1, \ldots, N\}\)</span>。目标是最小化来自<strong>同一幅图像</strong>的patch之间的距离，最大化来自<strong>不同图像</strong>的patch之间的距离。所以引入如下损失： <span class="math display">\[
+\begin{array}{r}
+l\left(f_{D_{i_{1}}}^{j}, f_{D_{i_{2}}}^{j}\right)=-\log \frac{\exp \left(d\left(f_{D_{i_{1}}}^{j}, f_{D_{i_{2}}}^{j}\right)\right)}{\sum_{k=1}^{B} \mathbb{I}_{k \neq j} \exp \left(d\left(f_{D_{i_{1}}}^{j}, f_{D_{i_{2}}}^{k}\right)\right)} \\
+\mathcal{L}_{\text {constrastive}}=\frac{1}{B N^{2}} \sum_{i_{1}=1}^{N} \sum_{i_{2}=1}^{N} \sum_{j=1}^{B} l\left(f_{D_{i_{1}}}^{j}, f_{D_{i_{2}}}^{j}\right)
+\end{array}
+\]</span> 其中<span class="math inline">\(d(\cdot,\cdot)\)</span>为余弦相似度<span class="math inline">\(d(a, b)=\frac{a^{T} b}{\|a\|\|b\|}\)</span>。</p>
+<p>最终的loss为： <span class="math display">\[
+\mathcal{L}_{I P T}=\lambda \cdot \mathcal{L}_{\text {contrastive}}+\mathcal{L}_{\text {supervised}}
+\]</span></p>
+<h3 id="实验结果">实验结果</h3>
+<p><img src="C:\Users\Jame Kuma\AppData\Roaming\Typora\typora-user-images\image-20201213202531504.png" alt="image-20201213202531504" style="zoom:50%;" /></p>
+<p>在各个任务上都达到了SOTA：</p>
+<p><img src="C:\Users\Jame Kuma\AppData\Roaming\Typora\typora-user-images\image-20201213202617373.png" alt="image-20201213202617373" style="zoom:67%;" /></p>
+<p><img src="C:\Users\Jame Kuma\AppData\Roaming\Typora\typora-user-images\image-20201213202631010.png" alt="image-20201213202631010" style="zoom:50%;" /></p>
+<p><img src="C:\Users\Jame Kuma\AppData\Roaming\Typora\typora-user-images\image-20201213202733752.png" alt="image-20201213202733752" style="zoom:67%;" /></p>
+<h3 id="总结与思考">总结与思考</h3>
+<ul>
+<li><p>利用Transformer的强大表示能力+ImageNet的海量数据，作者成功达到的多个low level问题的SOTA，真的很吃惊，虽然源码没有放出来，但是放出来也很难复现整个训练过程（32张V100.。。）</p></li>
+<li><p>作者给Transformer+low level挖了个新坑，读这篇文章让我系统性的学了一下Transformer相关的内容，这是我之前忽视的知识，感觉还是挺有收获的</p></li>
+</ul>
 
       
     </div>
