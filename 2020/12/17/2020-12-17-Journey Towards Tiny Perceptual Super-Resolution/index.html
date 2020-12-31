@@ -20,28 +20,27 @@
     var CONFIG = {"hostname":"jamekuma.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","width":270,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="论文背景 RealNVP的全称，real-valued non-volume preserving ，可以翻译为“真实值非体积保持”。对于无监督学习来说，感兴趣的数据通常是高维的、高度结构化的，因此该领域的挑战是构建足够强大的模型，以捕获其复杂性，但仍然是可训练的。作者通过引入实值非体积保持(real NVP)转换来解决这一挑战，这是一种易于处理但表现能力强的高维数据建模方法。  基本思想是">
+  <meta name="description" content="论文背景 对于图像超分辨问题，最简单的方法是基于邻像素的空间不变性的双线性插值、双三次插值等方法，但是这些方法忽视了图像内容的多样性，会造成过于模糊的纹理结构与细节。 为了处理图像中的不同的内容，稀疏字典学习(sparse dictionary learning)独立地处理每个像素(或者patch)。比如经典的这篇《Image super-resolution via sparse rep">
 <meta property="og:type" content="article">
-<meta property="og:title" content="读论文：Density estimation using Real NVP">
-<meta property="og:url" content="https://jamekuma.github.io/2020/11/03/2020-11-03-DENSITY%20ESTIMATION%20USING%20REAL%20NVP/index.html">
+<meta property="og:title" content="读论文：LAPAR：Linearly-Assembled Pixel-Adaptive Regression Network for Single Image Super-Resolution and Beyond">
+<meta property="og:url" content="https://jamekuma.github.io/2020/12/17/2020-12-17-Journey%20Towards%20Tiny%20Perceptual%20Super-Resolution/index.html">
 <meta property="og:site_name" content="Jame&#39;s Blog">
-<meta property="og:description" content="论文背景 RealNVP的全称，real-valued non-volume preserving ，可以翻译为“真实值非体积保持”。对于无监督学习来说，感兴趣的数据通常是高维的、高度结构化的，因此该领域的挑战是构建足够强大的模型，以捕获其复杂性，但仍然是可训练的。作者通过引入实值非体积保持(real NVP)转换来解决这一挑战，这是一种易于处理但表现能力强的高维数据建模方法。  基本思想是">
+<meta property="og:description" content="论文背景 对于图像超分辨问题，最简单的方法是基于邻像素的空间不变性的双线性插值、双三次插值等方法，但是这些方法忽视了图像内容的多样性，会造成过于模糊的纹理结构与细节。 为了处理图像中的不同的内容，稀疏字典学习(sparse dictionary learning)独立地处理每个像素(或者patch)。比如经典的这篇《Image super-resolution via sparse rep">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48.png">
-<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48-1.png">
-<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48-2.png">
-<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48-3.png">
-<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48-4.png">
-<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48-5.png">
-<meta property="article:published_time" content="2020-11-02T16:00:00.000Z">
-<meta property="article:modified_time" content="2020-12-12T04:27:28.030Z">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201221215658124.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201221223513296.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201221223736994.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201221223827352.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201221224302876.png">
+<meta property="article:published_time" content="2020-12-16T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-12-31T08:33:00.856Z">
 <meta property="article:author" content="Jame Kuma">
 <meta property="article:tag" content="图像超分辨">
 <meta property="article:tag" content="论文阅读">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48.png">
+<meta name="twitter:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201221215658124.png">
 
-<link rel="canonical" href="https://jamekuma.github.io/2020/11/03/2020-11-03-DENSITY%20ESTIMATION%20USING%20REAL%20NVP/">
+<link rel="canonical" href="https://jamekuma.github.io/2020/12/17/2020-12-17-Journey%20Towards%20Tiny%20Perceptual%20Super-Resolution/">
 
 
 <script id="page-configurations">
@@ -53,7 +52,7 @@
   };
 </script>
 
-  <title>读论文：Density estimation using Real NVP | Jame's Blog</title>
+  <title>读论文：LAPAR：Linearly-Assembled Pixel-Adaptive Regression Network for Single Image Super-Resolution and Beyond | Jame's Blog</title>
   
 
 
@@ -174,7 +173,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jamekuma.github.io/2020/11/03/2020-11-03-DENSITY%20ESTIMATION%20USING%20REAL%20NVP/">
+    <link itemprop="mainEntityOfPage" href="https://jamekuma.github.io/2020/12/17/2020-12-17-Journey%20Towards%20Tiny%20Perceptual%20Super-Resolution/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/showPhoto.jpg">
@@ -187,7 +186,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          读论文：Density estimation using Real NVP
+          读论文：LAPAR：Linearly-Assembled Pixel-Adaptive Regression Network for Single Image Super-Resolution and Beyond
         </h1>
 
         <div class="post-meta">
@@ -197,7 +196,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-11-03 00:00:00" itemprop="dateCreated datePublished" datetime="2020-11-03T00:00:00+08:00">2020-11-03</time>
+              <time title="创建时间：2020-12-17 00:00:00" itemprop="dateCreated datePublished" datetime="2020-12-17T00:00:00+08:00">2020-12-17</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -225,8 +224,8 @@
       </span>
       <span class="post-meta-item-text">Valine：</span>
     
-    <a title="valine" href="/2020/11/03/2020-11-03-DENSITY%20ESTIMATION%20USING%20REAL%20NVP/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/11/03/2020-11-03-DENSITY%20ESTIMATION%20USING%20REAL%20NVP/" itemprop="commentCount"></span>
+    <a title="valine" href="/2020/12/17/2020-12-17-Journey%20Towards%20Tiny%20Perceptual%20Super-Resolution/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/12/17/2020-12-17-Journey%20Towards%20Tiny%20Perceptual%20Super-Resolution/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -241,102 +240,47 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="论文背景">论文背景</h3>
-<p>RealNVP的全称，real-valued non-volume preserving ，可以翻译为“真实值非体积保持”。对于无监督学习来说，感兴趣的数据通常是高维的、高度结构化的，因此该领域的挑战是构建足够强大的模型，以捕获其复杂性，但仍然是可训练的。作者通过引入实值非体积保持(real NVP)转换来解决这一挑战，这是一种易于处理但表现能力强的高维数据建模方法。</p>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48.png" alt="image-20201106194258145" style="zoom:67%;" /></p>
-<p>基本思想是把数据空间映射到隐空间z，如上图所示。</p>
-<a id="more"></a>
-<p>以前的相关工作：</p>
-<ul>
-<li>受限玻尔兹曼机、深度玻尔兹曼机
-<ul>
-<li>通过利用两方的条件独立性来训练模型结构，可以对潜在变量进行有效的精确或近似后验推断。然而，由于潜在变量的相关边际分布的难处理性。训练、评估和抽样程序必须使用Mean Field inference 和马尔可夫链蒙特卡洛法。对于此类复杂模型，收敛时间往往是不确定的。另外，各种近似也限制了其性能</li>
-</ul></li>
-<li>有向概率图模型
-<ul>
-<li>在推理过程中的各种近似，限制了性能</li>
-</ul></li>
-<li>自回归模型
-<ul>
-<li>避免引入隐变量，从而消除各种近似。</li>
-<li>RNN、LSTM</li>
-<li>非并行，慢</li>
-</ul></li>
-<li>GAN
-<ul>
-<li>度量生成样本的多样性的指标不明确</li>
-<li>训练不稳定</li>
-</ul></li>
-</ul>
-<p>而作者提出的方法，可以训练这样一个生成网络<span class="math inline">\(g\)</span>，它将潜在变量<span class="math inline">\(z \sim p_Z\)</span>映射到样本<span class="math inline">\(x \sim p_{X}\)</span>，理论上不需要像GANs那样使用鉴别器网络，也不需要像变分自编码器那样使用近似推理。的确，如果g是双射，可以利用变量的变化公式，通过极大似然对其进行训练： <span class="math display">\[
-p_{X}(x)=p_{Z}(z)\left|\operatorname{det}\left(\frac{\partial g(z)}{\partial z^{T}}\right)\right|^{-1}
-\]</span></p>
-<h3 id="主要方法">主要方法</h3>
-<p>上周读的NICE，也是这个作者之前的工作，作者表示，自己在NICE的基础上，定义了一个更强大的双射函数类，它支持精确和可处理的概率密度评估与推理。代价函数不依赖于固定的形式重构代价（比如L2损失等），因此可以产生更加非平滑的样本。另外，这次提出的方法可以使用batch normalization、ResBlock等，从而构建一个具有多个抽象层次的深度多尺度架构（a very deep multi-scale architecture with multiple levels of abstraction）。</p>
-<h4 id="耦合层">耦合层</h4>
-<p>Real NVP的耦合层相较于NICE的有很大的不同：</p>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48-1.png" alt="image-20201106203733407" style="zoom:67%;" /></p>
-<p>写成式子： <span class="math display">\[
+        <a id="more"></a>
+<h3 id="论文背景">论文背景</h3>
+<p>对于图像超分辨问题，最简单的方法是基于邻像素的空间不变性的双线性插值、双三次插值等方法，但是这些方法忽视了图像内容的多样性，会造成过于模糊的纹理结构与细节。</p>
+<p>为了处理图像中的不同的内容，稀疏字典学习(sparse dictionary learning)独立地处理每个像素(或者patch)。比如经典的这篇《Image super-resolution via sparse representation》，给LR和HR中的patch学习一对字典，而假设LR和HR图像共享同一个稀疏编码。在推理过程中，给定训练字典，在一个优化过程中求出稀疏编码，从而完成对HR的估计。然而，在训练过程中，（字典与编码的）联合优化的难度还是会影响恢复效果。比如《Raisr: Rapid and accurate image super resolution》这篇中，基于图像的局部梯度统计特征，对图像的patch进行聚类处理，对每一类使用一个滤波器。虽然简单，但这种硬选择(hard-selection)操作是不连续的且不可微的。它们只为变化的输入模式提供折衷的解决方案，而不是最优的解决方案。</p>
+<p>而之后，各类深度学习的方法被提出来，但是挑战在于图像内容的无约束性质，当随机梯度存在很大变化时，训练可能是不稳定的。它会导致artifact。残差学习、注意力机制等策略可以缓解这些问题，但这些方法对计算资源要求很高。</p>
+<p>与对原图像的直接估计不同，自适应滤波器(核)方法按照空间变化，对相邻像素进行分组。由此带来的好处有两点：</p>
+<ol type="1">
+<li>估计的像素始终处于环境的凸包内，为了避免视觉伪影的产生（？）</li>
+<li>网络只需要评估相邻像素的相对重要性，而不需要预测绝对值，这加快了学习过程</li>
+</ol>
+<p>本文作者提出了一种，对SISR问题进行线性约束的方法——LAPAR（linearly-assembled pixel-adaptive regression network，线性组合像素自适应回归网络）。核心思想是，对一个进行把LR进行Bicubic插值后的模糊图像，应用一个“像素自适应”的滤波器进行滤波。而滤波器来自于，轻量级的卷积神经网络，这个网络根据每个输入像素，确定预定义的滤波器基的线性组合系数。</p>
+<h3 id="方法详述">方法详述</h3>
+<p>方法没有很复杂，用以下图片就可以看出来</p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201221215658124.png" alt="image-20201221215658124"  /></p>
+<p>预定义了一堆滤波器字典（也就是线性组合的基）<span class="math inline">\(\mathbf{D} \in \mathbb{R}^{L \times k^{2}}\)</span>，然后设计一个网络LaparNet，输入LR图像，学习每个像素对应的滤波器的系数Coefficients，每个像素所在的Bicubic patch都对应了一个由线性基合成的滤波器（卷积核）。而在实际SR过程中，把Bicubic 插值后的图像，应用每个patch所对应的卷积核，即可恢复出SR图像。</p>
+<p>而滤波器字典的采用的都是高斯滤波器（G）和差分高斯滤波器（DoG）： <span class="math display">\[
 \begin{aligned}
-\left\{\begin{array}{l}
-y_{1: d}=x_{1: d} \\
-y_{d+1: D}=x_{1: 1: D} \odot \exp \left(s\left(x_{1: d}\right)\right)+t\left(x_{1: d}\right)
-\end{array}\right.\\
-\Leftrightarrow\left\{\begin{array}{l}
-x_{1: d}=y_{1: d} \\
-x_{d+1: D}=\left(y_{d+1: D}-t\left(y_{1: d}\right)\right) \odot \exp \left(-s\left(y_{1: d}\right)\right)
-\end{array}\right.
+G\left(\mathbf{x}-\mathbf{x}^{\prime} ; \mathbf{\Sigma}\right)&amp;=\frac{1}{2 \pi|\mathbf{\Sigma}|^{\frac{1}{2}}} \exp \left\{-\frac{1}{2}\left(\mathbf{x}-\mathbf{x}^{\prime}\right)^{T} \mathbf{\Sigma}^{-1}\left(\mathbf{x}-\mathbf{x}^{\prime}\right)\right\} \\
+\boldsymbol{\Sigma} &amp;=\gamma^{2} \mathbf{U}_{\theta} \boldsymbol{\Lambda} \mathbf{U}_{\theta}^{T} \\
+\mathbf{U}_{\theta} &amp;=\left[\begin{array}{cc}
+\cos \theta &amp; -\sin \theta \\
+\sin \theta &amp; \cos \theta
+\end{array}\right] \\
+\boldsymbol{\Lambda} &amp;=\left[\begin{array}{cc}
+\sigma_{1}^{2} &amp; 0 \\
+0 &amp; \sigma_{2}^{2}
+\end{array}\right] \\
+D o G\left(\mathbf{x}-\mathbf{x}^{\prime} ; \mathbf{\Sigma}_{1}, \mathbf{\Sigma}_{2}\right)&amp;=G\left(\mathbf{x}-\mathbf{x}^{\prime} ; \mathbf{\Sigma}_{1}\right)-G\left(\mathbf{x}-\mathbf{x}^{\prime} ; \mathbf{\Sigma}_{2}\right)
 \end{aligned}
-\]</span></p>
-<p>与NICE同理，其雅克比行列式也是易于计算的： <span class="math display">\[
-\frac{\partial y}{\partial x^{T}}=\left[\begin{array}{cc}
-\mathbb{I}_{d} &amp; 0 \\
-\frac{\partial y_{d+1: D}}{\partial x_{1: d}^{T}} &amp; \operatorname{diag}\left(\exp \left[s\left(x_{1: d}\right)\right]\right)
-\end{array}\right]=\exp \left[\sum_{j} s\left(x_{1: d}\right)_{j}\right]
-\]</span> <strong>计算耦合层的逆并不需要计算s或t的逆，因此这些函数可以任意复杂且难以求逆。</strong></p>
-<h4 id="mask-convolution">Mask Convolution</h4>
-<p>另外，在实际实现中，可以使用一个Masked convolution，即使用一个二值化的mask <span class="math inline">\(b\)</span>： <span class="math display">\[
-y=b \odot x+(1-b) \odot(x \odot \exp (s(b \odot x))+t(b \odot x))
-\]</span> 对于mask，有以下两种模式：</p>
-<ul>
-<li>棋盘格掩蔽(checkerboard masking)</li>
-<li>通道掩蔽(channel-wise masking)</li>
-</ul>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48-2.png" alt="image-20201106212224230" style="zoom: 50%;" /></p>
-<h4 id="耦合层的整合">耦合层的整合</h4>
-<p>尽管耦合层功能强大，但它们的前向转换保留了一些组件(比如<span class="math inline">\(x_{1: d}\)</span>)。可以通过将耦合层组合为<strong>交替模式</strong>来克服这一困难，这样，在一个耦合层中保持不变的组件，将在下一个耦合层中更新:</p>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48-3.png" alt="image-20201106212608981" style="zoom: 50%;" /></p>
-<p>另外，多个耦合层的雅克比行列式只需累乘即可： <span class="math display">\[
-\begin{aligned}
-\frac{\partial\left(f_{b} \circ f_{a}\right)}{\partial x_{a}^{T}}\left(x_{a}\right) &amp;=\frac{\partial f_{a}}{\partial x_{a}^{T}}\left(x_{a}\right) \cdot \frac{\partial f_{b}}{\partial x_{b}^{T}}\left(x_{b}=f_{a}\left(x_{a}\right)\right) \\
-\operatorname{det}(A \cdot B) &amp;=\operatorname{det}(A) \operatorname{det}(B)
-\end{aligned}
-\]</span></p>
-<h4 id="多尺度结构multi-scale-architecture">多尺度结构(Multi-scale architecture)</h4>
-<p>(这一部分我看的不是很懂)</p>
-<p>作者通过squeeze操作实现了一个多尺度的架构:对于每个通道，将图像分割成形状为2×2×c的子正方形，然后将其重新塑形为形状为1×1×4c的子正方形。squeeze操作将一个s×s×c张量转化为一个2s×2s×4c张量，有效地交换了通道数与空间大小的关系。</p>
-<p>在每个尺度上，将几个操作组合成如下序列：我们首先应用三个耦合层，交替使用checkerboard masking，然后执行squeeze操作，最后应用三个耦合层，交替使用channel-wise masking。</p>
-<p>在所有耦合层中传播一个D维向量将是很麻烦的，因为计算和内存成本，以及需要训练的参数的数量。由于这个原因，作者遵循VGG中的设计选择，并定期提出一半的尺寸：</p>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48-4.png" alt="image-20201106214810116" style="zoom:67%;" /></p>
-<h4 id="batch-normalization">Batch normalization</h4>
-<p>批处理归一化的影响很容易包含在雅可比矩阵的计算中，因为它是对每个维度的线性调整。也就是说，给定估计的批处理统计量： <span class="math display">\[
-x \mapsto \frac{x-\tilde{\mu}}{\sqrt{\tilde{\sigma}^{2}+\epsilon}}
-\]</span> 我们具有雅克比矩阵： <span class="math display">\[
-\left(\prod_{i}\left(\tilde{\sigma}_{i}^{2}+\epsilon\right)\right)^{-\frac{1}{2}}
 \]</span></p>
 <h3 id="实验结果">实验结果</h3>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48-5.png" alt="image-20201106220750676" style="zoom:67%;" /></p>
+<p>首先对于滤波器字典，作者做了一系列实验：</p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201221223513296.png" alt="image-20201221223513296" style="zoom: 50%;" /></p>
+<p>然后是与SOTA方法进行对比：</p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201221223736994.png" alt="image-20201221223736994" style="zoom: 50%;" /></p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201221223827352.png" alt="image-20201221223827352" style="zoom: 50%;" /></p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201221224302876.png" alt="image-20201221224302876" style="zoom: 50%;" /></p>
 <h3 id="总结与思考">总结与思考</h3>
 <ul>
-<li><p>这篇是作者在本人的NICE工作的基础上的一篇完善工作，主要进步在于：</p>
-<ul>
-<li><p>改善了仿射层的结构</p></li>
-<li><p>使用了mask卷积保证了推理过程中所有信息都被处理</p></li>
-<li><p>考虑了多尺度的结构</p></li>
-<li><p>RealNVP 的雅可比行列式不再恒等于 1，行列式的几何意义就是体积，所以行列式等于 1 就意味着体积没有变化，而仿射耦合层的行列式不等于 1 就意味着体积有所变化，所谓“非体积保持”。</p></li>
-</ul></li>
-<li><p>第一篇 NICE 中，作者提出了加性耦合层。后面也提到了乘性耦合层，只不过没有用上；而在 RealNVP 中，加性和乘性耦合层结合在一起，成为一个一般的“仿射耦合层”。</p></li>
-<li><p>本文的mask卷积实质上就是对两个耦合层直接的信息实施一种可逆的打乱，比NICE中的单纯交换分区中两个子集的角色的做法要更优</p></li>
+<li>这篇工作的角度比较新颖，利用对滤波器空间的线性约束，充当正则项，进而大大减少网络参数和性能消耗</li>
+<li>只给局部patch使用单独滤波器的使用就意味着，在复原时，放弃了对图像更大范围的特征的<strong>直接</strong>捕获，转而使用一个卷积网络学滤波器的系数，<strong>间接</strong>地利用了图像更大范围的特征。感觉颇有Meta-Learning的意味</li>
 </ul>
 
     </div>
@@ -357,12 +301,12 @@ x \mapsto \frac{x-\tilde{\mu}}{\sqrt{\tilde{\sigma}^{2}+\epsilon}}
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/11/01/2020-11-01-NICE%EF%BC%9ANON-LINEAR%20INDEPENDENT%20COMPONENTS%20ESTIMATION/" rel="prev" title="读论文：NICE：Non-linear Independent Components Estimation">
-      <i class="fa fa-chevron-left"></i> 读论文：NICE：Non-linear Independent Components Estimation
+    <a href="/2020/12/11/2020-12-11-Pre-Trained%20Image%20Processing%20Transformer/" rel="prev" title="读论文：Pre-Trained Image Processing Transformer">
+      <i class="fa fa-chevron-left"></i> 读论文：Pre-Trained Image Processing Transformer
     </a></div>
       <div class="post-nav-item">
-    <a href="/2020/11/07/2020-11-07-Glow%EF%BC%9Agenerative%20flow%20with%20invertible%201x1%20convolutions/" rel="next" title="读论文：Glow：generative flow with invertible 1x1 convolutions">
-      读论文：Glow：generative flow with invertible 1x1 convolutions <i class="fa fa-chevron-right"></i>
+    <a href="/2020/12/26/2020-12-26-Learning%20with%20Privileged%20Information%20for%20Efficient%20Image%20Super-Resolution/" rel="next" title="读论文：Learning with Privileged Information for Efficient Image Super-Resolution   Super-Resolution and Beyond">
+      读论文：Learning with Privileged Information for Efficient Image Super-Resolution   Super-Resolution and Beyond <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -424,7 +368,7 @@ x \mapsto \frac{x-\tilde{\mu}}{\sqrt{\tilde{\sigma}^{2}+\epsilon}}
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#论文背景"><span class="nav-number">1.</span> <span class="nav-text">论文背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主要方法"><span class="nav-number">2.</span> <span class="nav-text">主要方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#耦合层"><span class="nav-number">2.1.</span> <span class="nav-text">耦合层</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mask-convolution"><span class="nav-number">2.2.</span> <span class="nav-text">Mask Convolution</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#耦合层的整合"><span class="nav-number">2.3.</span> <span class="nav-text">耦合层的整合</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#多尺度结构multi-scale-architecture"><span class="nav-number">2.4.</span> <span class="nav-text">多尺度结构(Multi-scale architecture)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#batch-normalization"><span class="nav-number">2.5.</span> <span class="nav-text">Batch normalization</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验结果"><span class="nav-number">3.</span> <span class="nav-text">实验结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结与思考"><span class="nav-number">4.</span> <span class="nav-text">总结与思考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#论文背景"><span class="nav-number">1.</span> <span class="nav-text">论文背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法详述"><span class="nav-number">2.</span> <span class="nav-text">方法详述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验结果"><span class="nav-number">3.</span> <span class="nav-text">实验结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结与思考"><span class="nav-number">4.</span> <span class="nav-text">总结与思考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
