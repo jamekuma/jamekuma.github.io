@@ -163,6 +163,195 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jamekuma.github.io/2020/10/23/2020-10-16-Unfolding%20the%20Alternating%20Optimization%20for%20Blind%20Super%20Resolution/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/showPhoto.jpg">
+      <meta itemprop="name" content="Jame Kuma">
+      <meta itemprop="description" content="“人类的赞歌是勇气的赞歌！”">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jame's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/10/23/2020-10-16-Unfolding%20the%20Alternating%20Optimization%20for%20Blind%20Super%20Resolution/" class="post-title-link" itemprop="url">读论文：Unfolding the Alternating Optimization for Blind Super Resolution</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-10-23 00:00:00" itemprop="dateCreated datePublished" datetime="2020-10-23T00:00:00+08:00">2020-10-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%A7%91%E7%A0%94/" itemprop="url" rel="index"><span itemprop="name">科研</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/10/23/2020-10-16-Unfolding%20the%20Alternating%20Optimization%20for%20Blind%20Super%20Resolution/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/10/23/2020-10-16-Unfolding%20the%20Alternating%20Optimization%20for%20Blind%20Super%20Resolution/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="论文背景">论文背景</h3>
+<p>对于一般的盲超分方法，一般都分为两步：</p>
+<ol type="1">
+<li>从LR图像中估计一个模糊核</li>
+<li>基于估计的模糊核，估计SR图像</li>
+</ol>
+<ul>
+<li>这两步通常是使用两个不同的模型（各自独立训练出来的）。而第一步的微小误差会给第二步的超分结果造成很大的损失。</li>
+<li>第一步只是通过LR中的信息去估计模糊核，信息来源比较有限，模糊核估计的不准</li>
+</ul>
+<p>因此，虽然这两个模型各自都能表现良好，但当它们组合在一起时，最终结果可能不是最优的。作者的思路是用一个交替迭代的优化算法。Restorer基于给定的模糊核，把LR图像超分辨为SR图像；而Estimator从LR、SR中估计模糊核，如此循环往复即可迭代。然后把这个网络展开，形成一个端到端的可训练的网络，作者称为DAN(Deep Alternating Network)。</p>
+<p>这样，从LR和SR中，估计模糊核更合理一些。更重要的是，在展开网络之后，相当于Restorer是使用Estimator生成的核做训练，而不是ground-truth的核。所以Restorer更能容忍Estimator的估计误差。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/10/23/2020-10-16-Unfolding%20the%20Alternating%20Optimization%20for%20Blind%20Super%20Resolution/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jamekuma.github.io/2020/10/11/2020-10-11-Analyzing%20Inverse%20Problems%20with%20Invertible%20Neural%20Networks/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/showPhoto.jpg">
+      <meta itemprop="name" content="Jame Kuma">
+      <meta itemprop="description" content="“人类的赞歌是勇气的赞歌！”">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jame's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/10/11/2020-10-11-Analyzing%20Inverse%20Problems%20with%20Invertible%20Neural%20Networks/" class="post-title-link" itemprop="url">读论文：Analyzing Inverse Problems with Invertible Neural Networks</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-10-11 00:00:00" itemprop="dateCreated datePublished" datetime="2020-10-11T00:00:00+08:00">2020-10-11</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%A7%91%E7%A0%94/" itemprop="url" rel="index"><span itemprop="name">科研</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/10/11/2020-10-11-Analyzing%20Inverse%20Problems%20with%20Invertible%20Neural%20Networks/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/10/11/2020-10-11-Analyzing%20Inverse%20Problems%20with%20Invertible%20Neural%20Networks/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="论文背景">论文背景</h3>
+<p>在分析一个复杂物理系统时，常见的问题是不能直接测量我们感兴趣的<strong>系统参数</strong>。对于许多这样的系统，科学家们已经发展出复杂的理论来解释，测量值y是如何从隐藏的系统参数x中产生的。我们将把这种映射称为<strong>前向过程</strong>。然而，其<strong>逆过程</strong>需要从测量中推断出系统的隐藏状态。然而，因为关键信息在正向过程中丢失了，逆过程是不适定问题(ill-posed，即许多种系统参数x都可产生同一个测量值y)。</p>
+<p>给定一个测量值时，这种逆过程的解往往有多个，所以作者提出，解决逆过程时，<strong>必须给出一个在以某个观察为条件的，系统参数的条件后验概率分布，即<span class="math inline">\(p(\mathbf{x|y})\)</span>。</strong>针对这一任务本文提出了可逆神经网络(invertible neural networks, INNs)。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/10/11/2020-10-11-Analyzing%20Inverse%20Problems%20with%20Invertible%20Neural%20Networks/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://jamekuma.github.io/2020/09/18/2020-09-18-Correction%20Filter%20for%20Single%20Image%20Super-Resolution%EF%BC%9ARobustifying%20Off-the-Shelf%20Deep%20Super-Resolvers/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -878,193 +1067,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jamekuma.github.io/2020/07/21/2020-07-21-%E5%86%99%E5%9C%A8%E4%BF%9D%E7%A0%94%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9D%9F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/showPhoto.jpg">
-      <meta itemprop="name" content="Jame Kuma">
-      <meta itemprop="description" content="“人类的赞歌是勇气的赞歌！”">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Jame's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/07/21/2020-07-21-%E5%86%99%E5%9C%A8%E4%BF%9D%E7%A0%94%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9D%9F/" class="post-title-link" itemprop="url">写在保研基本结束</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-07-21 14:41:00" itemprop="dateCreated datePublished" datetime="2020-07-21T14:41:00+08:00">2020-07-21</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%9A%8F%E7%AC%94/" itemprop="url" rel="index"><span itemprop="name">随笔</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2020/07/21/2020-07-21-%E5%86%99%E5%9C%A8%E4%BF%9D%E7%A0%94%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9D%9F/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/07/21/2020-07-21-%E5%86%99%E5%9C%A8%E4%BF%9D%E7%A0%94%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9D%9F/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>从大二开始有保研外校的想法，再到大三下学期开始正式准备，现在是7月下旬，终于上岸了。结果并没有特别出色，但是还是挺符合我的预期的，甚至有些环节还算是比较幸运的。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/07/21/2020-07-21-%E5%86%99%E5%9C%A8%E4%BF%9D%E7%A0%94%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9D%9F/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jamekuma.github.io/2020/04/12/2020-04-12-%E6%A0%B9%E6%8D%AE%E6%95%B0%E6%8D%AE%E8%8C%83%E5%9B%B4%E5%8F%8D%E6%8E%A8%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%8F%8A%E7%AE%97%E6%B3%95%E5%86%85%E5%AE%B9/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/showPhoto.jpg">
-      <meta itemprop="name" content="Jame Kuma">
-      <meta itemprop="description" content="“人类的赞歌是勇气的赞歌！”">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Jame's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/04/12/2020-04-12-%E6%A0%B9%E6%8D%AE%E6%95%B0%E6%8D%AE%E8%8C%83%E5%9B%B4%E5%8F%8D%E6%8E%A8%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%8F%8A%E7%AE%97%E6%B3%95%E5%86%85%E5%AE%B9/" class="post-title-link" itemprop="url">(转)根据数据范围反推复杂度及算法内容</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-04-12 11:00:00" itemprop="dateCreated datePublished" datetime="2020-04-12T11:00:00+08:00">2020-04-12</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%9F%A5%E8%AF%86%E6%80%BB%E7%BB%93/" itemprop="url" rel="index"><span itemprop="name">知识总结</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2020/04/12/2020-04-12-%E6%A0%B9%E6%8D%AE%E6%95%B0%E6%8D%AE%E8%8C%83%E5%9B%B4%E5%8F%8D%E6%8E%A8%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%8F%8A%E7%AE%97%E6%B3%95%E5%86%85%E5%AE%B9/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/04/12/2020-04-12-%E6%A0%B9%E6%8D%AE%E6%95%B0%E6%8D%AE%E8%8C%83%E5%9B%B4%E5%8F%8D%E6%8E%A8%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%8F%8A%E7%AE%97%E6%B3%95%E5%86%85%E5%AE%B9/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>一般ACM或者笔试题的时间限制是1秒或2秒。</p>
-<p>在这种情况下，C++代码中的操作次数控制在 <span class="math inline">\(10^7\)</span>为最佳。</p>
-<p><strong>下面给出在不同数据范围下，代码的时间复杂度和算法该如何选择：</strong></p>
-<p><span class="math inline">\(n≤30\)</span>, 指数级别, dfs+剪枝，状态压缩dp</p>
-<p><span class="math inline">\(n≤100\)</span> =&gt; <span class="math inline">\(O(n^3)\)</span>，floyd，dp</p>
-<p><span class="math inline">\(n≤10^3\)</span> =&gt; <span class="math inline">\(O(n^2)\)</span>，<span class="math inline">\(O(n^2log\ n)\)</span>，dp，二分</p>
-<p><span class="math inline">\(n≤10^4\)</span> =&gt; $ O(n∗n)$，块状链表</p>
-<p><span class="math inline">\(n≤10^5\)</span> =&gt; <span class="math inline">\(O(n*log\ n)\)</span> =&gt; 各种sort，线段树、树状数组、set/map、heap、dijkstra+heap、spfa、求凸包、求半平面交、二分</p>
-<p><span class="math inline">\(n≤10^6\)</span> =&gt; <span class="math inline">\(O(n)\)</span> =&gt; hash、双指针扫描、kmp、AC自动机。以及常数较小的 <span class="math inline">\(O(n*log\ n)\)</span> 算法sort、树状数组、heap、dijkstra、spfa</p>
-<p><span class="math inline">\(n≤10^7\)</span> =&gt; <span class="math inline">\(O(n)\)</span>，双指针扫描、kmp、AC自动机、线性筛素数</p>
-<p><span class="math inline">\(n≤10^9\)</span> =&gt; <span class="math inline">\(O(\sqrt n)\)</span>，判断质数</p>
-<p><span class="math inline">\(n≤10^{18}\)</span> =&gt; <span class="math inline">\(O(log\ n)\)</span>，最大公约数</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/04/12/2020-04-12-%E6%A0%B9%E6%8D%AE%E6%95%B0%E6%8D%AE%E8%8C%83%E5%9B%B4%E5%8F%8D%E6%8E%A8%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%8F%8A%E7%AE%97%E6%B3%95%E5%86%85%E5%AE%B9/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1137,7 +1139,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">32</span>
+          <span class="site-state-item-count">34</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1150,7 +1152,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-count">21</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1188,7 +1190,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2020</span>
+  <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
