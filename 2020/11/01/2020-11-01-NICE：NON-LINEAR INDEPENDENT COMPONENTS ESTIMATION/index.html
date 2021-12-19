@@ -29,7 +29,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20201103165925.png">
 <meta property="article:published_time" content="2020-10-31T16:00:00.000Z">
-<meta property="article:modified_time" content="2020-12-12T04:27:30.507Z">
+<meta property="article:modified_time" content="2021-04-22T03:56:44.829Z">
 <meta property="article:author" content="Jame Kuma">
 <meta property="article:tag" content="图像超分辨">
 <meta property="article:tag" content="论文阅读">
@@ -245,7 +245,7 @@ p_{X}(x)=p_{H}(f(x))\left|\operatorname{det} \frac{\partial f(x)}{\partial x}\ri
 \]</span></p>
 <p>这样，我们就能通过可逆结构<span class="math inline">\(f\)</span>来在<span class="math inline">\(x\)</span>域中采样： <span class="math display">\[
 \begin{array}{l}
-h \sim p_{H}(h) \\
+x \sim p_{H}(h) \\
 x=f^{-1}(h)
 \end{array}
 \]</span> 这篇论文的一个关键的idea是设计了这样一个变换<span class="math inline">\(f\)</span>，它可以得到的这两个性质</p>
@@ -285,6 +285,7 @@ x_{I_{2}}=g^{-1}\left(y_{I_{2}} ; m\left(y_{I_{1}}\right)\right)
 \]</span></p>
 <h5 id="加法耦合层additive-coupling-layer">加法耦合层（Additive coupling layer）</h5>
 <p>将一般形式中的<span class="math inline">\(g\)</span>变换写成如下的形式： <span class="math display">\[
+x_{I_{1}}=y_{I_{1}} \\
 y_{I_{2}}=x_{I_{2}}+m\left(x_{I_{1}}\right)
 \]</span> 由于<span class="math inline">\(\frac{\partial y_{I_{2}}}{\partial x_{I_{2}}}=1\)</span>，代表其雅克比行列式为1.</p>
 <p>其实除了加法之外，还能使用其他的耦合层，比如乘法耦合层<span class="math inline">\(g(a ; b)=a \odot b, b \neq 0\)</span>，仿射耦合层<span class="math inline">\(g(a ; b)=a \odot b_{1}+b_{2}, b_{1} \neq 0\)</span>等</p>
@@ -409,7 +410,7 @@ y_{I_{2}}=x_{I_{2}}+m\left(x_{I_{1}}\right)
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">34</span>
+          <span class="site-state-item-count">36</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -422,7 +423,7 @@ y_{I_{2}}=x_{I_{2}}+m\left(x_{I_{1}}\right)
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-count">23</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

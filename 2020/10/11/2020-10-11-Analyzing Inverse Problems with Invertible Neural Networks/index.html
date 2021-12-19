@@ -35,7 +35,7 @@
 <meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20201030213832.png">
 <meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20201030213831.png">
 <meta property="article:published_time" content="2020-10-10T16:00:00.000Z">
-<meta property="article:modified_time" content="2020-11-01T11:45:24.054Z">
+<meta property="article:modified_time" content="2021-04-21T17:28:48.347Z">
 <meta property="article:author" content="Jame Kuma">
 <meta property="article:tag" content="图像超分辨">
 <meta property="article:tag" content="论文阅读">
@@ -342,7 +342,7 @@ M M D(X, Y)=\left\|\frac{1}{n^{2}} \sum_{i}^{n} \sum_{i^{\prime}}^{n} k\left(x_{
 <p>在高维问题中，特别是在基于GAN的图像生成中，可训练的Discriminator loss通常是首选的。但是MMD的效果也很好，并且更容易使用、代价更小，从而使训练更稳定。这种方法需要定义一个核函数，这里使用了一个逆多二次函数(inverse multiquadric)作为核函数：<span class="math inline">\(k\left(\mathbf{x}, \mathbf{x}^{\prime}\right)=1 /\left(1+\left\|\left(\mathbf{x}-\mathbf{x}^{\prime}\right) / h\right\|_{2}^{2}\right)\)</span></p>
 <h3 id="实验结果">实验结果</h3>
 <h4 id="人为构造的数据">人为构造的数据</h4>
-<p>作者构造了一个由8个单高斯分布组成的高斯混合分布<span class="math inline">\(p(\mathbf x)\)</span>。前向过程是“样本--&gt;标签”的过程，定义的过程也很简单，就是属于8个单高斯分布峰值的的样本给打上对应的label。共有四种label：红色、蓝色、绿色、紫色</p>
+<p>作者构造了一个由8个单高斯分布组成的高斯混合分布<span class="math inline">\(p(\mathbf x)\)</span>。前向过程是“样本--&gt;标签”的过程，定义的过程也很简单，就是属于8个单高斯分布峰值的的样 本给打上对应的label。共有四种label：红色、蓝色、绿色、紫色</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20201030213829.png" alt="image-20201003172559045" style="zoom:67%;" /></p>
 <p>而逆向过程就是给定一种颜色，求该颜色的分布。</p>
 <p>作者使用了不同种方法来实现逆向过程，从而进行对比：</p>
@@ -472,7 +472,7 @@ M M D(X, Y)=\left\|\frac{1}{n^{2}} \sum_{i}^{n} \sum_{i^{\prime}}^{n} k\left(x_{
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">34</span>
+          <span class="site-state-item-count">36</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -485,7 +485,7 @@ M M D(X, Y)=\left\|\frac{1}{n^{2}} \sum_{i}^{n} \sum_{i^{\prime}}^{n} k\left(x_{
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-count">23</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
