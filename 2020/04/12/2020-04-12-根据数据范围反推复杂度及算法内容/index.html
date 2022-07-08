@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"jamekuma.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","width":270,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="一般ACM或者笔试题的时间限制是1秒或2秒。 在这种情况下，C++代码中的操作次数控制在 \(10^7\)为最佳。 下面给出在不同数据范围下，代码的时间复杂度和算法该如何选择： \(n≤30\), 指数级别, dfs+剪枝，状态压缩dp \(n≤100\) &#x3D;&gt; \(O(n^3)\)，floyd，dp \(n≤10^3\) &#x3D;&gt; \(O(n^2)\)，\(O(n^2log\">
+  <meta name="description" content="一般ACM或者笔试题的时间限制是1秒或2秒。 在这种情况下，C++代码中的操作次数控制在 $10^7$为最佳。 下面给出在不同数据范围下，代码的时间复杂度和算法该如何选择： $n≤30$, 指数级别, dfs+剪枝，状态压缩dp $n≤100$  &#x3D;&gt;  $O(n^3)$，floyd，dp $n≤10^3$  &#x3D;&gt;  $O(n^2)$，$O(n^2log\ n)$，dp，二分 $n≤1">
 <meta property="og:type" content="article">
 <meta property="og:title" content="(转)根据数据范围反推复杂度及算法内容">
 <meta property="og:url" content="https://jamekuma.github.io/2020/04/12/2020-04-12-%E6%A0%B9%E6%8D%AE%E6%95%B0%E6%8D%AE%E8%8C%83%E5%9B%B4%E5%8F%8D%E6%8E%A8%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%8F%8A%E7%AE%97%E6%B3%95%E5%86%85%E5%AE%B9/index.html">
 <meta property="og:site_name" content="Jame&#39;s Blog">
-<meta property="og:description" content="一般ACM或者笔试题的时间限制是1秒或2秒。 在这种情况下，C++代码中的操作次数控制在 \(10^7\)为最佳。 下面给出在不同数据范围下，代码的时间复杂度和算法该如何选择： \(n≤30\), 指数级别, dfs+剪枝，状态压缩dp \(n≤100\) &#x3D;&gt; \(O(n^3)\)，floyd，dp \(n≤10^3\) &#x3D;&gt; \(O(n^2)\)，\(O(n^2log\">
+<meta property="og:description" content="一般ACM或者笔试题的时间限制是1秒或2秒。 在这种情况下，C++代码中的操作次数控制在 $10^7$为最佳。 下面给出在不同数据范围下，代码的时间复杂度和算法该如何选择： $n≤30$, 指数级别, dfs+剪枝，状态压缩dp $n≤100$  &#x3D;&gt;  $O(n^3)$，floyd，dp $n≤10^3$  &#x3D;&gt;  $O(n^2)$，$O(n^2log\ n)$，dp，二分 $n≤1">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-04-12T03:00:00.000Z">
 <meta property="article:modified_time" content="2020-04-12T03:33:41.693Z">
@@ -234,20 +234,20 @@
 
       
         <p>一般ACM或者笔试题的时间限制是1秒或2秒。</p>
-<p>在这种情况下，C++代码中的操作次数控制在 <span class="math inline">\(10^7\)</span>为最佳。</p>
+<p>在这种情况下，C++代码中的操作次数控制在 $10^7$为最佳。</p>
 <p><strong>下面给出在不同数据范围下，代码的时间复杂度和算法该如何选择：</strong></p>
-<p><span class="math inline">\(n≤30\)</span>, 指数级别, dfs+剪枝，状态压缩dp</p>
-<p><span class="math inline">\(n≤100\)</span> =&gt; <span class="math inline">\(O(n^3)\)</span>，floyd，dp</p>
-<p><span class="math inline">\(n≤10^3\)</span> =&gt; <span class="math inline">\(O(n^2)\)</span>，<span class="math inline">\(O(n^2log\ n)\)</span>，dp，二分</p>
-<p><span class="math inline">\(n≤10^4\)</span> =&gt; $ O(n∗n)$，块状链表</p>
-<p><span class="math inline">\(n≤10^5\)</span> =&gt; <span class="math inline">\(O(n*log\ n)\)</span> =&gt; 各种sort，线段树、树状数组、set/map、heap、dijkstra+heap、spfa、求凸包、求半平面交、二分</p>
-<p><span class="math inline">\(n≤10^6\)</span> =&gt; <span class="math inline">\(O(n)\)</span> =&gt; hash、双指针扫描、kmp、AC自动机。以及常数较小的 <span class="math inline">\(O(n*log\ n)\)</span> 算法sort、树状数组、heap、dijkstra、spfa</p>
-<p><span class="math inline">\(n≤10^7\)</span> =&gt; <span class="math inline">\(O(n)\)</span>，双指针扫描、kmp、AC自动机、线性筛素数</p>
-<p><span class="math inline">\(n≤10^9\)</span> =&gt; <span class="math inline">\(O(\sqrt n)\)</span>，判断质数</p>
-<p><span class="math inline">\(n≤10^{18}\)</span> =&gt; <span class="math inline">\(O(log\ n)\)</span>，最大公约数</p>
+<p>$n≤30$, 指数级别, dfs+剪枝，状态压缩dp</p>
+<p>$n≤100$  =&gt;  $O(n^3)$，floyd，dp</p>
+<p>$n≤10^3$  =&gt;  $O(n^2)$，$O(n^2log\ n)$，dp，二分</p>
+<p>$n≤10^4$  =&gt; $ O(n∗\sqrt n)$，块状链表</p>
+<p>$n≤10^5$  =&gt; $O(n*log\ n)$ =&gt; 各种sort，线段树、树状数组、set/map、heap、dijkstra+heap、spfa、求凸包、求半平面交、二分</p>
+<p>$n≤10^6$  =&gt; $O(n)$  =&gt;  hash、双指针扫描、kmp、AC自动机。以及常数较小的 $O(n*log\ n)$ 算法sort、树状数组、heap、dijkstra、spfa</p>
+<p>$n≤10^7$  =&gt;  $O(n)$，双指针扫描、kmp、AC自动机、线性筛素数</p>
+<p>$n≤10^9$  =&gt;  $O(\sqrt n)$，判断质数</p>
+<p>$n≤10^{18}$ =&gt;  $O(log\ n)$，最大公约数</p>
 <a id="more"></a>
 <p>作者：yxc</p>
-<p>链接：https://www.acwing.com/blog/content/32/</p>
+<p>链接：<a href="https://www.acwing.com/blog/content/32/" target="_blank" rel="noopener">https://www.acwing.com/blog/content/32/</a></p>
 <p>来源：AcWing</p>
 
     </div>
@@ -349,7 +349,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-count">37</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -362,7 +362,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">26</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -400,7 +400,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

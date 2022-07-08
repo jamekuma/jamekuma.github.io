@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"jamekuma.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","width":270,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="这是一篇超分领域的知识蒸馏工作，发表于ECCV 2020 论文背景 传统的CNN-based超分方法，一般需要大量的存储资源和计算资源，难以在移动设备以及一些没有神经处理单元和芯片外存储器的设备上运行。 也有很多工作是致力于减少神经网络的消耗的：  比如在SISR中，使用递归层或者一些专门为SISR设计的网络结构。但是这些递归层或者专门设计的结构难以在硬件上实现。 网络剪枝、参数量化也">
+  <meta name="description" content="这是一篇超分领域的知识蒸馏工作，发表于ECCV 2020 论文背景传统的CNN-based超分方法，一般需要大量的存储资源和计算资源，难以在移动设备以及一些没有神经处理单元和芯片外存储器的设备上运行。 也有很多工作是致力于减少神经网络的消耗的：  比如在SISR中，使用递归层或者一些专门为SISR设计的网络结构。但是这些递归层或者专门设计的结构难以在硬件上实现。 网络剪枝、参数量化也被用于网络压缩">
 <meta property="og:type" content="article">
 <meta property="og:title" content="读论文：Learning with Privileged Information for Efficient Image Super-Resolution   Super-Resolution and Beyond">
 <meta property="og:url" content="https://jamekuma.github.io/2020/12/26/2020-12-26-Learning%20with%20Privileged%20Information%20for%20Efficient%20Image%20Super-Resolution/index.html">
 <meta property="og:site_name" content="Jame&#39;s Blog">
-<meta property="og:description" content="这是一篇超分领域的知识蒸馏工作，发表于ECCV 2020 论文背景 传统的CNN-based超分方法，一般需要大量的存储资源和计算资源，难以在移动设备以及一些没有神经处理单元和芯片外存储器的设备上运行。 也有很多工作是致力于减少神经网络的消耗的：  比如在SISR中，使用递归层或者一些专门为SISR设计的网络结构。但是这些递归层或者专门设计的结构难以在硬件上实现。 网络剪枝、参数量化也">
+<meta property="og:description" content="这是一篇超分领域的知识蒸馏工作，发表于ECCV 2020 论文背景传统的CNN-based超分方法，一般需要大量的存储资源和计算资源，难以在移动设备以及一些没有神经处理单元和芯片外存储器的设备上运行。 也有很多工作是致力于减少神经网络的消耗的：  比如在SISR中，使用递归层或者一些专门为SISR设计的网络结构。但是这些递归层或者专门设计的结构难以在硬件上实现。 网络剪枝、参数量化也被用于网络压缩">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201227180921556.png">
 <meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201227223828860.png">
@@ -242,8 +242,7 @@
 
       
         <p>这是一篇超分领域的知识蒸馏工作，发表于ECCV 2020</p>
-<h3 id="论文背景">论文背景</h3>
-<p>传统的CNN-based超分方法，一般需要大量的存储资源和计算资源，难以在移动设备以及一些没有神经处理单元和芯片外存储器的设备上运行。</p>
+<h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>传统的CNN-based超分方法，一般需要大量的存储资源和计算资源，难以在移动设备以及一些没有神经处理单元和芯片外存储器的设备上运行。</p>
 <p>也有很多工作是致力于减少神经网络的消耗的：</p>
 <ul>
 <li>比如在SISR中，使用递归层或者一些专门为SISR设计的网络结构。但是这些递归层或者专门设计的结构难以在硬件上实现。</li>
@@ -255,38 +254,28 @@
 <p>具体框架如下图：</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201227180921556.png" alt="image-20201227180921556" style="zoom:67%;" /></p>
 <p>传统的知识蒸馏方式如左图，其T网络和S网络的输入是一样的。而本文采用的广义蒸馏方式，对于T网络，其输入是一个优势特征——HR图像，而Encoder-Decoder的沙漏结构，其中的Decoder即为S网络的学习对象，Decoder中的中间特征通过特征蒸馏传递给S网络，这样S网络就可以学习通过优势特征培训的T网络的知识(例如，高频或HR输入的细节)。S网络可以用解码器的网络参数初始化，这允许将教师的重构能力转移给S网络。（？）</p>
-<h3 id="方法详述">方法详述</h3>
-<h4 id="teather网络">Teather网络</h4>
-<p>由于教师网络输入的是真实的HR图像，可能无法提取出有用的特征，不管其容量如何，只是学会复制其输入——HR图像。此外，网络参数数量的巨大差异或教师和学生之间的表现差距阻碍了蒸馏过程。</p>
-<p>为了在促进Teather网络获取有用特征的同时减少差距，作者为Teather网络开发了一个沙漏结构。将HR图像投影到一个低维的特征空间中，生成紧凑的特征，然后从这些特征中重构出原始HR图像，这样Teather网络就可以学习提取更好的特征表示来完成图像重构任务。具体来说，教师网络由一个编码器<span class="math inline">\(G^{\mathcal{T}}\)</span>和一个解码器<span class="math inline">\(F^{\mathcal{T}}\)</span>组成。给定一对LR和HR图像，编码器<span class="math inline">\(G^{\mathcal{T}}\)</span>将输入HR图像<span class="math inline">\(\mathbf Y\)</span>转换为特征表示<span class="math inline">\(\hat{\mathbf{X}}^{\mathcal{T}}\)</span>。 <span class="math display">\[
-\hat{\mathbf{X}}^{\mathcal{T}}=G^{\mathcal{T}}(\mathbf{Y})
-\]</span> 而<span class="math inline">\(\hat{\mathbf{X}}^{\mathcal{T}}\)</span>的size和LR图像是一致的，decoder把<span class="math inline">\(\hat{\mathbf{X}}^{\mathcal{T}}\)</span>重新重构为HR图像<span class="math inline">\(\hat{\mathbf{Y}}^{\mathcal{T}}\)</span>。 <span class="math display">\[
-\hat{\mathbf{Y}}^{\mathcal{T}}=F^{\mathcal{T}}\left(\hat{\mathbf{X}}^{\mathcal{T}}\right)
-\]</span> 对于decoder，使用与Student网络相同的架构。它允许教师拥有与学生相似的表现能力，这在《Improved knowledge distillation via teacher assistant: Bridging the gap between student and teacher》(AAAI 2020)中被证明是有用的。</p>
-<p>而损失函数即为重构损失+模仿损失(imitation loss)： <span class="math display">\[
-L_{\mathrm{recon}}^{\mathcal{T}}=\frac{1}{H W} \sum_{i=1}^{H} \sum_{j=1}^{W}\left|Y_{i j}-\hat{Y}_{i j}^{\mathcal{T}}\right|
-\]</span></p>
-<p><span class="math display">\[
-L_{\mathrm{im}}^{\mathcal{T}}=\frac{1}{H^{\prime} W^{\prime}} \sum_{i=1}^{H^{\prime}} \sum_{j=1}^{W^{\prime}}\left|X_{i j}-\hat{X}_{i j}^{\mathcal{T}}\right|
-\]</span></p>
-<h4 id="student网络">Student网络</h4>
-<p>student网络完成以下映射： <span class="math display">\[
-\hat{\mathbf{Y}}^{\mathcal{S}}=F^{\mathcal{S}}(\mathbf{X})
-\]</span> 损失函数使用的是重构损失+蒸馏损失。重构损失如下： <span class="math display">\[
-L_{\text {recon }}^{\mathcal{S}}=\frac{1}{H W} \sum_{i=1}^{H} \sum_{j=1}^{W}\left|Y_{i j}-\hat{Y}_{i j}^{S}\right|
-\]</span></p>
-<h5 id="蒸馏损失">蒸馏损失</h5>
-<p>用<span class="math inline">\(\mathbf{f}^{\mathcal{T}}\)</span>和<span class="math inline">\(\mathbf{f}^{\mathcal{S}}\)</span>分别表示教师网络和学生网络的中间特征，它们的大小相同，分别为<span class="math inline">\(C×H&#39;×W&#39;\)</span>，定义互信息（mutual information）如下： <span class="math display">\[
-I\left(\mathbf{f}^{\mathcal{T}} ; \mathbf{f}^{\mathcal{S}}\right)=H\left(\mathbf{f}^{\mathcal{T}}\right)-H\left(\mathbf{f}^{\mathcal{T}} \mid \mathbf{f}^{\mathcal{S}}\right)
-\]</span> <span class="math inline">\(H\left(\mathbf{f}^{\mathcal{T}}\right)\)</span>和<span class="math inline">\(H\left(\mathbf{f}^{\mathcal{T}} \mid \mathbf{f}^{\mathcal{S}}\right)\)</span>分别是边际熵和条件熵(marginal and conditional entropies)。为了使互信息最大化，应该使条件熵<span class="math inline">\(H\left(\mathbf{f}^{\mathcal{T}} \mid \mathbf{f}^{\mathcal{S}}\right)\)</span>最小。然而，对学生的权重进行精确的优化是很难的，因为它涉及到对条件概率<span class="math inline">\(p\left(\mathbf{f}^{\mathcal{T}} \mid \mathbf{f}^{\mathcal{S}}\right)\)</span>的积分。变分信息最大化(The variational information maximization)技术使用参数模型<span class="math inline">\(q\left(\mathbf{f}^{\mathcal{T}} \mid \mathbf{f}^{\mathcal{S}}\right)\)</span>来近似条件分布<span class="math inline">\(p\left(\mathbf{f}^{\mathcal{T}} \mid \mathbf{f}^{\mathcal{S}}\right)\)</span>，例如高斯分布或拉普拉斯分布，使得找到互信息<span class="math inline">\(I\left(\mathbf{f}^{\mathcal{T}} ; \mathbf{f}^{\mathcal{S}}\right)\)</span>的下界。对于参数模型<span class="math inline">\(q\left(\mathbf{f}^{\mathcal{T}} \mid \mathbf{f}^{\mathcal{S}}\right)\)</span>，我们使用一个多元拉普拉斯分布，这个分布包含两个参数，其中<span class="math inline">\(\boldsymbol{\mu}\)</span>为位置参数，而<span class="math inline">\(\boldsymbol b\)</span>为尺度参数（控制蒸馏的程度），<span class="math inline">\(\boldsymbol{\mu},\boldsymbol{b} \in \mathbb{R}^{C \times H^{\prime} \times W^{\prime}}\)</span>。于是定义蒸馏损失<span class="math inline">\(L_{\text {distill }}^{S}\)</span>为: <span class="math display">\[
-L_{\mathrm{distill}}^{\mathcal{S}}=\frac{1}{C H^{\prime} W^{\prime}} \sum_{i=1}^{C} \sum_{j=1}^{H^{\prime}} \sum_{k=1}^{W^{\prime}} \log b_{i j k}+\frac{\left|f_{i j k}^{\mathcal{T}}-\mu_{i j k}\right|}{b_{i j k}}
-\]</span> 当S网络不能从蒸馏中获益时，尺度参数<span class="math inline">\(b_{ijk}\)</span>增大以减小蒸馏程度。因为教师和学生网络采取不同的输入，这样就能自适应地决定，学生从教师那里学到学生“可以接受的”特征。<span class="math inline">\(\log b_{i j k}\)</span>相当于一个正则项，防止<span class="math inline">\(b_{i j k}\)</span>造成loss的一个平凡解。</p>
-<p>而<span class="math inline">\(\boldsymbol{\mu}\)</span>和<span class="math inline">\(\boldsymbol{b}\)</span>是从student网络的特征<span class="math inline">\(\mathbf f^{\mathcal S}\)</span>中估计的。估计方法是使用一个小网络，这个小网络有两个分支，分别用于估计<span class="math inline">\(\boldsymbol{\mu}\)</span>和<span class="math inline">\(\boldsymbol{b}\)</span>。两个分支使用相同的网络架构，两个1×1卷积层，之间有一个PReLU。对于估计<span class="math inline">\(\boldsymbol{b}\)</span>的尺度分支，我们在最后一层添加softplus函数(ζ(x) = log(1 + e^x))，使尺度参数为正。<strong>注意，估算模块是为蒸馏过程服务的，因此仅在训练时使用。</strong></p>
-<h3 id="实验设计与结果">实验设计与结果</h3>
-<p>与大多数SR工作一样，使用DIV2K来训练，并在Set5、Set14、B100、Urban100上做测试。</p>
-<h4 id="消融实验">消融实验</h4>
-<p>如下表所示。</p>
-<ol type="1">
+<h3 id="方法详述"><a href="#方法详述" class="headerlink" title="方法详述"></a>方法详述</h3><h4 id="Teather网络"><a href="#Teather网络" class="headerlink" title="Teather网络"></a>Teather网络</h4><p>由于教师网络输入的是真实的HR图像，可能无法提取出有用的特征，不管其容量如何，只是学会复制其输入——HR图像。此外，网络参数数量的巨大差异或教师和学生之间的表现差距阻碍了蒸馏过程。</p>
+<p>为了在促进Teather网络获取有用特征的同时减少差距，作者为Teather网络开发了一个沙漏结构。将HR图像投影到一个低维的特征空间中，生成紧凑的特征，然后从这些特征中重构出原始HR图像，这样Teather网络就可以学习提取更好的特征表示来完成图像重构任务。具体来说，教师网络由一个编码器$G^{\mathcal{T}}$和一个解码器$F^{\mathcal{T}}$组成。给定一对LR和HR图像，编码器$G^{\mathcal{T}}$将输入HR图像$\mathbf Y$转换为特征表示$\hat{\mathbf{X}}^{\mathcal{T}}$。</p>
+<script type="math/tex; mode=display">
+\hat{\mathbf{X}}^{\mathcal{T}}=G^{\mathcal{T}}(\mathbf{Y})</script><p>而$\hat{\mathbf{X}}^{\mathcal{T}}$的size和LR图像是一致的，decoder把$\hat{\mathbf{X}}^{\mathcal{T}}$重新重构为HR图像$\hat{\mathbf{Y}}^{\mathcal{T}}$。</p>
+<script type="math/tex; mode=display">
+\hat{\mathbf{Y}}^{\mathcal{T}}=F^{\mathcal{T}}\left(\hat{\mathbf{X}}^{\mathcal{T}}\right)</script><p>对于decoder，使用与Student网络相同的架构。它允许教师拥有与学生相似的表现能力，这在《Improved knowledge distillation via teacher assistant: Bridging the gap between student and teacher》(AAAI 2020)中被证明是有用的。</p>
+<p>而损失函数即为重构损失+模仿损失(imitation loss)：</p>
+<script type="math/tex; mode=display">
+L_{\mathrm{recon}}^{\mathcal{T}}=\frac{1}{H W} \sum_{i=1}^{H} \sum_{j=1}^{W}\left|Y_{i j}-\hat{Y}_{i j}^{\mathcal{T}}\right|</script><script type="math/tex; mode=display">
+L_{\mathrm{im}}^{\mathcal{T}}=\frac{1}{H^{\prime} W^{\prime}} \sum_{i=1}^{H^{\prime}} \sum_{j=1}^{W^{\prime}}\left|X_{i j}-\hat{X}_{i j}^{\mathcal{T}}\right|</script><h4 id="Student网络"><a href="#Student网络" class="headerlink" title="Student网络"></a>Student网络</h4><p>student网络完成以下映射：</p>
+<script type="math/tex; mode=display">
+\hat{\mathbf{Y}}^{\mathcal{S}}=F^{\mathcal{S}}(\mathbf{X})</script><p>损失函数使用的是重构损失+蒸馏损失。重构损失如下：</p>
+<script type="math/tex; mode=display">
+L_{\text {recon }}^{\mathcal{S}}=\frac{1}{H W} \sum_{i=1}^{H} \sum_{j=1}^{W}\left|Y_{i j}-\hat{Y}_{i j}^{S}\right|</script><h5 id="蒸馏损失"><a href="#蒸馏损失" class="headerlink" title="蒸馏损失"></a>蒸馏损失</h5><p>用$\mathbf{f}^{\mathcal{T}}$和$\mathbf{f}^{\mathcal{S}}$分别表示教师网络和学生网络的中间特征，它们的大小相同，分别为$C×H’×W’$，定义互信息（mutual information）如下：</p>
+<script type="math/tex; mode=display">
+I\left(\mathbf{f}^{\mathcal{T}} ; \mathbf{f}^{\mathcal{S}}\right)=H\left(\mathbf{f}^{\mathcal{T}}\right)-H\left(\mathbf{f}^{\mathcal{T}} \mid \mathbf{f}^{\mathcal{S}}\right)</script><p>$H\left(\mathbf{f}^{\mathcal{T}}\right)$和$H\left(\mathbf{f}^{\mathcal{T}} \mid \mathbf{f}^{\mathcal{S}}\right)$分别是边际熵和条件熵(marginal and conditional entropies)。为了使互信息最大化，应该使条件熵$H\left(\mathbf{f}^{\mathcal{T}} \mid \mathbf{f}^{\mathcal{S}}\right)$最小。然而，对学生的权重进行精确的优化是很难的，因为它涉及到对条件概率$p\left(\mathbf{f}^{\mathcal{T}} \mid \mathbf{f}^{\mathcal{S}}\right)$的积分。变分信息最大化(The variational information maximization)技术使用参数模型$q\left(\mathbf{f}^{\mathcal{T}} \mid \mathbf{f}^{\mathcal{S}}\right)$来近似条件分布$p\left(\mathbf{f}^{\mathcal{T}} \mid \mathbf{f}^{\mathcal{S}}\right)$，例如高斯分布或拉普拉斯分布，使得找到互信息$I\left(\mathbf{f}^{\mathcal{T}} ; \mathbf{f}^{\mathcal{S}}\right)$的下界。对于参数模型$q\left(\mathbf{f}^{\mathcal{T}} \mid \mathbf{f}^{\mathcal{S}}\right)$，我们使用一个多元拉普拉斯分布，这个分布包含两个参数，其中$\boldsymbol{\mu}$为位置参数，而$\boldsymbol b$为尺度参数（控制蒸馏的程度），$\boldsymbol{\mu},\boldsymbol{b}  \in \mathbb{R}^{C \times H^{\prime} \times W^{\prime}}$。于是定义蒸馏损失$L_{\text {distill }}^{S}$为:</p>
+<script type="math/tex; mode=display">
+L_{\mathrm{distill}}^{\mathcal{S}}=\frac{1}{C H^{\prime} W^{\prime}} \sum_{i=1}^{C} \sum_{j=1}^{H^{\prime}} \sum_{k=1}^{W^{\prime}} \log b_{i j k}+\frac{\left|f_{i j k}^{\mathcal{T}}-\mu_{i j k}\right|}{b_{i j k}}</script><p>当S网络不能从蒸馏中获益时，尺度参数$b_{ijk}$增大以减小蒸馏程度。因为教师和学生网络采取不同的输入，这样就能自适应地决定，学生从教师那里学到学生“可以接受的”特征。$\log b_{i j k}$相当于一个正则项，防止$b_{i j k}$造成loss的一个平凡解。</p>
+<p>而$\boldsymbol{\mu}$和$\boldsymbol{b}$是从student网络的特征$\mathbf f^{\mathcal S}$中估计的。估计方法是使用一个小网络，这个小网络有两个分支，分别用于估计$\boldsymbol{\mu}$和$\boldsymbol{b}$。两个分支使用相同的网络架构，两个1×1卷积层，之间有一个PReLU。对于估计$\boldsymbol{b}$的尺度分支，我们在最后一层添加softplus函数(ζ(x) = log(1 + e^x))，使尺度参数为正。<strong>注意，估算模块是为蒸馏过程服务的，因此仅在训练时使用。</strong></p>
+<h3 id="实验设计与结果"><a href="#实验设计与结果" class="headerlink" title="实验设计与结果"></a>实验设计与结果</h3><p>与大多数SR工作一样，使用DIV2K来训练，并在Set5、Set14、B100、Urban100上做测试。</p>
+<h4 id="消融实验"><a href="#消融实验" class="headerlink" title="消融实验"></a>消融实验</h4><p>如下表所示。</p>
+<ol>
 <li>baseline使用的是FSRCNN（第一行）。</li>
 <li>从第二行开始，就能看出distillation对SR结果的促进效果了。第二行是把FSRCNN的结构去掉最后的deconvolution，作为teacher的结构，但没有沙漏结构。</li>
 <li>而第三行的沙漏结构限制了教师的性能并降低了性能(例如:第二排的老师比第二排的老师下降了19.9dB)，但是缩小了老师和学生之间的成绩差距。这使得特征提取更加有效，因此第三行student的性能(37.22dB)优于第二行student的性能(37.19dB)。</li>
@@ -295,11 +284,9 @@ L_{\mathrm{distill}}^{\mathcal{S}}=\frac{1}{C H^{\prime} W^{\prime}} \sum_{i=1}^
 <li>最后两行表明，在拉普拉斯分布的情况下，VID loss的处理效果比MAE的要好（基于MAE的蒸馏损失，会使得学生网络和教师网络的特征图相同。然而，这种对特征映射的强烈约束在本文的例子中是有问题的，因为本文的框架中对学生和教师网络使用了不同的输入。）</li>
 </ol>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201227223828860.png" alt="image-20201227223828860" style="zoom: 50%;" /></p>
-<h4 id="lr">LR</h4>
-<p>对于encoder编码得到的compact features ，作者也在w和w/o imitation loss的条件下做了分析，这个结果也是可预见的。</p>
+<h4 id="LR"><a href="#LR" class="headerlink" title="LR"></a>LR</h4><p>对于encoder编码得到的compact features ，作者也在w和w/o imitation loss的条件下做了分析，这个结果也是可预见的。</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201227225432138.png" alt="image-20201227225432138" style="zoom:50%;" /></p>
-<h4 id="最终结果">最终结果</h4>
-<p>最终也是取得了不错的结果。相对于baselineFSRCNN，没有任何参数或是计算量的增加，但提上来了指标。相对于其他的大模型，本框架在时空效率上也更优。</p>
+<h4 id="最终结果"><a href="#最终结果" class="headerlink" title="最终结果"></a>最终结果</h4><p>最终也是取得了不错的结果。相对于baselineFSRCNN，没有任何参数或是计算量的增加，但提上来了指标。相对于其他的大模型，本框架在时空效率上也更优。</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201227225633856.png" alt="image-20201227225633856" style="zoom:67%;" /></p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20201227225845509.png" alt="image-20201227225845509" style="zoom:50%;" /></p>
 <p>不仅在FSRCNN上，把本方法应用到其他SR模型中，也能提升性能：</p>
@@ -327,8 +314,8 @@ L_{\mathrm{distill}}^{\mathcal{S}}=\frac{1}{C H^{\prime} W^{\prime}} \sum_{i=1}^
       <i class="fa fa-chevron-left"></i> 读论文：LAPAR：Linearly-Assembled Pixel-Adaptive Regression Network for Single Image Super-Resolution and Beyond
     </a></div>
       <div class="post-nav-item">
-    <a href="/2021/01/23/2021-01-29-Exploiting%20Deep%20Generative%20Prior%20for%20Versatile%20Image%20Restoration%20and%20Manipulation/" rel="next" title="读论文：Exploiting Deep Generative Prior for Versatile Image Restoration and Manipulation">
-      读论文：Exploiting Deep Generative Prior for Versatile Image Restoration and Manipulation <i class="fa fa-chevron-right"></i>
+    <a href="/2021/01/23/2021-01-23-Learning%20Continuous%20Image%20Representation%20with%20Local%20Implicit%20Image%20Function/" rel="next" title="读论文：Learning Continuous Image Representation with Local Implicit Image Function">
+      读论文：Learning Continuous Image Representation with Local Implicit Image Function <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -390,7 +377,7 @@ L_{\mathrm{distill}}^{\mathcal{S}}=\frac{1}{C H^{\prime} W^{\prime}} \sum_{i=1}^
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#论文背景"><span class="nav-number">1.</span> <span class="nav-text">论文背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法详述"><span class="nav-number">2.</span> <span class="nav-text">方法详述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#teather网络"><span class="nav-number">2.1.</span> <span class="nav-text">Teather网络</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#student网络"><span class="nav-number">2.2.</span> <span class="nav-text">Student网络</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#蒸馏损失"><span class="nav-number">2.2.1.</span> <span class="nav-text">蒸馏损失</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验设计与结果"><span class="nav-number">3.</span> <span class="nav-text">实验设计与结果</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#消融实验"><span class="nav-number">3.1.</span> <span class="nav-text">消融实验</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#lr"><span class="nav-number">3.2.</span> <span class="nav-text">LR</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#最终结果"><span class="nav-number">3.3.</span> <span class="nav-text">最终结果</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#论文背景"><span class="nav-number">1.</span> <span class="nav-text">论文背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法详述"><span class="nav-number">2.</span> <span class="nav-text">方法详述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Teather网络"><span class="nav-number">2.1.</span> <span class="nav-text">Teather网络</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Student网络"><span class="nav-number">2.2.</span> <span class="nav-text">Student网络</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#蒸馏损失"><span class="nav-number">2.2.1.</span> <span class="nav-text">蒸馏损失</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验设计与结果"><span class="nav-number">3.</span> <span class="nav-text">实验设计与结果</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#消融实验"><span class="nav-number">3.1.</span> <span class="nav-text">消融实验</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LR"><span class="nav-number">3.2.</span> <span class="nav-text">LR</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#最终结果"><span class="nav-number">3.3.</span> <span class="nav-text">最终结果</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -406,7 +393,7 @@ L_{\mathrm{distill}}^{\mathcal{S}}=\frac{1}{C H^{\prime} W^{\prime}} \sum_{i=1}^
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-count">37</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -419,7 +406,7 @@ L_{\mathrm{distill}}^{\mathcal{S}}=\frac{1}{C H^{\prime} W^{\prime}} \sum_{i=1}^
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">26</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -457,7 +444,7 @@ L_{\mathrm{distill}}^{\mathcal{S}}=\frac{1}{C H^{\prime} W^{\prime}} \sum_{i=1}^
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

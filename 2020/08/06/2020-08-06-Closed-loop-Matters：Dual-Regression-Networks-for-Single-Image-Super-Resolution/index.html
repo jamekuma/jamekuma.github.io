@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"jamekuma.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","width":270,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="论文背景 这篇文章的主要思想是利用对偶学习的思想去训练SR网络，涉及到了很多对偶学习的概念，在这里做一些归纳。">
+  <meta name="description" content="论文背景这篇文章的主要思想是利用对偶学习的思想去训练SR网络，涉及到了很多对偶学习的概念，在这里做一些归纳。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="读论文：Closed-loop Matters：Dual Regression Networks for Single Image Super-Resolution">
 <meta property="og:url" content="https://jamekuma.github.io/2020/08/06/2020-08-06-Closed-loop-Matters%EF%BC%9ADual-Regression-Networks-for-Single-Image-Super-Resolution/index.html">
 <meta property="og:site_name" content="Jame&#39;s Blog">
-<meta property="og:description" content="论文背景 这篇文章的主要思想是利用对偶学习的思想去训练SR网络，涉及到了很多对偶学习的概念，在这里做一些归纳。">
+<meta property="og:description" content="论文背景这篇文章的主要思想是利用对偶学习的思想去训练SR网络，涉及到了很多对偶学习的概念，在这里做一些归纳。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808100504.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808100513.png">
@@ -247,65 +247,45 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="论文背景">论文背景</h3>
-<p>这篇文章的主要思想是利用对偶学习的思想去训练SR网络，涉及到了很多对偶学习的概念，在这里做一些归纳。</p>
+        <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>这篇文章的主要思想是利用对偶学习的思想去训练SR网络，涉及到了很多对偶学习的概念，在这里做一些归纳。</p>
 <a id="more"></a>
-<h4 id="对偶学习dual-learning">对偶学习(dual learning)</h4>
-<p>对偶学习最早是在面对机器翻译问题提出来的，发表在Dual Learning for Machine Translation这篇文章里。作者观察到在机器学习的任务中，有许多任务是对偶存在的，比如：英汉互译。现实中我们往往分别考虑两个过程，即对于汉语翻译成英语进行一个模型的训练，对于英语翻译成汉语进行另一个模型的训练。那这两个模型之间是否存在着什么关系呢？是否可以同时训练这两个过程，同时两者之间可以相互的促进？</p>
-<figure>
-<img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808100504.png" alt="image-20200806121905733" /><figcaption aria-hidden="true">image-20200806121905733</figcaption>
-</figure>
+<h4 id="对偶学习-dual-learning"><a href="#对偶学习-dual-learning" class="headerlink" title="对偶学习(dual learning)"></a>对偶学习(dual learning)</h4><p>对偶学习最早是在面对机器翻译问题提出来的，发表在Dual Learning for Machine Translation这篇文章里。作者观察到在机器学习的任务中，有许多任务是对偶存在的，比如：英汉互译。现实中我们往往分别考虑两个过程，即对于汉语翻译成英语进行一个模型的训练，对于英语翻译成汉语进行另一个模型的训练。那这两个模型之间是否存在着什么关系呢？是否可以同时训练这两个过程，同时两者之间可以相互的促进？</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808100504.png" alt="image-20200806121905733"></p>
 <p>对偶学习的基本思想是两个对偶的任务能形成一个闭环反馈系统，使我们得以从未标注的数据上获得反馈信息，进而利用该反馈信息提高对偶任务中的两个机器学习模型。该思想具有普适性，可以扩展到多个相关任务上面，前提是只要它们能形成一个闭环反馈系统。例如，从中文翻译到英文，然后从英文翻译到日文，再从日文翻译到中文。另外一个例子是从图片转化成文字，然后从文字转成语音，再从语音转化成图片。本文把超分辨问题也看做的一个闭环反馈系统，即LR&lt;—&gt;HR，进而采用了对偶学习的方法。</p>
-<h4 id="motivation">motivation</h4>
-<ul>
+<h4 id="motivation"><a href="#motivation" class="headerlink" title="motivation"></a>motivation</h4><ul>
 <li>对于LR-&gt;HR这一ill-pose问题，可能的函数空间过大，限制了学习性能。对于这种问题，现有的很多方法的解决方案是提升模型容量，比如EDSR、DBPN、RCAN。但由于函数空间过大，这些方法的性能还是不高，具体体现在难以生成尖锐的纹理(sharp textures) 。<strong>因此本文的第一个motivation在于如何减少LR-&gt;HR映射空间的大小。</strong></li>
 <li>对于训练集，当没有paired训练集时，很多SR模型就没用。再者，对于paired训练集，很多真实世界下的LR图片和训练集中使用固定退化形成的LR图片的分布不一样，进而导致模型在自然场景下表现不好。因此，<strong>本文的第二个motivation在于如何有效的利用unpaired数据集进而使SR模型更适应实际应用</strong>。</li>
 </ul>
-<h3 id="主要贡献">主要贡献</h3>
-<ul>
+<h3 id="主要贡献"><a href="#主要贡献" class="headerlink" title="主要贡献"></a>主要贡献</h3><ul>
 <li>开发了一个对偶回归方案，使映射可以形成一个闭环，通过对LR图像的重建来提高SR模型的性能。此外，还从理论上分析了该方法的泛化能力，进一步证明了该方法相对于现有方法的优越性。</li>
 <li>通过提出的双重回归方案，深度模型可以很容易地适应现实世界的数据。</li>
 <li>通过对训练数据和非配对真实数据的大量实验，证明了对偶回归方法在图像超分辨方面的有效性。</li>
 </ul>
-<h3 id="方法详述">方法详述</h3>
-<h4 id="对于paired数据的对偶回归">对于paired数据的对偶回归</h4>
-<p>引入两个网络P和D，loss如下：</p>
+<h3 id="方法详述"><a href="#方法详述" class="headerlink" title="方法详述"></a>方法详述</h3><h4 id="对于paired数据的对偶回归"><a href="#对于paired数据的对偶回归" class="headerlink" title="对于paired数据的对偶回归"></a>对于paired数据的对偶回归</h4><p>引入两个网络P和D，loss如下：</p>
 <p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808100513.png" alt="image-20200806135216943" style="zoom:50%;" /></p>
 <p>前者是原始回归的损失，用于优化P网络；后者是对偶回归的损失，用于优化D网络。</p>
-<h4 id="对于unpaired数据的对偶回归">对于unpaired数据的对偶回归</h4>
-<p>对于unpaired数据，网络和上述一直，只是loss没有了原始回归的部分。</p>
+<h4 id="对于unpaired数据的对偶回归"><a href="#对于unpaired数据的对偶回归" class="headerlink" title="对于unpaired数据的对偶回归"></a>对于unpaired数据的对偶回归</h4><p>对于unpaired数据，网络和上述一直，只是loss没有了原始回归的部分。</p>
 <p>为了结合paired和unpaired的数据，对于两者混合的数据集，loss如下：</p>
 <p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808100521.png" alt="image-20200806135615012" style="zoom:67%;" /></p>
-<p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808100526.png" alt="image-20200806135854191" />当xi属于paired数据时为1，否则为0.</p>
-<h4 id="网络结构">网络结构</h4>
-<p>整体的网络是带skip connection的U-Net，没有特别的地方：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808100526.png" alt="image-20200806135854191">当xi属于paired数据时为1，否则为0.</p>
+<h4 id="网络结构"><a href="#网络结构" class="headerlink" title="网络结构"></a>网络结构</h4><p>整体的网络是带skip connection的U-Net，没有特别的地方：</p>
 <p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808100531.png" alt="image-20200806140000924" style="zoom:67%;" /></p>
 <p>注：U-net左边的input是LR图片通过Bicubic kernel来放大的。</p>
-<h4 id="理论分析">理论分析</h4>
-<p>本篇论文花了较大篇幅证明这种Dual regression对模型的泛化能力的提升，其中涉及到了Rademacher复杂度等机器学习理论的知识。</p>
+<h4 id="理论分析"><a href="#理论分析" class="headerlink" title="理论分析"></a>理论分析</h4><p>本篇论文花了较大篇幅证明这种Dual regression对模型的泛化能力的提升，其中涉及到了Rademacher复杂度等机器学习理论的知识。</p>
 <p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808100536.png" alt="image-20200806140450086" style="zoom:67%;" /></p>
 <p>推导的结论是：与传统的SR方法相比，对偶回归SR方法具有更小的泛化边界，有助于实现更准确的SR预测。</p>
-<h3 id="实验结果">实验结果</h3>
-<h4 id="只使用paired数据集">只使用paired数据集</h4>
-<p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808100542.png" alt="image-20200806143030438" style="zoom:67%;" /></p>
-<h4 id="加上unpaired数据">加上unpaired数据</h4>
-<h5 id="在人工的lr图像的数值表现">在人工的LR图像的数值表现</h5>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200815010807.png" alt="image-20200806143156843" style="zoom:67%;" /></p>
-<h5 id="在自然图像的视觉表现">在自然图像的视觉表现</h5>
-<p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808100548.png" alt="image-20200806143223305" style="zoom:67%;" /></p>
-<h4 id="消融实验">消融实验</h4>
-<p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808100553.png" alt="image-20200806143409359" style="zoom:67%;" /></p>
-<h4 id="损失函数中的λ取值实验">损失函数中的λ取值实验</h4>
-<p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808100557.png" alt="image-20200806143530185" style="zoom:67%;" /></p>
-<h4 id="unpaired数据在数据集中的占比ρ">unpaired数据在数据集中的占比ρ</h4>
-<p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808100602.png" alt="image-20200806143729831" style="zoom:50%;" /></p>
-<h3 id="总结与思考">总结与思考</h3>
-<ul>
-<li>乍一看觉得dual regression的思路跟上周看的基于Cycle-GAN的方法的机制很像，但是本文中作者也特地强调了区别：
-<ul>
+<h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><h4 id="只使用paired数据集"><a href="#只使用paired数据集" class="headerlink" title="只使用paired数据集"></a>只使用paired数据集</h4><p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808100542.png" alt="image-20200806143030438" style="zoom:67%;" /></p>
+<h4 id="加上unpaired数据"><a href="#加上unpaired数据" class="headerlink" title="加上unpaired数据"></a>加上unpaired数据</h4><h5 id="在人工的LR图像的数值表现"><a href="#在人工的LR图像的数值表现" class="headerlink" title="在人工的LR图像的数值表现"></a>在人工的LR图像的数值表现</h5><p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200815010807.png" alt="image-20200806143156843" style="zoom:67%;" /></p>
+<h5 id="在自然图像的视觉表现"><a href="#在自然图像的视觉表现" class="headerlink" title="在自然图像的视觉表现"></a>在自然图像的视觉表现</h5><p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808100548.png" alt="image-20200806143223305" style="zoom:67%;" /></p>
+<h4 id="消融实验"><a href="#消融实验" class="headerlink" title="消融实验"></a>消融实验</h4><p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808100553.png" alt="image-20200806143409359" style="zoom:67%;" /></p>
+<h4 id="损失函数中的λ取值实验"><a href="#损失函数中的λ取值实验" class="headerlink" title="损失函数中的λ取值实验"></a>损失函数中的λ取值实验</h4><p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808100557.png" alt="image-20200806143530185" style="zoom:67%;" /></p>
+<h4 id="unpaired数据在数据集中的占比ρ"><a href="#unpaired数据在数据集中的占比ρ" class="headerlink" title="unpaired数据在数据集中的占比ρ"></a>unpaired数据在数据集中的占比ρ</h4><p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200808100602.png" alt="image-20200806143729831" style="zoom:50%;" /></p>
+<h3 id="总结与思考"><a href="#总结与思考" class="headerlink" title="总结与思考"></a>总结与思考</h3><ul>
+<li>乍一看觉得dual regression的思路跟上周看的基于Cycle-GAN的方法的机制很像，但是本文中作者也特地强调了区别：<ul>
 <li>基于Cycle-GAN的方法，使用循环一致损失是为了防止在domain transfer的时候模型倒塌(mode collapse)（即把所有的图片都映射为同一张图来骗过discriminator）；而本文中的目的是把“闭环”作为一个额外的约束来减小可能的函数空间。</li>
 <li>基于Cycle-GAN的方法完全抛弃了成对的合成数据(paired synthetic data)；但是本文可以同时利用成对的合成数据和真实世界的非成对数据来增强训练。</li>
-</ul></li>
+</ul>
+</li>
 <li>本文出现了很多数学推导，特别是函数空间、Rademacher复杂度等概念我之前没有接触过，读起来比较吃力，而且理解得不是很深刻。让我体会到了自己的机器学习基础数学理论还需要加强。</li>
 </ul>
 
@@ -394,7 +374,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#论文背景"><span class="nav-number">1.</span> <span class="nav-text">论文背景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#对偶学习dual-learning"><span class="nav-number">1.1.</span> <span class="nav-text">对偶学习(dual learning)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#motivation"><span class="nav-number">1.2.</span> <span class="nav-text">motivation</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主要贡献"><span class="nav-number">2.</span> <span class="nav-text">主要贡献</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法详述"><span class="nav-number">3.</span> <span class="nav-text">方法详述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#对于paired数据的对偶回归"><span class="nav-number">3.1.</span> <span class="nav-text">对于paired数据的对偶回归</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#对于unpaired数据的对偶回归"><span class="nav-number">3.2.</span> <span class="nav-text">对于unpaired数据的对偶回归</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#网络结构"><span class="nav-number">3.3.</span> <span class="nav-text">网络结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#理论分析"><span class="nav-number">3.4.</span> <span class="nav-text">理论分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验结果"><span class="nav-number">4.</span> <span class="nav-text">实验结果</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#只使用paired数据集"><span class="nav-number">4.1.</span> <span class="nav-text">只使用paired数据集</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#加上unpaired数据"><span class="nav-number">4.2.</span> <span class="nav-text">加上unpaired数据</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#在人工的lr图像的数值表现"><span class="nav-number">4.2.1.</span> <span class="nav-text">在人工的LR图像的数值表现</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#在自然图像的视觉表现"><span class="nav-number">4.2.2.</span> <span class="nav-text">在自然图像的视觉表现</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#消融实验"><span class="nav-number">4.3.</span> <span class="nav-text">消融实验</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#损失函数中的λ取值实验"><span class="nav-number">4.4.</span> <span class="nav-text">损失函数中的λ取值实验</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#unpaired数据在数据集中的占比ρ"><span class="nav-number">4.5.</span> <span class="nav-text">unpaired数据在数据集中的占比ρ</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结与思考"><span class="nav-number">5.</span> <span class="nav-text">总结与思考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#论文背景"><span class="nav-number">1.</span> <span class="nav-text">论文背景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#对偶学习-dual-learning"><span class="nav-number">1.1.</span> <span class="nav-text">对偶学习(dual learning)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#motivation"><span class="nav-number">1.2.</span> <span class="nav-text">motivation</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主要贡献"><span class="nav-number">2.</span> <span class="nav-text">主要贡献</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法详述"><span class="nav-number">3.</span> <span class="nav-text">方法详述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#对于paired数据的对偶回归"><span class="nav-number">3.1.</span> <span class="nav-text">对于paired数据的对偶回归</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#对于unpaired数据的对偶回归"><span class="nav-number">3.2.</span> <span class="nav-text">对于unpaired数据的对偶回归</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#网络结构"><span class="nav-number">3.3.</span> <span class="nav-text">网络结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#理论分析"><span class="nav-number">3.4.</span> <span class="nav-text">理论分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验结果"><span class="nav-number">4.</span> <span class="nav-text">实验结果</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#只使用paired数据集"><span class="nav-number">4.1.</span> <span class="nav-text">只使用paired数据集</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#加上unpaired数据"><span class="nav-number">4.2.</span> <span class="nav-text">加上unpaired数据</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#在人工的LR图像的数值表现"><span class="nav-number">4.2.1.</span> <span class="nav-text">在人工的LR图像的数值表现</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#在自然图像的视觉表现"><span class="nav-number">4.2.2.</span> <span class="nav-text">在自然图像的视觉表现</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#消融实验"><span class="nav-number">4.3.</span> <span class="nav-text">消融实验</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#损失函数中的λ取值实验"><span class="nav-number">4.4.</span> <span class="nav-text">损失函数中的λ取值实验</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#unpaired数据在数据集中的占比ρ"><span class="nav-number">4.5.</span> <span class="nav-text">unpaired数据在数据集中的占比ρ</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结与思考"><span class="nav-number">5.</span> <span class="nav-text">总结与思考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -410,7 +390,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-count">37</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -423,7 +403,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">26</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -461,7 +441,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

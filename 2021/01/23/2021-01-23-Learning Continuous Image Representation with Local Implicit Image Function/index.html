@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"jamekuma.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","width":270,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="经过上次旁听小组会，大致对神经表示的方法有所了解，这是那次组会上张江辉分享的神经表示+超分辨的论文，当时没有太听明白，这回拿出来仔细研读一下。 这篇论文主要利用了神经表示在3D重构中的作用，提出了一个局部隐式图像函数（Local Implicit Image function, LIIF），利用表示的连续性完成任意尺度的超分辨。">
+  <meta name="description" content="经过上次旁听小组会，大致对神经表示的方法有所了解，这是那次组会上张江辉分享的神经表示+超分辨的论文，当时没有太听明白，这回拿出来仔细研读一下。 这篇论文主要利用了神经表示在3D重构中的作用，提出了一个局部隐式图像函数（Local Implicit Image function, LIIF），利用表示的连续性完成任意尺度的超分辨。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="读论文：Learning Continuous Image Representation with Local Implicit Image Function">
 <meta property="og:url" content="https://jamekuma.github.io/2021/01/23/2021-01-23-Learning%20Continuous%20Image%20Representation%20with%20Local%20Implicit%20Image%20Function/index.html">
 <meta property="og:site_name" content="Jame&#39;s Blog">
-<meta property="og:description" content="经过上次旁听小组会，大致对神经表示的方法有所了解，这是那次组会上张江辉分享的神经表示+超分辨的论文，当时没有太听明白，这回拿出来仔细研读一下。 这篇论文主要利用了神经表示在3D重构中的作用，提出了一个局部隐式图像函数（Local Implicit Image function, LIIF），利用表示的连续性完成任意尺度的超分辨。">
+<meta property="og:description" content="经过上次旁听小组会，大致对神经表示的方法有所了解，这是那次组会上张江辉分享的神经表示+超分辨的论文，当时没有太听明白，这回拿出来仔细研读一下。 这篇论文主要利用了神经表示在3D重构中的作用，提出了一个局部隐式图像函数（Local Implicit Image function, LIIF），利用表示的连续性完成任意尺度的超分辨。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20210124195149674.png">
 <meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20210124202714069.png">
@@ -241,52 +241,40 @@
         <p>经过上次旁听小组会，大致对神经表示的方法有所了解，这是那次组会上张江辉分享的神经表示+超分辨的论文，当时没有太听明白，这回拿出来仔细研读一下。</p>
 <p>这篇论文主要利用了神经表示在3D重构中的作用，提出了一个局部隐式图像函数（Local Implicit Image function, LIIF），利用表示的连续性完成任意尺度的超分辨。</p>
 <a id="more"></a>
-<h3 id="论文背景">论文背景</h3>
-<p>真实的视觉世界应该是连续的，但是机器在捕获一个场景的图片时，会将其离散化采样为2D得像素数组，也就是<strong>基于像素表示的</strong>数字图像。而这种表示方法也带来了“分辨率”这一衡量图像采样质量的描述。而本文的工作是想以一种连续性的表示方法去表示图像，这样，我们可以以任意的分辨率来储存、生成图像。</p>
+<h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>真实的视觉世界应该是连续的，但是机器在捕获一个场景的图片时，会将其离散化采样为2D得像素数组，也就是<strong>基于像素表示的</strong>数字图像。而这种表示方法也带来了“分辨率”这一衡量图像采样质量的描述。而本文的工作是想以一种连续性的表示方法去表示图像，这样，我们可以以任意的分辨率来储存、生成图像。</p>
 <p>对于连续地表示图像，经典的编码器-解码器就是一个例子——把图像编码到一个隐空间，这个隐空间就是连续的，再通过一个独立的解码器解码出图像。但作者表示，这种encoder是在实例(instance)之间分享知识(knowledge)的，这里我的理解是encoder是学习了不同的图像(实例)的编码过程，得到了最终的encoder参数(知识)，也就是多个实例共享一个decoder模型的。而decoder也是一样的道理。但是这种表示方法，只能成功地表示简单的图像，无法表示信息丰富的自然图像。据作者推断，这是因为，将自然图像的所有细节编码在一个简单的隐编码中是很困难的。</p>
 <p>然后作者基于神经表示的思想，在本文提出一个局部隐式图像函数（Local Implicit Image function, LIIF），用一组<strong>分布在空间维度上</strong>的隐码来表示图像，每个隐码存储关于其<strong>局部区域</strong>的信息。</p>
 <p>对于这样一种表示方法，其输入也是一张基于像素表示的离散图像吗，但是LIIF却要生成准确度更高的信息，于是</p>
-<h3 id="方法详述">方法详述</h3>
-<h4 id="局部隐式图像函数local-implicit-image-function-liif">局部隐式图像函数（Local Implicit Image function, LIIF）</h4>
-<p>在LIIF的表示中，<span class="math inline">\(I^{(i)}\)</span>表示<strong>连续图像</strong>，而这个<span class="math inline">\(I^{(i)}\)</span>是由一个二维的特征图<span class="math inline">\(M^{(i)} \in \mathbb{R}^{H \times W \times D}\)</span>变换而来的，而一个建模成MLP的神经隐式函数定义为如下： <span class="math display">\[
-s=f(z, x)
-\]</span> 其中<span class="math inline">\(z\)</span>是一个特征向量，<span class="math inline">\(x \in \mathcal{X}\)</span> 是一个二维连续坐标，<span class="math inline">\(s \in \mathcal{S}\)</span> 是预测的RGB值。这样，每个<span class="math inline">\(z\)</span>都可以被看做一个二维坐标到像素值的一个映射：<span class="math inline">\(f(z, \cdot): \mathcal{X} \mapsto \mathcal{S}\)</span>，而这个映射本身<span class="math inline">\(f(z, \cdot)\)</span>正是一种图像的连续的表示。假设<span class="math inline">\(H\times W\)</span>个<span class="math inline">\(D\)</span>维特征向量（后文中称为latent code隐码）均匀地分布在连续图像<span class="math inline">\(I^{(i)}\)</span>所在的二维空间中，组成了特征图<span class="math inline">\(M^{(i)}\)</span>。</p>
-<p>更具体地，对于连续图像<span class="math inline">\(I^{(i)}\)</span>，在坐标<span class="math inline">\(x_q\)</span>处的RGB值可表示为： <span class="math display">\[
-I^{(i)}\left(x_{q}\right)=f\left(z^{*}, x_{q}-v^{*}\right)
-\]</span> 其中，<span class="math inline">\(z^*\)</span>是离坐标<span class="math inline">\(x_q\)</span>处欧氏距离最近的latent code，<span class="math inline">\(v^*\)</span>是<span class="math inline">\(z^*\)</span>的坐标，那么<span class="math inline">\(x_q-v^*\)</span>也就是一个坐标偏移（欧式空间中的向量）。</p>
+<h3 id="方法详述"><a href="#方法详述" class="headerlink" title="方法详述"></a>方法详述</h3><h4 id="局部隐式图像函数（Local-Implicit-Image-function-LIIF）"><a href="#局部隐式图像函数（Local-Implicit-Image-function-LIIF）" class="headerlink" title="局部隐式图像函数（Local Implicit Image function, LIIF）"></a>局部隐式图像函数（Local Implicit Image function, LIIF）</h4><p>在LIIF的表示中，$I^{(i)}$表示<strong>连续图像</strong>，而这个$I^{(i)}$是由一个二维的特征图$M^{(i)} \in \mathbb{R}^{H \times W \times D}$变换而来的，而一个建模成MLP的神经隐式函数定义为如下：</p>
+<script type="math/tex; mode=display">
+s=f(z, x)</script><p>其中$z$是一个特征向量，$x \in \mathcal{X}$ 是一个二维连续坐标，$s \in \mathcal{S}$ 是预测的RGB值。这样，每个$z$都可以被看做一个二维坐标到像素值的一个映射：$f(z, \cdot): \mathcal{X} \mapsto \mathcal{S}$，而这个映射本身$f(z, \cdot)$正是一种图像的连续的表示。假设$H\times W$个$D$维特征向量（后文中称为latent code隐码）均匀地分布在连续图像$I^{(i)}$所在的二维空间中，组成了特征图$M^{(i)}$。</p>
+<p>更具体地，对于连续图像$I^{(i)}$，在坐标$x_q$处的RGB值可表示为：</p>
+<script type="math/tex; mode=display">
+I^{(i)}\left(x_{q}\right)=f\left(z^{*}, x_{q}-v^{*}\right)</script><p>其中，$z^<em>$是离坐标$x_q$处欧氏距离最近的latent code，$v^</em>$是$z^<em>$的坐标，那么$x_q-v^</em>$也就是一个坐标偏移（欧式空间中的向量）。</p>
 <p>另外，作者为LIIF设置了如下几个trick：</p>
-<h5 id="特征折叠feature-unfolding">特征折叠(Feature unfolding)</h5>
-<p>为了使得隐码包含更多的空间局部信息，其实就是把原始的<span class="math inline">\(M^{(i)}\)</span>的每个3x3相邻的隐码concatenate到一起。</p>
-<h5 id="feature-unfolding">Feature unfolding</h5>
-<p>式(2)存在一个问题，当目标点的位置从一个<span class="math inline">\(z\)</span>的附近渐变到另一个<span class="math inline">\(z\)</span>的附近时，<span class="math inline">\(z^*\)</span>的选取会发生改变，从而造成像素值的突变，这会大大影响到图像的局部像素值连续性。</p>
-<p>对此，作者提出了Feature unfolding的方法，其实就是通过多个<span class="math inline">\(f(\cdot)\)</span>的加权和，扩大<span class="math inline">\(z\)</span>的选取范围为离离坐标<span class="math inline">\(x_q\)</span>处欧氏距离最近的4个latent code。而根据到坐标<span class="math inline">\(x_q\)</span>处的相对距离不同，有不同的权值。 <span class="math display">\[
-I^{(i)}\left(x_{q}\right)=\sum_{t \in\{00,01,10,11\}} \frac{S_{t}}{S} \cdot f\left(z_{t}^{*}, x_{q}-v_{t}^{*}\right)
-\]</span></p>
-<h5 id="cell-decoding">Cell decoding</h5>
-<p>设想使用LIIF的表示方法解码出任意分辨率的离散图像的场景，直接的做法是根据所需分辨率，均匀离散地取各个坐标，代入LIIF中查询得到各点的像素值。但是这种做法有一个问题，某个点的查询所得像素值是<strong>独立于目标图像分辨率的</strong>，换句话说，无论是什么分辨率，该点的像素值都是一成不变的，也就是说，其他更精细尺度下的信息在某个粗糙尺度下被完全丢弃了，这其实是不符合常规的图像退化假设的。比如高分辨到低分辨的退化中，并不是单纯的下采样，而是首先伴随一个模糊的过程（双三次、任意模糊核等待），也就是一个整合周围像素信息的过程，而已定义的LIIF把这个过程忽略掉了。</p>
-<p>于是作者把图像分辨率信息也加入到LIIF中，具体做法是，把图像长宽的倒数与坐标<span class="math inline">\(x_q\)</span>连接在一起： <span class="math display">\[
-s=f_{\text {cell }}(z,[x, c])
-\]</span></p>
-<h4 id="学习过程">学习过程</h4>
-<p>学习过程可以用下图概括：</p>
+<h5 id="特征折叠-Feature-unfolding"><a href="#特征折叠-Feature-unfolding" class="headerlink" title="特征折叠(Feature unfolding)"></a>特征折叠(Feature unfolding)</h5><p>为了使得隐码包含更多的空间局部信息，其实就是把原始的$M^{(i)}$的每个3x3相邻的隐码concatenate到一起。</p>
+<h5 id="Feature-unfolding"><a href="#Feature-unfolding" class="headerlink" title="Feature unfolding"></a>Feature unfolding</h5><p>式(2)存在一个问题，当目标点的位置从一个$z$的附近渐变到另一个$z$的附近时，$z^*$的选取会发生改变，从而造成像素值的突变，这会大大影响到图像的局部像素值连续性。</p>
+<p>对此，作者提出了Feature unfolding的方法，其实就是通过多个$f(\cdot)$的加权和，扩大$z$的选取范围为离离坐标$x_q$处欧氏距离最近的4个latent code。而根据到坐标$x_q$处的相对距离不同，有不同的权值。</p>
+<script type="math/tex; mode=display">
+I^{(i)}\left(x_{q}\right)=\sum_{t \in\{00,01,10,11\}} \frac{S_{t}}{S} \cdot f\left(z_{t}^{*}, x_{q}-v_{t}^{*}\right)</script><h5 id="Cell-decoding"><a href="#Cell-decoding" class="headerlink" title="Cell decoding"></a>Cell decoding</h5><p>设想使用LIIF的表示方法解码出任意分辨率的离散图像的场景，直接的做法是根据所需分辨率，均匀离散地取各个坐标，代入LIIF中查询得到各点的像素值。但是这种做法有一个问题，某个点的查询所得像素值是<strong>独立于目标图像分辨率的</strong>，换句话说，无论是什么分辨率，该点的像素值都是一成不变的，也就是说，其他更精细尺度下的信息在某个粗糙尺度下被完全丢弃了，这其实是不符合常规的图像退化假设的。比如高分辨到低分辨的退化中，并不是单纯的下采样，而是首先伴随一个模糊的过程（双三次、任意模糊核等待），也就是一个整合周围像素信息的过程，而已定义的LIIF把这个过程忽略掉了。</p>
+<p>于是作者把图像分辨率信息也加入到LIIF中，具体做法是，把图像长宽的倒数与坐标$x_q$连接在一起：</p>
+<script type="math/tex; mode=display">
+s=f_{\text {cell }}(z,[x, c])</script><h4 id="学习过程"><a href="#学习过程" class="headerlink" title="学习过程"></a>学习过程</h4><p>学习过程可以用下图概括：</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20210124195149674.png" alt="image-20210124195149674" style="zoom: 50%;" /></p>
-<p>由原始的图像作为GT，采样点坐标为<span class="math inline">\(x_{hr}\)</span>，对应的像素值为<span class="math inline">\(s_{hr}\)</span>，然后进行监督训练。此处loss为L1 loss。</p>
-<h3 id="实验设计与结果">实验设计与结果</h3>
-<p>训练数据集为DIV2K，把EDSR、RDN去除最后的Upsample模块，作为<span class="math inline">\(E_{\varphi}\)</span>的结构。</p>
+<p>由原始的图像作为GT，采样点坐标为$x_{hr}$，对应的像素值为$s_{hr}$，然后进行监督训练。此处loss为L1 loss。</p>
+<h3 id="实验设计与结果"><a href="#实验设计与结果" class="headerlink" title="实验设计与结果"></a>实验设计与结果</h3><p>训练数据集为DIV2K，把EDSR、RDN去除最后的Upsample模块，作为$E_{\varphi}$的结构。</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20210124202714069.png" alt="image-20210124202714069" style="zoom: 50%;" /></p>
-<h3 id="总结与思考">总结与思考</h3>
-<ul>
+<h3 id="总结与思考"><a href="#总结与思考" class="headerlink" title="总结与思考"></a>总结与思考</h3><ul>
 <li>这是一篇把神经表示应用到超分辨领域的工作，应用的角度也很直接，就是把3D的神经表示应用到2D图像中</li>
-<li>不过其没有直接使用一个MLP去强行表示一幅LR图像，而是充分利用了SOTA的SR网络起到的特征提取能力，将提取的特征图作为LIIF的输入，利用超分辨退化的局部性，设置了LIIF的变换过程。
-<ul>
+<li>不过其没有直接使用一个MLP去强行表示一幅LR图像，而是充分利用了SOTA的SR网络起到的特征提取能力，将提取的特征图作为LIIF的输入，利用超分辨退化的局部性，设置了LIIF的变换过程。<ul>
 <li>换个角度说，其实LIIF就是一个可变的上采样模块，用于替换EDSR等SOTA SR网络的上采样层。只不过在推理过程中，后续的LIIF网络参数是“LR输入相关的”，对于每个LR输入，都需要把上采样层的参数进行重新训练。</li>
 <li>我觉得这种模型最大的优点是，对于同一张测试图像下，变换尺度的效率很高，因为只需要更改连续坐标的采样间隔即可。但是对于不同的测试图像，需要额外的时间训练其神经表示，时间效率不高，不过这也是神经表示本身的缺点之一</li>
-</ul></li>
+</ul>
+</li>
 <li>其余的特征折叠(Feature unfolding)、Feature unfolding、Cell decoding基本算是根据SR任务的特征加入的小trick</li>
 </ul>
-<p>$$</p>
-<p>$$</p>
-
+<script type="math/tex; mode=display">
+</script>
     </div>
 
     
@@ -306,12 +294,12 @@ s=f_{\text {cell }}(z,[x, c])
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/01/23/2021-01-29-Exploiting%20Deep%20Generative%20Prior%20for%20Versatile%20Image%20Restoration%20and%20Manipulation/" rel="prev" title="读论文：Exploiting Deep Generative Prior for Versatile Image Restoration and Manipulation">
-      <i class="fa fa-chevron-left"></i> 读论文：Exploiting Deep Generative Prior for Versatile Image Restoration and Manipulation
+    <a href="/2020/12/26/2020-12-26-Learning%20with%20Privileged%20Information%20for%20Efficient%20Image%20Super-Resolution/" rel="prev" title="读论文：Learning with Privileged Information for Efficient Image Super-Resolution   Super-Resolution and Beyond">
+      <i class="fa fa-chevron-left"></i> 读论文：Learning with Privileged Information for Efficient Image Super-Resolution   Super-Resolution and Beyond
     </a></div>
       <div class="post-nav-item">
-    <a href="/2021/02/28/2021-02-28-Matrix%20calculus/" rel="next" title="矩阵微积分">
-      矩阵微积分 <i class="fa fa-chevron-right"></i>
+    <a href="/2021/01/23/2021-01-29-Exploiting%20Deep%20Generative%20Prior%20for%20Versatile%20Image%20Restoration%20and%20Manipulation/" rel="next" title="读论文：Exploiting Deep Generative Prior for Versatile Image Restoration and Manipulation">
+      读论文：Exploiting Deep Generative Prior for Versatile Image Restoration and Manipulation <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -373,7 +361,7 @@ s=f_{\text {cell }}(z,[x, c])
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#论文背景"><span class="nav-number">1.</span> <span class="nav-text">论文背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法详述"><span class="nav-number">2.</span> <span class="nav-text">方法详述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#局部隐式图像函数local-implicit-image-function-liif"><span class="nav-number">2.1.</span> <span class="nav-text">局部隐式图像函数（Local Implicit Image function, LIIF）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#特征折叠feature-unfolding"><span class="nav-number">2.1.1.</span> <span class="nav-text">特征折叠(Feature unfolding)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#feature-unfolding"><span class="nav-number">2.1.2.</span> <span class="nav-text">Feature unfolding</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#cell-decoding"><span class="nav-number">2.1.3.</span> <span class="nav-text">Cell decoding</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#学习过程"><span class="nav-number">2.2.</span> <span class="nav-text">学习过程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验设计与结果"><span class="nav-number">3.</span> <span class="nav-text">实验设计与结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结与思考"><span class="nav-number">4.</span> <span class="nav-text">总结与思考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#论文背景"><span class="nav-number">1.</span> <span class="nav-text">论文背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法详述"><span class="nav-number">2.</span> <span class="nav-text">方法详述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#局部隐式图像函数（Local-Implicit-Image-function-LIIF）"><span class="nav-number">2.1.</span> <span class="nav-text">局部隐式图像函数（Local Implicit Image function, LIIF）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#特征折叠-Feature-unfolding"><span class="nav-number">2.1.1.</span> <span class="nav-text">特征折叠(Feature unfolding)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Feature-unfolding"><span class="nav-number">2.1.2.</span> <span class="nav-text">Feature unfolding</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Cell-decoding"><span class="nav-number">2.1.3.</span> <span class="nav-text">Cell decoding</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#学习过程"><span class="nav-number">2.2.</span> <span class="nav-text">学习过程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验设计与结果"><span class="nav-number">3.</span> <span class="nav-text">实验设计与结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结与思考"><span class="nav-number">4.</span> <span class="nav-text">总结与思考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -389,7 +377,7 @@ s=f_{\text {cell }}(z,[x, c])
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-count">37</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -402,7 +390,7 @@ s=f_{\text {cell }}(z,[x, c])
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">26</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -440,7 +428,7 @@ s=f_{\text {cell }}(z,[x, c])
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

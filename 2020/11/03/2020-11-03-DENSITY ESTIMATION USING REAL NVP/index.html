@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"jamekuma.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","width":270,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="论文背景 RealNVP的全称，real-valued non-volume preserving ，可以翻译为“真实值非体积保持”。对于无监督学习来说，感兴趣的数据通常是高维的、高度结构化的，因此该领域的挑战是构建足够强大的模型，以捕获其复杂性，但仍然是可训练的。作者通过引入实值非体积保持(real NVP)转换来解决这一挑战，这是一种易于处理但表现能力强的高维数据建模方法。  基本思想是">
+  <meta name="description" content="论文背景RealNVP的全称，real-valued non-volume preserving ，可以翻译为“真实值非体积保持”。对于无监督学习来说，感兴趣的数据通常是高维的、高度结构化的，因此该领域的挑战是构建足够强大的模型，以捕获其复杂性，但仍然是可训练的。作者通过引入实值非体积保持(real NVP)转换来解决这一挑战，这是一种易于处理但表现能力强的高维数据建模方法。  基本思想是把数据空">
 <meta property="og:type" content="article">
 <meta property="og:title" content="读论文：Density estimation using Real NVP">
 <meta property="og:url" content="https://jamekuma.github.io/2020/11/03/2020-11-03-DENSITY%20ESTIMATION%20USING%20REAL%20NVP/index.html">
 <meta property="og:site_name" content="Jame&#39;s Blog">
-<meta property="og:description" content="论文背景 RealNVP的全称，real-valued non-volume preserving ，可以翻译为“真实值非体积保持”。对于无监督学习来说，感兴趣的数据通常是高维的、高度结构化的，因此该领域的挑战是构建足够强大的模型，以捕获其复杂性，但仍然是可训练的。作者通过引入实值非体积保持(real NVP)转换来解决这一挑战，这是一种易于处理但表现能力强的高维数据建模方法。  基本思想是">
+<meta property="og:description" content="论文背景RealNVP的全称，real-valued non-volume preserving ，可以翻译为“真实值非体积保持”。对于无监督学习来说，感兴趣的数据通常是高维的、高度结构化的，因此该领域的挑战是构建足够强大的模型，以捕获其复杂性，但仍然是可训练的。作者通过引入实值非体积保持(real NVP)转换来解决这一挑战，这是一种易于处理但表现能力强的高维数据建模方法。  基本思想是把数据空">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48.png">
 <meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48-1.png">
@@ -241,42 +241,39 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="论文背景">论文背景</h3>
-<p>RealNVP的全称，real-valued non-volume preserving ，可以翻译为“真实值非体积保持”。对于无监督学习来说，感兴趣的数据通常是高维的、高度结构化的，因此该领域的挑战是构建足够强大的模型，以捕获其复杂性，但仍然是可训练的。作者通过引入实值非体积保持(real NVP)转换来解决这一挑战，这是一种易于处理但表现能力强的高维数据建模方法。</p>
+        <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>RealNVP的全称，real-valued non-volume preserving ，可以翻译为“真实值非体积保持”。对于无监督学习来说，感兴趣的数据通常是高维的、高度结构化的，因此该领域的挑战是构建足够强大的模型，以捕获其复杂性，但仍然是可训练的。作者通过引入实值非体积保持(real NVP)转换来解决这一挑战，这是一种易于处理但表现能力强的高维数据建模方法。</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48.png" alt="image-20201106194258145" style="zoom:67%;" /></p>
 <p>基本思想是把数据空间映射到隐空间z，如上图所示。</p>
 <a id="more"></a>
 <p>以前的相关工作：</p>
 <ul>
-<li>受限玻尔兹曼机、深度玻尔兹曼机
-<ul>
+<li>受限玻尔兹曼机、深度玻尔兹曼机<ul>
 <li>通过利用两方的条件独立性来训练模型结构，可以对潜在变量进行有效的精确或近似后验推断。然而，由于潜在变量的相关边际分布的难处理性。训练、评估和抽样程序必须使用Mean Field inference 和马尔可夫链蒙特卡洛法。对于此类复杂模型，收敛时间往往是不确定的。另外，各种近似也限制了其性能</li>
-</ul></li>
-<li>有向概率图模型
-<ul>
+</ul>
+</li>
+<li>有向概率图模型<ul>
 <li>在推理过程中的各种近似，限制了性能</li>
-</ul></li>
-<li>自回归模型
-<ul>
+</ul>
+</li>
+<li>自回归模型<ul>
 <li>避免引入隐变量，从而消除各种近似。</li>
 <li>RNN、LSTM</li>
 <li>非并行，慢</li>
-</ul></li>
-<li>GAN
-<ul>
+</ul>
+</li>
+<li>GAN<ul>
 <li>度量生成样本的多样性的指标不明确</li>
 <li>训练不稳定</li>
-</ul></li>
 </ul>
-<p>而作者提出的方法，可以训练这样一个生成网络<span class="math inline">\(g\)</span>，它将潜在变量<span class="math inline">\(z \sim p_Z\)</span>映射到样本<span class="math inline">\(x \sim p_{X}\)</span>，理论上不需要像GANs那样使用鉴别器网络，也不需要像变分自编码器那样使用近似推理。的确，如果g是双射，可以利用变量的变化公式，通过极大似然对其进行训练： <span class="math display">\[
-p_{X}(x)=p_{Z}(z)\left|\operatorname{det}\left(\frac{\partial g(z)}{\partial z^{T}}\right)\right|^{-1}
-\]</span></p>
-<h3 id="主要方法">主要方法</h3>
-<p>上周读的NICE，也是这个作者之前的工作，作者表示，自己在NICE的基础上，定义了一个更强大的双射函数类，它支持精确和可处理的概率密度评估与推理。代价函数不依赖于固定的形式重构代价（比如L2损失等），因此可以产生更加非平滑的样本。另外，这次提出的方法可以使用batch normalization、ResBlock等，从而构建一个具有多个抽象层次的深度多尺度架构（a very deep multi-scale architecture with multiple levels of abstraction）。</p>
-<h4 id="耦合层">耦合层</h4>
-<p>Real NVP的耦合层相较于NICE的有很大的不同：</p>
+</li>
+</ul>
+<p>而作者提出的方法，可以训练这样一个生成网络$g$，它将潜在变量$z \sim p_Z$映射到样本$x \sim p_{X}$，理论上不需要像GANs那样使用鉴别器网络，也不需要像变分自编码器那样使用近似推理。的确，如果g是双射，可以利用变量的变化公式，通过极大似然对其进行训练：</p>
+<script type="math/tex; mode=display">
+p_{X}(x)=p_{Z}(z)\left|\operatorname{det}\left(\frac{\partial g(z)}{\partial z^{T}}\right)\right|^{-1}</script><h3 id="主要方法"><a href="#主要方法" class="headerlink" title="主要方法"></a>主要方法</h3><p>上周读的NICE，也是这个作者之前的工作，作者表示，自己在NICE的基础上，定义了一个更强大的双射函数类，它支持精确和可处理的概率密度评估与推理。代价函数不依赖于固定的形式重构代价（比如L2损失等），因此可以产生更加非平滑的样本。另外，这次提出的方法可以使用batch normalization、ResBlock等，从而构建一个具有多个抽象层次的深度多尺度架构（a very deep multi-scale architecture with multiple levels of abstraction）。</p>
+<h4 id="耦合层"><a href="#耦合层" class="headerlink" title="耦合层"></a>耦合层</h4><p>Real NVP的耦合层相较于NICE的有很大的不同：</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48-1.png" alt="image-20201106203733407" style="zoom:67%;" /></p>
-<p>写成式子： <span class="math display">\[
+<p>写成式子：</p>
+<script type="math/tex; mode=display">
 \begin{aligned}
 \left\{\begin{array}{l}
 y_{1: d}=x_{1: d} \\
@@ -286,57 +283,54 @@ y_{d+1: D}=x_{1: 1: D} \odot \exp \left(s\left(x_{1: d}\right)\right)+t\left(x_{
 x_{1: d}=y_{1: d} \\
 x_{d+1: D}=\left(y_{d+1: D}-t\left(y_{1: d}\right)\right) \odot \exp \left(-s\left(y_{1: d}\right)\right)
 \end{array}\right.
-\end{aligned}
-\]</span></p>
-<p>与NICE同理，其雅克比行列式也是易于计算的： <span class="math display">\[
+\end{aligned}</script><p>与NICE同理，其雅克比行列式也是易于计算的：</p>
+<script type="math/tex; mode=display">
 \frac{\partial y}{\partial x^{T}}=\left[\begin{array}{cc}
-\mathbb{I}_{d} &amp; 0 \\
-\frac{\partial y_{d+1: D}}{\partial x_{1: d}^{T}} &amp; \operatorname{diag}\left(\exp \left[s\left(x_{1: d}\right)\right]\right)
-\end{array}\right]=\exp \left[\sum_{j} s\left(x_{1: d}\right)_{j}\right]
-\]</span> <strong>计算耦合层的逆并不需要计算s或t的逆，因此这些函数可以任意复杂且难以求逆。</strong></p>
-<h4 id="mask-convolution">Mask Convolution</h4>
-<p>另外，在实际实现中，可以使用一个Masked convolution，即使用一个二值化的mask <span class="math inline">\(b\)</span>： <span class="math display">\[
-y=b \odot x+(1-b) \odot(x \odot \exp (s(b \odot x))+t(b \odot x))
-\]</span> 对于mask，有以下两种模式：</p>
+\mathbb{I}_{d} & 0 \\
+\frac{\partial y_{d+1: D}}{\partial x_{1: d}^{T}} & \operatorname{diag}\left(\exp \left[s\left(x_{1: d}\right)\right]\right)
+\end{array}\right]=\exp \left[\sum_{j} s\left(x_{1: d}\right)_{j}\right]</script><p> <strong>计算耦合层的逆并不需要计算s或t的逆，因此这些函数可以任意复杂且难以求逆。</strong></p>
+<h4 id="Mask-Convolution"><a href="#Mask-Convolution" class="headerlink" title="Mask Convolution"></a>Mask Convolution</h4><p>另外，在实际实现中，可以使用一个Masked convolution，即使用一个二值化的mask $b$：</p>
+<script type="math/tex; mode=display">
+y=b \odot x+(1-b) \odot(x \odot \exp (s(b \odot x))+t(b \odot x))</script><p>对于mask，有以下两种模式：</p>
 <ul>
 <li>棋盘格掩蔽(checkerboard masking)</li>
 <li>通道掩蔽(channel-wise masking)</li>
 </ul>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48-2.png" alt="image-20201106212224230" style="zoom: 50%;" /></p>
-<h4 id="耦合层的整合">耦合层的整合</h4>
-<p>尽管耦合层功能强大，但它们的前向转换保留了一些组件(比如<span class="math inline">\(x_{1: d}\)</span>)。可以通过将耦合层组合为<strong>交替模式</strong>来克服这一困难，这样，在一个耦合层中保持不变的组件，将在下一个耦合层中更新:</p>
+<h4 id="耦合层的整合"><a href="#耦合层的整合" class="headerlink" title="耦合层的整合"></a>耦合层的整合</h4><p>尽管耦合层功能强大，但它们的前向转换保留了一些组件(比如$x_{1: d}$)。可以通过将耦合层组合为<strong>交替模式</strong>来克服这一困难，这样，在一个耦合层中保持不变的组件，将在下一个耦合层中更新:</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48-3.png" alt="image-20201106212608981" style="zoom: 50%;" /></p>
-<p>另外，多个耦合层的雅克比行列式只需累乘即可： <span class="math display">\[
+<p>另外，多个耦合层的雅克比行列式只需累乘即可：</p>
+<script type="math/tex; mode=display">
 \begin{aligned}
-\frac{\partial\left(f_{b} \circ f_{a}\right)}{\partial x_{a}^{T}}\left(x_{a}\right) &amp;=\frac{\partial f_{a}}{\partial x_{a}^{T}}\left(x_{a}\right) \cdot \frac{\partial f_{b}}{\partial x_{b}^{T}}\left(x_{b}=f_{a}\left(x_{a}\right)\right) \\
-\operatorname{det}(A \cdot B) &amp;=\operatorname{det}(A) \operatorname{det}(B)
-\end{aligned}
-\]</span></p>
-<h4 id="多尺度结构multi-scale-architecture">多尺度结构(Multi-scale architecture)</h4>
-<p>(这一部分我看的不是很懂)</p>
+\frac{\partial\left(f_{b} \circ f_{a}\right)}{\partial x_{a}^{T}}\left(x_{a}\right) &=\frac{\partial f_{a}}{\partial x_{a}^{T}}\left(x_{a}\right) \cdot \frac{\partial f_{b}}{\partial x_{b}^{T}}\left(x_{b}=f_{a}\left(x_{a}\right)\right) \\
+\operatorname{det}(A \cdot B) &=\operatorname{det}(A) \operatorname{det}(B)
+\end{aligned}</script><h4 id="多尺度结构-Multi-scale-architecture"><a href="#多尺度结构-Multi-scale-architecture" class="headerlink" title="多尺度结构(Multi-scale architecture)"></a>多尺度结构(Multi-scale architecture)</h4><p>(这一部分我看的不是很懂)</p>
 <p>作者通过squeeze操作实现了一个多尺度的架构:对于每个通道，将图像分割成形状为2×2×c的子正方形，然后将其重新塑形为形状为1×1×4c的子正方形。squeeze操作将一个s×s×c张量转化为一个2s×2s×4c张量，有效地交换了通道数与空间大小的关系。</p>
 <p>在每个尺度上，将几个操作组合成如下序列：我们首先应用三个耦合层，交替使用checkerboard masking，然后执行squeeze操作，最后应用三个耦合层，交替使用channel-wise masking。</p>
 <p>在所有耦合层中传播一个D维向量将是很麻烦的，因为计算和内存成本，以及需要训练的参数的数量。由于这个原因，作者遵循VGG中的设计选择，并定期提出一半的尺寸：</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48-4.png" alt="image-20201106214810116" style="zoom:67%;" /></p>
-<h4 id="batch-normalization">Batch normalization</h4>
-<p>批处理归一化的影响很容易包含在雅可比矩阵的计算中，因为它是对每个维度的线性调整。也就是说，给定估计的批处理统计量： <span class="math display">\[
-x \mapsto \frac{x-\tilde{\mu}}{\sqrt{\tilde{\sigma}^{2}+\epsilon}}
-\]</span> 我们具有雅克比矩阵： <span class="math display">\[
-\left(\prod_{i}\left(\tilde{\sigma}_{i}^{2}+\epsilon\right)\right)^{-\frac{1}{2}}
-\]</span></p>
-<h3 id="实验结果">实验结果</h3>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48-5.png" alt="image-20201106220750676" style="zoom:67%;" /></p>
-<h3 id="总结与思考">总结与思考</h3>
-<ul>
+<h4 id="Batch-normalization"><a href="#Batch-normalization" class="headerlink" title="Batch normalization"></a>Batch normalization</h4><p>批处理归一化的影响很容易包含在雅可比矩阵的计算中，因为它是对每个维度的线性调整。也就是说，给定估计的批处理统计量：</p>
+<script type="math/tex; mode=display">
+x \mapsto \frac{x-\tilde{\mu}}{\sqrt{\tilde{\sigma}^{2}+\epsilon}}</script><p>我们具有雅克比矩阵：</p>
+<script type="math/tex; mode=display">
+\left(\prod_{i}\left(\tilde{\sigma}_{i}^{2}+\epsilon\right)\right)^{-\frac{1}{2}}</script><h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48-5.png" alt="image-20201106220750676" style="zoom:67%;" /></p>
+<h3 id="总结与思考"><a href="#总结与思考" class="headerlink" title="总结与思考"></a>总结与思考</h3><ul>
 <li><p>这篇是作者在本人的NICE工作的基础上的一篇完善工作，主要进步在于：</p>
 <ul>
-<li><p>改善了仿射层的结构</p></li>
-<li><p>使用了mask卷积保证了推理过程中所有信息都被处理</p></li>
-<li><p>考虑了多尺度的结构</p></li>
-<li><p>RealNVP 的雅可比行列式不再恒等于 1，行列式的几何意义就是体积，所以行列式等于 1 就意味着体积没有变化，而仿射耦合层的行列式不等于 1 就意味着体积有所变化，所谓“非体积保持”。</p></li>
-</ul></li>
-<li><p>第一篇 NICE 中，作者提出了加性耦合层。后面也提到了乘性耦合层，只不过没有用上；而在 RealNVP 中，加性和乘性耦合层结合在一起，成为一个一般的“仿射耦合层”。</p></li>
-<li><p>本文的mask卷积实质上就是对两个耦合层直接的信息实施一种可逆的打乱，比NICE中的单纯交换分区中两个子集的角色的做法要更优</p></li>
+<li><p>改善了仿射层的结构</p>
+</li>
+<li><p>使用了mask卷积保证了推理过程中所有信息都被处理</p>
+</li>
+<li><p>考虑了多尺度的结构</p>
+</li>
+<li><p>RealNVP 的雅可比行列式不再恒等于 1，行列式的几何意义就是体积，所以行列式等于 1 就意味着体积没有变化，而仿射耦合层的行列式不等于 1 就意味着体积有所变化，所谓“非体积保持”。 </p>
+</li>
+</ul>
+</li>
+<li><p>第一篇 NICE 中，作者提出了加性耦合层。后面也提到了乘性耦合层，只不过没有用上；而在 RealNVP 中，加性和乘性耦合层结合在一起，成为一个一般的“仿射耦合层”。</p>
+</li>
+<li><p>本文的mask卷积实质上就是对两个耦合层直接的信息实施一种可逆的打乱，比NICE中的单纯交换分区中两个子集的角色的做法要更优</p>
+</li>
 </ul>
 
     </div>
@@ -424,7 +418,7 @@ x \mapsto \frac{x-\tilde{\mu}}{\sqrt{\tilde{\sigma}^{2}+\epsilon}}
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#论文背景"><span class="nav-number">1.</span> <span class="nav-text">论文背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主要方法"><span class="nav-number">2.</span> <span class="nav-text">主要方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#耦合层"><span class="nav-number">2.1.</span> <span class="nav-text">耦合层</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mask-convolution"><span class="nav-number">2.2.</span> <span class="nav-text">Mask Convolution</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#耦合层的整合"><span class="nav-number">2.3.</span> <span class="nav-text">耦合层的整合</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#多尺度结构multi-scale-architecture"><span class="nav-number">2.4.</span> <span class="nav-text">多尺度结构(Multi-scale architecture)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#batch-normalization"><span class="nav-number">2.5.</span> <span class="nav-text">Batch normalization</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验结果"><span class="nav-number">3.</span> <span class="nav-text">实验结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结与思考"><span class="nav-number">4.</span> <span class="nav-text">总结与思考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#论文背景"><span class="nav-number">1.</span> <span class="nav-text">论文背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主要方法"><span class="nav-number">2.</span> <span class="nav-text">主要方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#耦合层"><span class="nav-number">2.1.</span> <span class="nav-text">耦合层</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Mask-Convolution"><span class="nav-number">2.2.</span> <span class="nav-text">Mask Convolution</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#耦合层的整合"><span class="nav-number">2.3.</span> <span class="nav-text">耦合层的整合</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#多尺度结构-Multi-scale-architecture"><span class="nav-number">2.4.</span> <span class="nav-text">多尺度结构(Multi-scale architecture)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Batch-normalization"><span class="nav-number">2.5.</span> <span class="nav-text">Batch normalization</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验结果"><span class="nav-number">3.</span> <span class="nav-text">实验结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结与思考"><span class="nav-number">4.</span> <span class="nav-text">总结与思考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -440,7 +434,7 @@ x \mapsto \frac{x-\tilde{\mu}}{\sqrt{\tilde{\sigma}^{2}+\epsilon}}
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-count">37</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -453,7 +447,7 @@ x \mapsto \frac{x-\tilde{\mu}}{\sqrt{\tilde{\sigma}^{2}+\epsilon}}
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">26</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -491,7 +485,7 @@ x \mapsto \frac{x-\tilde{\mu}}{\sqrt{\tilde{\sigma}^{2}+\epsilon}}
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

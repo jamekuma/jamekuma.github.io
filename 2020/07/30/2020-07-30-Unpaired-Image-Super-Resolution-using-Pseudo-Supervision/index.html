@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"jamekuma.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","width":270,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="论文背景 这是CVPR 2020的一篇超分工作。 最开始的超分技术，基于的都是固定的下采样制造的训练数据集(比如双三次)，不适于在真实场景下的超分辨。对此，目前主要有以下两种解决思路：">
+  <meta name="description" content="论文背景  这是CVPR 2020的一篇超分工作。   最开始的超分技术，基于的都是固定的下采样制造的训练数据集(比如双三次)，不适于在真实场景下的超分辨。对此，目前主要有以下两种解决思路：">
 <meta property="og:type" content="article">
 <meta property="og:title" content="读论文：Unpaired Image Super-Resolution using Pseudo-Supervision">
 <meta property="og:url" content="https://jamekuma.github.io/2020/07/30/2020-07-30-Unpaired-Image-Super-Resolution-using-Pseudo-Supervision/index.html">
 <meta property="og:site_name" content="Jame&#39;s Blog">
-<meta property="og:description" content="论文背景 这是CVPR 2020的一篇超分工作。 最开始的超分技术，基于的都是固定的下采样制造的训练数据集(比如双三次)，不适于在真实场景下的超分辨。对此，目前主要有以下两种解决思路：">
+<meta property="og:description" content="论文背景  这是CVPR 2020的一篇超分工作。   最开始的超分技术，基于的都是固定的下采样制造的训练数据集(比如双三次)，不适于在真实场景下的超分辨。对此，目前主要有以下两种解决思路：">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://raw.githubusercontent.com/jamekuma/images/master/20200801103716.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/jamekuma/images/master/20200801103737.png">
@@ -252,111 +252,89 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="论文背景">论文背景</h3>
-<p>这是CVPR 2020的一篇超分工作。</p>
-<p>最开始的超分技术，基于的都是固定的下采样制造的训练数据集(比如双三次)，不适于在真实场景下的超分辨。对此，目前主要有以下两种解决思路：</p>
+        <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>  这是CVPR 2020的一篇超分工作。</p>
+<p>  最开始的超分技术，基于的都是固定的下采样制造的训练数据集(比如双三次)，不适于在真实场景下的超分辨。对此，目前主要有以下两种解决思路：</p>
 <a id="more"></a>
 <ul>
-<li><p>blind SR methods：用一些随机的模糊核去构造LR图像，但是这些退化形式还是有一些限制性的假设。</p></li>
+<li><p>blind SR methods：用一些随机的模糊核去构造LR图像，但是这些退化形式还是有一些限制性的假设。</p>
+</li>
 <li><p>GAN-based unpaired SR methods：直接利用GAN来学一个LR-&gt;HR的映射，不对退化过程做任何假设。</p>
 <p>GAN-based的方法主要有以下两种：</p>
 <ul>
 <li><p>直接法</p>
 <ul>
-<li><p>generator网络用于把LR放大为一个“假的”HR图像，从而欺骗discriminator网络。在这种方法中，discriminator网络的职责是辨别其是否是真的HR图像</p></li>
+<li><p>generator网络用于把LR放大为一个“假的”HR图像，从而欺骗discriminator网络。在这种方法中，discriminator网络的职责是辨别其是否是真的HR图像</p>
+</li>
 <li><p>缺点：训练generator时，无法使用像素级的损失函数。（我的理解：比如SRGAN的数值指标不好）而这种像素损失不仅在以失真为导向(distortion-oriented)、以感知为导向(perception-oriented)的方法中都起着重要作用。</p>
-<p><img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801103716.png" alt="image-20200729230958756" style="zoom:67%;" /></p></li>
-</ul></li>
+<p><img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801103716.png" alt="image-20200729230958756" style="zoom:67%;" /></p>
+</li>
+</ul>
+</li>
 <li><p>间接法</p>
 <ul>
 <li>generator网络用于把HR缩小为一个“假的”LR图像来欺骗discriminator网络。然后这个“假的”LR图像就可以以paired方式来训练一个SR网络。</li>
 <li>缺点：生成的LR图像的分布与真实的LR分布之间有偏差，会导致在测试集上的性能低下。</li>
-</ul></li>
 </ul>
-<p><img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801103737.png" alt="image-20200729230625647" style="zoom:67%;" /></p></li>
+</li>
 </ul>
+<p><img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801103737.png" alt="image-20200729230625647" style="zoom:67%;" /></p>
 <p>作者基于Cycle-GAN提出了一种新的方法。这里简要了解了一下Cycle-GAN</p>
-<p>#### Cycle-GAN</p>
-<p>cycle-GAN是ICCV17的工作，是在条件图像生成领域，实现两个域(domain)的的图片的转化。传统的GAN是单向生成，而CycleGAN是互相生成，网络是个环形，所以命名为Cycle。并且CycleGAN一个非常实用的地方就是输入的两张图片可以是任意的两张图片，也就是可以是unpaired的。</p>
-<figure>
-<img src="http://media.paperweekly.site/LUOHAO_1513259309.1659012.png?imageView2/2/w/800/q/70%7Cimageslim" alt="图片" /><figcaption aria-hidden="true">图片</figcaption>
-</figure>
-<p>X→Y的判别器损失为： <span class="math display">\[
-  L_{GAN}(G,D_Y,X,Y)=\mathbb{E}_{y\sim p_{data}(y)}[\log{D_Y(y)}]+\mathbb{E}_{x\sim p_{data}(x)}[\log{(1-D_Y(G(x)))}]
-\]</span> Y→X的判别器损失为: <span class="math display">\[
-  L_{GAN}(F,D_X,Y,X)=\mathbb{E}_{x\sim p_{data}(x)}[\log{D_X(x)}]+\mathbb{E}_{y\sim p_{data}(y)}[\log{(1-D_X(F(y)))}]
-\]</span> 而两个生成器的loss加起来表示为： <span class="math display">\[
-  L_{cyc}(G,F) = \mathbb{E}_{x \sim p_{data}(x)}[||F(G(x))-x||_1]+\mathbb{E}_{y \sim p_{data}(y)}[||G(F(y))-y||_1]
-\]</span> 最终网络的所有损失加起来为： <span class="math display">\[
-  L(G,F,D_X,D_Y)=L_{GAN}(G,D_Y,X,Y)+L_{GAN}(F,D_X,Y,X)+L_{cyc}(G,F)
-\]</span></p>
-<p>#### motivation</p>
-<p>既然cycle-GAN可以在unpair的条件下学习一个domain到另一个domain的映射，那么作者想到基于cycle-GAN引入一个correction network用来实现true LR domain ↔︎ clean LR domain 的转化。所谓Clean LR是作者提出的一个新概念，意思是对HR图像使用预先设定的降采样操作得到的LR图像；而true LR就是真实的自然场景下的LR图像。在这种意义下，由于先前的SR网络能在clean LR得到好的效果，那么利用这个cycle-GAN，把整个SR过程就变成true LR-&gt;clean LR-&gt;HR。</p>
-<p>### 主要方法</p>
-<p><strong>LR图像的域转换(domain transfer)</strong>：</p>
-<p>如上文所述，要实现true LR与clean LR的域转换，也利用就是cycle-GAN的思想，设置两个Generator网络，分别完成true LR-&gt;clean LR与clean LR-&gt;true LR任务。分别在clean LR、true LR两个域设置两个Discriminator网络，用来辨别其分布是否真实。同时，在clean LR-&gt;true LR-&gt;pseudo-clean LR上保证循环的一致性（起点和终点尽可能相同）。</p>
-<figure>
-<img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801103749.png" alt="image-20200730161358150" /><figcaption aria-hidden="true">image-20200730161358150</figcaption>
-</figure>
+<h4 id="Cycle-GAN"><a href="#Cycle-GAN" class="headerlink" title="Cycle-GAN"></a>Cycle-GAN</h4><p>cycle-GAN是ICCV17的工作，是在条件图像生成领域，实现两个域(domain)的的图片的转化。传统的GAN是单向生成，而CycleGAN是互相生成，网络是个环形，所以命名为Cycle。并且CycleGAN一个非常实用的地方就是输入的两张图片可以是任意的两张图片，也就是可以是unpaired的。</p>
+<p><img src="http://media.paperweekly.site/LUOHAO_1513259309.1659012.png?imageView2/2/w/800/q/70|imageslim" alt="图片"></p>
+<p>X→Y的判别器损失为：</p>
+<script type="math/tex; mode=display">
+L_{GAN}(G,D_Y,X,Y)=\mathbb{E}_{y\sim p_{data}(y)}[\log{D_Y(y)}]+\mathbb{E}_{x\sim p_{data}(x)}[\log{(1-D_Y(G(x)))}]</script><p>Y→X的判别器损失为:</p>
+<script type="math/tex; mode=display">
+L_{GAN}(F,D_X,Y,X)=\mathbb{E}_{x\sim p_{data}(x)}[\log{D_X(x)}]+\mathbb{E}_{y\sim p_{data}(y)}[\log{(1-D_X(F(y)))}]</script><p>而两个生成器的loss加起来表示为：</p>
+<script type="math/tex; mode=display">
+L_{cyc}(G,F) = \mathbb{E}_{x \sim p_{data}(x)}[||F(G(x))-x||_1]+\mathbb{E}_{y \sim p_{data}(y)}[||G(F(y))-y||_1]</script><p>最终网络的所有损失加起来为：</p>
+<script type="math/tex; mode=display">
+L(G,F,D_X,D_Y)=L_{GAN}(G,D_Y,X,Y)+L_{GAN}(F,D_X,Y,X)+L_{cyc}(G,F)</script><h4 id="motivation"><a href="#motivation" class="headerlink" title="motivation"></a>motivation</h4><p>既然cycle-GAN可以在unpair的条件下学习一个domain到另一个domain的映射，那么作者想到基于cycle-GAN引入一个correction network用来实现true LR domain ↔ clean LR domain 的转化。所谓Clean LR是作者提出的一个新概念，意思是对HR图像使用预先设定的降采样操作得到的LR图像；而true LR就是真实的自然场景下的LR图像。在这种意义下，由于先前的SR网络能在clean LR得到好的效果，那么利用这个cycle-GAN，把整个SR过程就变成true LR-&gt;clean LR-&gt;HR。</p>
+<h3 id="主要方法"><a href="#主要方法" class="headerlink" title="主要方法"></a>主要方法</h3><p><strong>LR图像的域转换(domain transfer)</strong>：</p>
+<p>如上文所述，要实现true LR与clean LR的域转换，也利用就是cycle-GAN的思想，设置两个Generator网络，分别完成true LR-&gt;clean LR与clean LR-&gt;true LR任务。分别在clean LR、true LR两个域设置两个Discriminator网络，用来辨别其分布是否真实。同时，在clean LR-&gt;true LR-&gt;pseudo-clean  LR上保证循环的一致性（起点和终点尽可能相同）。</p>
+<p><img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801103749.png" alt="image-20200730161358150"></p>
 <p><strong>LR到HR的映射</strong>：</p>
-<p>当我们有一个HR图像时，可以首先利用特定的降采样方式，得到一张clean LR，再通过Cycle-GAN转一圈得到pseudo-clean LR。这时，设置一个网络U，学习一个pseudo-clean LR到原HR图像的映射。</p>
-<figure>
-<img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801103804.png" alt="image-20200730161421917" /><figcaption aria-hidden="true">image-20200730161421917</figcaption>
-</figure>
+<p>当我们有一个HR图像时，可以首先利用特定的降采样方式，得到一张clean LR，再通过Cycle-GAN转一圈得到pseudo-clean  LR。这时，设置一个网络U，学习一个pseudo-clean  LR到原HR图像的映射。</p>
+<p><img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801103804.png" alt="image-20200730161421917"></p>
 <p><strong>使用HR Discriminator进行调整</strong>：</p>
-<p>尽管在训练网络U时，是使用pseudo-clean LR来作为输入训练的(即图中的绿色实线)，但是在测试过程中，是通过图中的黑色实线生成最终的SR图片的。因此，再增加了一个HR Discriminator，用于判断<strong>是不是“黑线”的分布</strong>。值得注意的是，这个HR Discriminator的对抗损失只用于更新两个Generator的参数，而SR网络U的参数被固定。</p>
-<p>#### 损失函数</p>
-<p>用于优化2个Generator和3个Discriminator的损失函数如下：</p>
-<ul>
+<p>尽管在训练网络U时，是使用pseudo-clean  LR来作为输入训练的(即图中的绿色实线)，但是在测试过程中，是通过图中的黑色实线生成最终的SR图片的。因此，再增加了一个HR Discriminator，用于判断<strong>是不是“黑线”的分布</strong>。值得注意的是，这个HR Discriminator的对抗损失只用于更新两个Generator的参数，而SR网络U的参数被固定。</p>
+<h4 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h4><p>用于优化2个Generator和3个Discriminator的损失函数如下：</p>
+</li>
 <li><p><strong>对抗损失(Adversarial loss)</strong>：</p>
-<p>每个Discriminator即对应了一个对抗损失，损失函数就是GAN的经典形式：</p></li>
-</ul>
+<p>每个Discriminator即对应了一个对抗损失，损失函数就是GAN的经典形式：</p>
 <p><img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801105343.png" alt="image-20200730162918528" style="zoom:67%;" /></p>
 <p><img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801105352.png" alt="image-20200730162939508" style="zoom:67%;" /></p>
 <p><img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801105401.png" alt="image-20200730162952467" style="zoom:67%;" /></p>
-<ul>
+</li>
 <li><p><strong>循环一致性损失(Cycle consistency loss)</strong>：</p>
-<p>经典的Cycle-GAN本来需要两个循环一致损失的，但本文放松了这个约束，只用了其中一个:</p></li>
-</ul>
+<p>经典的Cycle-GAN本来需要两个循环一致损失的，但本文放松了这个约束，只用了其中一个:</p>
 <p><img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801105419.png" alt="image-20200730163148166" style="zoom:67%;" /></p>
-<ul>
+</li>
 <li><p><strong>恒等映射损失(Identity mapping loss)</strong>：</p>
-<p>在原始的Cycle-GAN中，对生成器进行正则化以接近恒等映射。这里同理，给true LR-&gt;clean LR的网络也添加一个类似的正则项：</p></li>
-</ul>
+<p>在原始的Cycle-GAN中，对生成器进行正则化以接近恒等映射。这里同理，给true LR-&gt;clean LR的网络也添加一个类似的正则项：</p>
 <p><img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801105423.png" alt="image-20200730174843176" style="zoom:67%;" /></p>
-<ul>
+</li>
 <li><p><strong>几何整体损失(Geometric ensemble loss)</strong>：</p>
-<p>引入了一个简单的几何集合损失，它要求翻转和旋转输入图像不改变结果：</p></li>
-</ul>
+<p>引入了一个简单的几何集合损失，它要求翻转和旋转输入图像不改变结果：</p>
 <p><img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801105920.png" alt="image-20200730174955563" style="zoom:67%;" /></p>
 <p>最后把上述loss线性组合一下：</p>
 <p><img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801105414.png" alt="image-20200730175411735" style="zoom:67%;" /></p>
-<p>而对于SR网络U，它是独立于Generator和Discriminator的，他的loss很简单，即重构损失，使用的是普通的L1 loss：</p>
-<p><img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801105835.png" alt="image-20200730175500577" style="zoom:67%;" /></p>
-<p>#### 网络结构</p>
-<p>该篇的重点不在于其网络内部结构，因此简述</p>
+</li>
+</ul>
+<p>  而对于SR网络U，它是独立于Generator和Discriminator的，他的loss很简单，即重构损失，使用的是普通的L1 loss：</p>
+<p>  <img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801105835.png" alt="image-20200730175500577" style="zoom:67%;" /></p>
+<h4 id="网络结构"><a href="#网络结构" class="headerlink" title="网络结构"></a>网络结构</h4><p>  该篇的重点不在于其网络内部结构，因此简述</p>
 <ul>
 <li>对于SR网络U、true LR-&gt;clean LR网络，都用的是RCAN的结构</li>
 <li>而 clean LR-&gt;true LR网络，用的5x5卷积的ResBlock，用的LeakyReLU激活，加了BN层。值得一提的是，为了加入一些随机的扰动，给原始的RGB通道增加了一些高斯分布N(0, 1)的通道</li>
-<li>对于三个Discriminator网络，五层卷积层+LeakyReLU+BN</li>
-</ul>
-<p>### 实验结果</p>
-<p>#### 自然场景下的图片</p>
-<figure>
-<img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801103815.png" alt="image-20200730180948340" /><figcaption aria-hidden="true">image-20200730180948340</figcaption>
-</figure>
-<figure>
-<img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200801115735.png" alt="image-20200730181019859" /><figcaption aria-hidden="true">image-20200730181019859</figcaption>
-</figure>
-<p>#### 人脸</p>
-<p><img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801103920.png" alt="image-20200730184840662" style="zoom:67%;" /></p>
-<p>#### 航空图像</p>
-<figure>
-<img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801103930.png" alt="image-20200730185747556" /><figcaption aria-hidden="true">image-20200730185747556</figcaption>
-</figure>
-<p>### 总结与思考</p>
-<ul>
-<li>以往SR问题中，我们都在思考，如何对每一个HR图像，构造更贴近自然场景的LR图像，从而生成更好的&lt;HR, LR&gt;的paired数据集（比如使用退化模型，对核进行各种估计，或是生成更自然的核等等）。既然普通SR网络，在“人造”的LR图像上表现良好，本文则提出了一个很新颖的思路，把重点放在如何把“自然“的LR图像，转换为”固定退化方式”的LR图像，进而得到更好的SR效果；</li>
+<li><p>对于三个Discriminator网络，五层卷积层+LeakyReLU+BN</p>
+<h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><h4 id="自然场景下的图片"><a href="#自然场景下的图片" class="headerlink" title="自然场景下的图片"></a>自然场景下的图片</h4><p><img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801103815.png" alt="image-20200730180948340"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/jamekuma/images/20200801115735.png" alt="image-20200730181019859"></p>
+<h4 id="人脸"><a href="#人脸" class="headerlink" title="人脸"></a>人脸</h4><p><img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801103920.png" alt="image-20200730184840662" style="zoom:67%;" /></p>
+<h4 id="航空图像"><a href="#航空图像" class="headerlink" title="航空图像"></a>航空图像</h4><p><img src="https://raw.githubusercontent.com/jamekuma/images/master/20200801103930.png" alt="image-20200730185747556"></p>
+<h3 id="总结与思考"><a href="#总结与思考" class="headerlink" title="总结与思考"></a>总结与思考</h3></li>
+<li><p>以往SR问题中，我们都在思考，如何对每一个HR图像，构造更贴近自然场景的LR图像，从而生成更好的<HR, LR>的paired数据集（比如使用退化模型，对核进行各种估计，或是生成更自然的核等等）。既然普通SR网络，在“人造”的LR图像上表现良好，本文则提出了一个很新颖的思路，把重点放在如何把“自然“的LR图像，转换为”固定退化方式”的LR图像，进而得到更好的SR效果；</p>
+</li>
 <li>作者开创性的把Cycle-GAN用到了SR领域。在unpaired数据集上，用于“自然“的LR图像域与”固定退化方式”的LR图像域的转换；</li>
 <li>这样做的好处是，不仅摈弃了对退化模式估计过程中的各种限制性的假设，也能对直接对SR结果做像素级别的限制。</li>
 </ul>
@@ -446,7 +424,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#论文背景"><span class="nav-number">1.</span> <span class="nav-text">论文背景</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#论文背景"><span class="nav-number">1.</span> <span class="nav-text">论文背景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Cycle-GAN"><span class="nav-number">1.1.</span> <span class="nav-text">Cycle-GAN</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#motivation"><span class="nav-number">1.2.</span> <span class="nav-text">motivation</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主要方法"><span class="nav-number">2.</span> <span class="nav-text">主要方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#损失函数"><span class="nav-number">2.1.</span> <span class="nav-text">损失函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#网络结构"><span class="nav-number">2.2.</span> <span class="nav-text">网络结构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验结果"><span class="nav-number">3.</span> <span class="nav-text">实验结果</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#自然场景下的图片"><span class="nav-number">3.1.</span> <span class="nav-text">自然场景下的图片</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#人脸"><span class="nav-number">3.2.</span> <span class="nav-text">人脸</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#航空图像"><span class="nav-number">3.3.</span> <span class="nav-text">航空图像</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结与思考"><span class="nav-number">4.</span> <span class="nav-text">总结与思考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -462,7 +440,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-count">37</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -475,7 +453,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">26</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -513,7 +491,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
