@@ -17,7 +17,7 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"jamekuma.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","width":270,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+    var CONFIG = {"hostname":"jamekuma.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","width":270,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="薅百度的羊毛  这几天做软件杯的项目的时候，为了实现文本中关键词关系的抽取，clone了github上的一个TensorFlow项目。该项目需要较高配置的GPU，本地跑不了，因此开始尝试寻找免费的算力资源。发现百度AI平台上面提供AI studio的算力平台，配置了Tesla V100-SXM2的GPU，算力超强。更重要的是，每天登录都可领12小时的算力卡。但是本平台只支持PaddlePa">
@@ -108,6 +108,7 @@
 
   <div class="site-nav-right">
     <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
   </div>
 </div>
@@ -141,9 +142,39 @@
     <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
 
   </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
   </ul>
 
 </nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
 </div>
     </header>
 
@@ -434,12 +465,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/03/01/2020-03-01-CF-1311B-%E9%99%90%E5%AE%9A%E4%BA%A4%E6%8D%A2%E6%8E%92%E5%BA%8F/" rel="prev" title="CodeForce 1311 B：WeirdSort">
-      <i class="fa fa-chevron-left"></i> CodeForce 1311 B：WeirdSort
+    <a href="/2020/03/03/2020-03-03-CF-1311D-%E4%B8%89%E4%B8%AA%E6%95%B4%E6%95%B0/" rel="prev" title="CodeForce 1311 D：Three Integers">
+      <i class="fa fa-chevron-left"></i> CodeForce 1311 D：Three Integers
     </a></div>
       <div class="post-nav-item">
-    <a href="/2020/03/03/2020-03-03-CF-1311D-%E4%B8%89%E4%B8%AA%E6%95%B4%E6%95%B0/" rel="next" title="CodeForce 1311 D：Three Integers">
-      CodeForce 1311 D：Three Integers <i class="fa fa-chevron-right"></i>
+    <a href="/2020/03/06/2020-03-06-POJ-2362/" rel="next" title="POJ 2362：Square DFS剪枝">
+      POJ 2362：Square DFS剪枝 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -637,6 +668,10 @@
   
 
 
+
+
+  
+<script src="/js/local-search.js"></script>
 
 
 
