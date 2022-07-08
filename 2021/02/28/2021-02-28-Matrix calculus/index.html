@@ -27,14 +27,14 @@
 <meta property="og:site_name" content="Jame&#39;s Blog">
 <meta property="og:description" content="指的是列向量 矩阵求导矩阵求导在最大似然问题中经常出现。总的来说，矩阵求导有四种类型，可以用下列表格表示：  一句话概括：分子的偏导符号根据$\mathbf{Y}$的形状展开，而分母的偏导符号根据$\mathbf{X}$的形状的转置展开。举例来说，$\mathrm d \mathbf y &#x2F; \mathrm{d} x$是一个列向量，$\mathrm{d} y &#x2F; \mathrm{d} \mathb">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="c:/Users/Jame%20Kuma/AppData/Roaming/Typora/typora-user-images/image-20210228112100880.png">
+<meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20210228112100880.png">
 <meta property="og:image" content="c:/Users/Jame%20Kuma/AppData/Roaming/Typora/typora-user-images/image-20210228123320421.png">
 <meta property="article:published_time" content="2021-02-27T16:00:00.000Z">
-<meta property="article:modified_time" content="2021-03-14T08:45:53.483Z">
+<meta property="article:modified_time" content="2022-07-08T16:38:28.694Z">
 <meta property="article:author" content="Jame Kuma">
 <meta property="article:tag" content="数学">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="c:/Users/Jame%20Kuma/AppData/Roaming/Typora/typora-user-images/image-20210228112100880.png">
+<meta name="twitter:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20210228112100880.png">
 
 <link rel="canonical" href="https://jamekuma.github.io/2021/02/28/2021-02-28-Matrix%20calculus/">
 
@@ -238,7 +238,7 @@
       
         <p>指的是列向量</p>
 <h2 id="矩阵求导"><a href="#矩阵求导" class="headerlink" title="矩阵求导"></a>矩阵求导</h2><p>矩阵求导在最大似然问题中经常出现。总的来说，矩阵求导有四种类型，可以用下列表格表示：</p>
-<p><img src="C:\Users\Jame Kuma\AppData\Roaming\Typora\typora-user-images\image-20210228112100880.png" alt="image-20210228112100880" style="zoom:67%;" /></p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/imagesimage-20210228112100880.png" alt="image-20210228112100880" style="zoom:67%;" /></p>
 <p>一句话概括：<strong>分子的偏导符号根据$\mathbf{Y}$的形状展开，而分母的偏导符号根据$\mathbf{X}$的形状的转置展开。</strong>举例来说，$\mathrm d \mathbf y / \mathrm{d} x$是一个列向量，$\mathrm{d} y / \mathrm{d} \mathbf{x}$是一个行向量（假设$\mathbf y$和$\mathbf x$都指的是列向量）。每个积分都可以这样“冗长地”通过标量的偏导来计算，但是本节展示如何来通过矩阵操作来计算矩阵求导。</p>
 <a id="more"></a>
 <p>就像工数中学习的那样，定义微分$dy(x)$为增量$y(x+\mathrm{d} x)-y(x)$对$dx$的线性主部。<strong>不像是经典的极限定义，这里的定义即使在$x$或$y$不是标量的情况下也成立。</strong></p>
