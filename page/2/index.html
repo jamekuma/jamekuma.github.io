@@ -224,7 +224,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>RealNVP的全称，real-valued non-volume preserving ，可以翻译为“真实值非体积保持”。对于无监督学习来说，感兴趣的数据通常是高维的、高度结构化的，因此该领域的挑战是构建足够强大的模型，以捕获其复杂性，但仍然是可训练的。作者通过引入实值非体积保持(real NVP)转换来解决这一挑战，这是一种易于处理但表现能力强的高维数据建模方法。</p>
+          <h3 id="论文背景">论文背景</h3>
+<p>RealNVP的全称，real-valued non-volume preserving ，可以翻译为“真实值非体积保持”。对于无监督学习来说，感兴趣的数据通常是高维的、高度结构化的，因此该领域的挑战是构建足够强大的模型，以捕获其复杂性，但仍然是可训练的。作者通过引入实值非体积保持(real NVP)转换来解决这一挑战，这是一种易于处理但表现能力强的高维数据建模方法。</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:21:48.png" alt="image-20201106194258145" style="zoom:67%;" /></p>
 <p>基本思想是把数据空间映射到隐空间z，如上图所示。</p>
           <!--noindex-->
@@ -490,8 +491,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>对于一般的盲超分方法，一般都分为两步：</p>
-<ol>
+          <h3 id="论文背景">论文背景</h3>
+<p>对于一般的盲超分方法，一般都分为两步：</p>
+<ol type="1">
 <li>从LR图像中估计一个模糊核</li>
 <li>基于估计的模糊核，估计SR图像</li>
 </ol>
@@ -588,8 +590,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>在分析一个复杂物理系统时，常见的问题是不能直接测量我们感兴趣的<strong>系统参数</strong>。对于许多这样的系统，科学家们已经发展出复杂的理论来解释，测量值y是如何从隐藏的系统参数x中产生的。我们将把这种映射称为<strong>前向过程</strong>。然而，其<strong>逆过程</strong>需要从测量中推断出系统的隐藏状态。然而，因为关键信息在正向过程中丢失了，逆过程是不适定问题(ill-posed，即许多种系统参数x都可产生同一个测量值y)。</p>
-<p>给定一个测量值时，这种逆过程的解往往有多个，所以作者提出，解决逆过程时，<strong>必须给出一个在以某个观察为条件的，系统参数的条件后验概率分布，即$p(\mathbf{x|y})$。</strong>针对这一任务本文提出了可逆神经网络(invertible neural networks, INNs)。</p>
+          <h3 id="论文背景">论文背景</h3>
+<p>在分析一个复杂物理系统时，常见的问题是不能直接测量我们感兴趣的<strong>系统参数</strong>。对于许多这样的系统，科学家们已经发展出复杂的理论来解释，测量值y是如何从隐藏的系统参数x中产生的。我们将把这种映射称为<strong>前向过程</strong>。然而，其<strong>逆过程</strong>需要从测量中推断出系统的隐藏状态。然而，因为关键信息在正向过程中丢失了，逆过程是不适定问题(ill-posed，即许多种系统参数x都可产生同一个测量值y)。</p>
+<p>给定一个测量值时，这种逆过程的解往往有多个，所以作者提出，解决逆过程时，<strong>必须给出一个在以某个观察为条件的，系统参数的条件后验概率分布，即<span class="math inline">\(p(\mathbf{x|y})\)</span>。</strong>针对这一任务本文提出了可逆神经网络(invertible neural networks, INNs)。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/10/11/2020-10-11-Analyzing%20Inverse%20Problems%20with%20Invertible%20Neural%20Networks/#more" rel="contents">
@@ -677,7 +680,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><h4 id="motivation"><a href="#motivation" class="headerlink" title="motivation"></a>motivation</h4><p>针对某个退化模型训练的SR网络，如果换了退化模型，性能就会有很大下降（比方说训练集用双三次下采样构造，而测试时遇到其他的退化模型）。于是作者从广义采样中受到了启发，出了一种改进现有的CNN框架的方法，即使用一个校正滤波器，能把一张LR图像变化到其他核模糊下的LR图像(如双三次核)，进而提高test时SR网络的性能，具体分为非盲SR和盲SR两种情况：</p>
+          <h3 id="论文背景">论文背景</h3>
+<h4 id="motivation">motivation</h4>
+<p>针对某个退化模型训练的SR网络，如果换了退化模型，性能就会有很大下降（比方说训练集用双三次下采样构造，而测试时遇到其他的退化模型）。于是作者从广义采样中受到了启发，出了一种改进现有的CNN框架的方法，即使用一个校正滤波器，能把一张LR图像变化到其他核模糊下的LR图像(如双三次核)，进而提高test时SR网络的性能，具体分为非盲SR和盲SR两种情况：</p>
 <ul>
 <li>在非盲SR中，LR图像的模糊核是已知的(但不一定和训练集的核匹配)，于是作者构造的滤波器，可以提供一个将其转换到指定退化核LR图像的校正滤波器，并且是<strong>闭合解</strong>。</li>
 <li>而在盲SR中，LR图像的模糊核是未知的，作者提出了一种能估计这张LR所需校正滤波器的算法。</li>
@@ -770,7 +775,8 @@
 
       
           <p>这篇算是一篇超分辨/去噪的数据增强方面的文章，与以往的数据增强不同的是，它是在频域的角度设置了数据增强方法。</p>
-<h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>作者指出，基于学习的超分辨/去噪的CNN网络，总是基于一个庞大的数据集来训练。而这个数据集往往是通过把ground-truth图片经过一个模糊核/有限的模糊核集合进行退化构造出LR图片。但是在测试过程中，往往需要针对一个未知模糊核的LR图像来进行SR，或是对一个未知等级的噪声进行denoising。<strong>作者指出，现有的SR模型都对有限的退化模型产生了过拟合。</strong>作者在频域中分析了这一点。进一步地，作者更加形式化地揭示了SR过程中隐含的一种条件学习——“在已知低频的情况下学习高频”。据此，作者提出了本文的主要工作——随机频率掩蔽(Stochastic Frequency Masking, SFM)。</p>
+<h3 id="论文背景">论文背景</h3>
+<p>作者指出，基于学习的超分辨/去噪的CNN网络，总是基于一个庞大的数据集来训练。而这个数据集往往是通过把ground-truth图片经过一个模糊核/有限的模糊核集合进行退化构造出LR图片。但是在测试过程中，往往需要针对一个未知模糊核的LR图像来进行SR，或是对一个未知等级的噪声进行denoising。<strong>作者指出，现有的SR模型都对有限的退化模型产生了过拟合。</strong>作者在频域中分析了这一点。进一步地，作者更加形式化地揭示了SR过程中隐含的一种条件学习——“在已知低频的情况下学习高频”。据此，作者提出了本文的主要工作——随机频率掩蔽(Stochastic Frequency Masking, SFM)。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/09/14/2020-09-14-Stochastic%20Frequency%20Masking%20to%20Improve%20Super-Resolution%20and%20Denoising%20Networks/#more" rel="contents">
@@ -858,8 +864,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>作者表示，SR问题本来就是一个ill-posed的问题，可是大多数工作忽略了这一点，只致力于去学一个单图像到单图像的映射。而作者利用了基于标准化流(Normalizing Flow)的方法，去学一个LR到<strong>HR分布</strong>的映射（学习与输入LR图像相对应的真实HR图像的分布，即可以看做是给定LR图像，HR的条件概率分布），同时还表明在去噪、复原的任务中也能发挥作用。</p>
-<p>所谓标准化流(Normalizing Flow)的方法，是用来拟合一些复杂概率分布的。实际上就是学一个可逆神经网络$f_{\theta}$，使用它的逆过程$f_{\theta}^{- 1}$把一个简单的分布(比如高斯分布、均匀分布等)$p_{\mathbf{z}}(\mathbf{z})$变成$\mathbf{y} = f_{\theta}^{- 1}(\mathbf{z})$。</p>
+          <h3 id="论文背景">论文背景</h3>
+<p>作者表示，SR问题本来就是一个ill-posed的问题，可是大多数工作忽略了这一点，只致力于去学一个单图像到单图像的映射。而作者利用了基于标准化流(Normalizing Flow)的方法，去学一个LR到<strong>HR分布</strong>的映射（学习与输入LR图像相对应的真实HR图像的分布，即可以看做是给定LR图像，HR的条件概率分布），同时还表明在去噪、复原的任务中也能发挥作用。</p>
+<p>所谓标准化流(Normalizing Flow)的方法，是用来拟合一些复杂概率分布的。实际上就是学一个可逆神经网络<span class="math inline">\(f_{\theta}\)</span>，使用它的逆过程<span class="math inline">\(f_{\theta}^{- 1}\)</span>把一个简单的分布(比如高斯分布、均匀分布等)<span class="math inline">\(p_{\mathbf{z}}(\mathbf{z})\)</span>变成<span class="math inline">\(\mathbf{y} = f_{\theta}^{- 1}(\mathbf{z})\)</span>。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/09/04/2020-09-04-SRFlow%EF%BC%9ALearning%20the%20Super-Resolution%20Space%20with%20Normalizing%20Flow/#more" rel="contents">

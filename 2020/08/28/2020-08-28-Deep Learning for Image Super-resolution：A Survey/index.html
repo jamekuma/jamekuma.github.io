@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"jamekuma.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","width":270,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="从入组到现在，读了十余篇SR相关的最新论文了，但是感觉自己对整个SR问题还没有一个特别清晰的脉络，特别是在读一些论文的related work部分的时候感受尤为明显。于是这几周我找来的这篇2019年的SR综述来阅读，想借此全面地了解一下SR领域的工作，并挑一些经典工作深入理解。 如题目所示，这篇论文就是一个领域综述，主要调研了基于深度学习的图像超分辨方法。作者把现有的方法归为三大类：有监督的SR、">
+  <meta name="description" content="从入组到现在，读了十余篇SR相关的最新论文了，但是感觉自己对整个SR问题还没有一个特别清晰的脉络，特别是在读一些论文的related work部分的时候感受尤为明显。于是这几周我找来的这篇2019年的SR综述来阅读，想借此全面地了解一下SR领域的工作，并挑一些经典工作深入理解。 如题目所示，这篇论文就是一个领域综述，主要调研了基于深度学习的图像超分辨方法。作者把现有的方法归为三大类：有监督的SR">
 <meta property="og:type" content="article">
 <meta property="og:title" content="读综述：Deep Learning for Image Super-resolution：A Survey">
 <meta property="og:url" content="https://jamekuma.github.io/2020/08/28/2020-08-28-Deep%20Learning%20for%20Image%20Super-resolution%EF%BC%9AA%20Survey/index.html">
 <meta property="og:site_name" content="Jame&#39;s Blog">
-<meta property="og:description" content="从入组到现在，读了十余篇SR相关的最新论文了，但是感觉自己对整个SR问题还没有一个特别清晰的脉络，特别是在读一些论文的related work部分的时候感受尤为明显。于是这几周我找来的这篇2019年的SR综述来阅读，想借此全面地了解一下SR领域的工作，并挑一些经典工作深入理解。 如题目所示，这篇论文就是一个领域综述，主要调研了基于深度学习的图像超分辨方法。作者把现有的方法归为三大类：有监督的SR、">
+<meta property="og:description" content="从入组到现在，读了十余篇SR相关的最新论文了，但是感觉自己对整个SR问题还没有一个特别清晰的脉络，特别是在读一些论文的related work部分的时候感受尤为明显。于是这几周我找来的这篇2019年的SR综述来阅读，想借此全面地了解一下SR领域的工作，并挑一些经典工作深入理解。 如题目所示，这篇论文就是一个领域综述，主要调研了基于深度学习的图像超分辨方法。作者把现有的方法归为三大类：有监督的SR">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200827205612.png">
 <meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200827210011.png">
@@ -267,439 +267,478 @@
         <p>从入组到现在，读了十余篇SR相关的最新论文了，但是感觉自己对整个SR问题还没有一个特别清晰的脉络，特别是在读一些论文的related work部分的时候感受尤为明显。于是这几周我找来的这篇2019年的SR综述来阅读，想借此全面地了解一下SR领域的工作，并挑一些经典工作深入理解。</p>
 <p>如题目所示，这篇论文就是一个领域综述，主要调研了基于深度学习的图像超分辨方法。作者把现有的方法归为三大类：有监督的SR、无监督的SR和特定领域的SR。另外总结了目前SR领域公开可用的基准数据集和性能评估指标。最后提出了未来的几个可能的SR方向和有待进一步解决的问题。</p>
 <a id="more"></a>
-<h3 id="问题定义与相关术语"><a href="#问题定义与相关术语" class="headerlink" title="问题定义与相关术语"></a>问题定义与相关术语</h3><p>整个综述的结构如图：</p>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200827205612.png" alt="image-20200827205612235"></p>
-<h4 id="问题定义"><a href="#问题定义" class="headerlink" title="问题定义"></a>问题定义</h4><p>LR图像都是由对应的HR图像由某个退化过程得到的：</p>
-<script type="math/tex; mode=display">
-I_x=\mathcal {D}(I_y;\delta)</script><p>其中$I_x$是LR图像，$I_y$是HR图像，$\delta$是退化过程中的参数（比如放缩倍数、噪声等）。当$\mathcal D$与$\delta$都是未知的时候，就是盲SR(blind SR)，即从一个LR图像$I_x$去求一个对应HR图像$I_y$的估计值$\hat I_y$：</p>
-<script type="math/tex; mode=display">
-\hat I_y = \mathcal F(I_x;\theta)</script><p>$\mathcal F$是SR模型，$\theta$是$\mathcal F$的参数。</p>
+<h3 id="问题定义与相关术语">问题定义与相关术语</h3>
+<p>整个综述的结构如图：</p>
+<figure>
+<img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200827205612.png" alt="image-20200827205612235" /><figcaption aria-hidden="true">image-20200827205612235</figcaption>
+</figure>
+<h4 id="问题定义">问题定义</h4>
+<p>LR图像都是由对应的HR图像由某个退化过程得到的： <span class="math display">\[
+I_x=\mathcal {D}(I_y;\delta)
+\]</span> 其中<span class="math inline">\(I_x\)</span>是LR图像，<span class="math inline">\(I_y\)</span>是HR图像，<span class="math inline">\(\delta\)</span>是退化过程中的参数（比如放缩倍数、噪声等）。当<span class="math inline">\(\mathcal D\)</span>与<span class="math inline">\(\delta\)</span>都是未知的时候，就是盲SR(blind SR)，即从一个LR图像<span class="math inline">\(I_x\)</span>去求一个对应HR图像<span class="math inline">\(I_y\)</span>的估计值<span class="math inline">\(\hat I_y\)</span>： <span class="math display">\[
+\hat I_y = \mathcal F(I_x;\theta)
+\]</span> <span class="math inline">\(\mathcal F\)</span>是SR模型，<span class="math inline">\(\theta\)</span>是<span class="math inline">\(\mathcal F\)</span>的参数。</p>
 <p>退化过程是未知的，并且可能被很多因素影响，比如图像压缩时产生的伪影(artifacts)、各向异性退化(anisotropic degradations)、传感器噪声、斑点噪声(speckle noise)等。</p>
-<p> 但是研究者们都尝试去给退化过程建一个特定的模型。大多数的工作都是使用一个简单的下采样的操作作为退化模型：</p>
-<script type="math/tex; mode=display">
-\mathcal D(I_y;\delta)=(I_y){\downarrow_s},{s}\subset\delta</script><p>其中$\downarrow_s$是使用缩放因子s的下采样。<strong>大多数的SR数据集都是按照这种模式建立的。</strong>而常用的下采样操作是抗锯齿的双三次插值(bicubic interpolation with antialiasing)。但是也有工作(<a href="https://arxiv.org/pdf/1712.06116.pdf" target="_blank" rel="noopener">SRMD</a>)是使用另外的退化模型：</p>
-<script type="math/tex; mode=display">
-\mathcal D(I_y;\delta)=(I_y \otimes \kappa)\downarrow_s+n_\varsigma,\{\kappa,s,\varsigma\}\subset\delta</script><p>$\kappa$是模糊核(blur kernel)，$n_\varsigma$是一个标准差为$\varsigma$的高斯噪声。这种退化模型更接近于真实世界的情况。</p>
-<p>最后，SR模型的优化目标如下：</p>
-<script type="math/tex; mode=display">
-\hat\theta = \mathop {\arg \min}_{\theta} \mathcal L(\hat I_y,I_y)+\lambda\Phi(\theta)</script><p>其中，$\mathcal L(\hat I_y,I_y)$代表生成的HR图像与GT(ground-truth)图像$I_y$的损失函数。$\Phi(\theta)$是正则项，$\lambda$是trade-off参数。</p>
-<h4 id="SR的相关数据集"><a href="#SR的相关数据集" class="headerlink" title="SR的相关数据集"></a>SR的相关数据集</h4><p>各种数据集的不同主要体现在图像数量、质量、分辨率、多样性等。有的提供LR-HR图像对，有的只提供HR图像（在这种情况下，LR图像通常通过MATLAB中的imresize函数的默认设置(即，抗走样的双三次插值)获得）。</p>
+<p>但是研究者们都尝试去给退化过程建一个特定的模型。大多数的工作都是使用一个简单的下采样的操作作为退化模型： <span class="math display">\[
+\mathcal D(I_y;\delta)=(I_y){\downarrow_s},{s}\subset\delta
+\]</span> 其中<span class="math inline">\(\downarrow_s\)</span>是使用缩放因子s的下采样。<strong>大多数的SR数据集都是按照这种模式建立的。</strong>而常用的下采样操作是抗锯齿的双三次插值(bicubic interpolation with antialiasing)。但是也有工作(<a href="https://arxiv.org/pdf/1712.06116.pdf" target="_blank" rel="noopener">SRMD</a>)是使用另外的退化模型： <span class="math display">\[
+\mathcal D(I_y;\delta)=(I_y \otimes \kappa)\downarrow_s+n_\varsigma,\{\kappa,s,\varsigma\}\subset\delta
+\]</span></p>
+<p><span class="math inline">\(\kappa\)</span>是模糊核(blur kernel)，<span class="math inline">\(n_\varsigma\)</span>是一个标准差为<span class="math inline">\(\varsigma\)</span>的高斯噪声。这种退化模型更接近于真实世界的情况。</p>
+<p>最后，SR模型的优化目标如下： <span class="math display">\[
+\hat\theta = \mathop {\arg \min}_{\theta} \mathcal L(\hat I_y,I_y)+\lambda\Phi(\theta)
+\]</span> 其中，<span class="math inline">\(\mathcal L(\hat I_y,I_y)\)</span>代表生成的HR图像与GT(ground-truth)图像<span class="math inline">\(I_y\)</span>的损失函数。<span class="math inline">\(\Phi(\theta)\)</span>是正则项，<span class="math inline">\(\lambda\)</span>是trade-off参数。</p>
+<h4 id="sr的相关数据集">SR的相关数据集</h4>
+<p>各种数据集的不同主要体现在图像数量、质量、分辨率、多样性等。有的提供LR-HR图像对，有的只提供HR图像（在这种情况下，LR图像通常通过MATLAB中的imresize函数的默认设置(即，抗走样的双三次插值)获得）。</p>
 <p>作者总结了常用的SR图像数据集如下表，主要体现了图像数量、平均分辨率、平均像素数、图像格式、图像类别的关键词。</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200827210011.png" alt="image-20200827210011863" style="zoom:67%;" /></p>
-<h4 id="图像的质量评价标准-Image-Quality-Assessment-IQA"><a href="#图像的质量评价标准-Image-Quality-Assessment-IQA" class="headerlink" title="图像的质量评价标准(Image Quality Assessment, IQA)"></a>图像的质量评价标准(Image Quality Assessment, IQA)</h4><p>图像的质量评价标准主要分为两大类：基于人类感知的主观方法、客观的计算方法。前者非常耗时比起昂贵，所以后者成为主流。但是这两类方法并不总是一致的，因为客观的方法往往不能很准确地捕捉到人类的视觉感知，这可能会导致IQA结果存在较大差异。基于客观计算的方法又分为了三类：</p>
+<h4 id="图像的质量评价标准image-quality-assessment-iqa">图像的质量评价标准(Image Quality Assessment, IQA)</h4>
+<p>图像的质量评价标准主要分为两大类：基于人类感知的主观方法、客观的计算方法。前者非常耗时比起昂贵，所以后者成为主流。但是这两类方法并不总是一致的，因为客观的方法往往不能很准确地捕捉到人类的视觉感知，这可能会导致IQA结果存在较大差异。基于客观计算的方法又分为了三类：</p>
 <ul>
 <li>基于人类感知的主观方法</li>
-<li>客观的计算方法<ul>
+<li>客观的计算方法
+<ul>
 <li>使用参考图像进行评估的全参考方法(full-reference methods)</li>
 <li>基于提取特征比较的约简参考方法(reduced-reference methods)</li>
 <li>无参考图像的无参考方法(no-reference methods)，即盲IQA</li>
+</ul></li>
 </ul>
-</li>
-</ul>
-<h5 id="峰值信噪比-Peak-Signal-to-Noise-Ratio-PSNR"><a href="#峰值信噪比-Peak-Signal-to-Noise-Ratio-PSNR" class="headerlink" title="峰值信噪比(Peak Signal-to-Noise Ratio, PSNR)"></a>峰值信噪比(Peak Signal-to-Noise Ratio, PSNR)</h5><p>峰值信噪比(PSNR)是有损变换中最常用的重构质量测量方法之一。对于图像超分辨率来说，PSNR由最大像素值(记作$L$)和图像间的均方误差(mean squared error, MSE)定义。给定$N$个像素的图像$I$，重构图像的$\hat I$的PSNR定义如下：</p>
-<script type="math/tex; mode=display">
-{PSNR} = 10\cdot \log_{10}(\frac{L^2}{\frac 1 N \sum^N_{i=1}(I(i)-\hat I(i))^2})</script><p>在8-bit的灰度图像中，$L=255$。由于PSNR只与像素级的MSE有关，往往会导致在真实场景中重建质量表现不佳，而在真实场景中我们通常更关心人的感知。然而，由于缺乏完全准确的感知度量，且一般提出的方法都需要与其他文献进行比较，所以PSNR仍是目前SR模型使用最广泛的评价标准</p>
-<h5 id="结构相似性-Structural-Similarity-SSIM"><a href="#结构相似性-Structural-Similarity-SSIM" class="headerlink" title="结构相似性(Structural Similarity, SSIM)"></a>结构相似性(Structural Similarity, SSIM)</h5><p>SSIM是根据人类视觉系统(Human Vision System, HVS)提取图片结构的特点设计的，它基于亮度(luminance)、对比度(contrast)、结构(structures)三者的独立比较。</p>
-<p>对于$N$个像素的图像$I$，亮度$\mu_I$是像素值的均值，对比度$\sigma_I$是像素值的标准差。定义亮度、对比度的独立比较如下：</p>
-<script type="math/tex; mode=display">
-\mathcal C_l(I,\hat I)=\frac {2\mu_I\mu_{\hat I} + C_1} {\mu_I^2+\mu_{\hat I}^2+C_1}</script><script type="math/tex; mode=display">
-\mathcal C_c(I,\hat I)=\frac {2\sigma_I\sigma_{\hat I} + C_1} {\sigma_I^2+\sigma_{\hat I}^2+C_1}</script><p>其中，$C_1=(k_1L)^2,\ C_2=(k_2L)^2,\ k1\ll 1,\ k2\ll1$。</p>
-<p>结构的独立比较定义如下：</p>
-<script type="math/tex; mode=display">
-\sigma_{I\hat I}=\frac 1 {N-1}\sum_{i=1}^N{(I(i)-\mu_I)(\hat I(i)-\mu_{\hat I})}</script><script type="math/tex; mode=display">
-\mathcal C_s(I,\hat I)=\frac {\sigma_{I\hat I}+C_3}{\sigma_I\sigma_{\hat I} + C_3}</script><p>最后的SSIM定义如下：</p>
-<script type="math/tex; mode=display">
-{ SSIM}(I,\hat I)=[\mathcal C_l(I,\hat I)]^\alpha[\mathcal C_c(I,\hat I)]^\beta[\mathcal C_s(I,\hat I)]^\gamma</script><p>于SSIM是从HVS的角度来评价重建质量，因此较好地满足了感知评估的要求，也得到了广泛的应用。</p>
-<h5 id="平均意见得分（Mean-Opinion-Score-MOS）"><a href="#平均意见得分（Mean-Opinion-Score-MOS）" class="headerlink" title="平均意见得分（Mean Opinion Score, MOS）"></a>平均意见得分（Mean Opinion Score, MOS）</h5><p>在这种方法中，人类评分者被要求给被测试图像分配感知质量分数。通常，分数是1(差)到5(好)。最后的MOS是计算所有评级的算术平均值。</p>
-<h5 id="基于学习的感知质量"><a href="#基于学习的感知质量" class="headerlink" title="基于学习的感知质量"></a>基于学习的感知质量</h5><p>研究者们尝试通过在大数据集上学习来评估感知质量 。比如Ma和Talebi分别提出了无参考的评价方法Ma和NIMA，它们根据视觉感知分数直接预测质量分数，而不考虑地面真实图像。Zhang收集了一个大规模的感知相似度数据集，通过训练过的深度网络，根据深度特征的差异对感知图像patch相似度(LPIPS)进行评估，通过CNNs学习到的深度特征对感知相似度的模型要比不使用CNNs的测度好得多。</p>
+<h5 id="峰值信噪比peak-signal-to-noise-ratio-psnr">峰值信噪比(Peak Signal-to-Noise Ratio, PSNR)</h5>
+<p>峰值信噪比(PSNR)是有损变换中最常用的重构质量测量方法之一。对于图像超分辨率来说，PSNR由最大像素值(记作<span class="math inline">\(L\)</span>)和图像间的均方误差(mean squared error, MSE)定义。给定<span class="math inline">\(N\)</span>个像素的图像<span class="math inline">\(I\)</span>，重构图像的<span class="math inline">\(\hat I\)</span>的PSNR定义如下： <span class="math display">\[
+{PSNR} = 10\cdot \log_{10}(\frac{L^2}{\frac 1 N \sum^N_{i=1}(I(i)-\hat I(i))^2})
+\]</span> 在8-bit的灰度图像中，<span class="math inline">\(L=255\)</span>。由于PSNR只与像素级的MSE有关，往往会导致在真实场景中重建质量表现不佳，而在真实场景中我们通常更关心人的感知。然而，由于缺乏完全准确的感知度量，且一般提出的方法都需要与其他文献进行比较，所以PSNR仍是目前SR模型使用最广泛的评价标准</p>
+<h5 id="结构相似性structural-similarity-ssim">结构相似性(Structural Similarity, SSIM)</h5>
+<p>SSIM是根据人类视觉系统(Human Vision System, HVS)提取图片结构的特点设计的，它基于亮度(luminance)、对比度(contrast)、结构(structures)三者的独立比较。</p>
+<p>对于<span class="math inline">\(N\)</span>个像素的图像<span class="math inline">\(I\)</span>，亮度<span class="math inline">\(\mu_I\)</span>是像素值的均值，对比度<span class="math inline">\(\sigma_I\)</span>是像素值的标准差。定义亮度、对比度的独立比较如下： <span class="math display">\[
+\mathcal C_l(I,\hat I)=\frac {2\mu_I\mu_{\hat I} + C_1} {\mu_I^2+\mu_{\hat I}^2+C_1}
+\]</span></p>
+<p><span class="math display">\[
+\mathcal C_c(I,\hat I)=\frac {2\sigma_I\sigma_{\hat I} + C_1} {\sigma_I^2+\sigma_{\hat I}^2+C_1}
+\]</span></p>
+<p>其中，<span class="math inline">\(C_1=(k_1L)^2,\ C_2=(k_2L)^2,\ k1\ll 1,\ k2\ll1\)</span>。</p>
+<p>结构的独立比较定义如下： <span class="math display">\[
+\sigma_{I\hat I}=\frac 1 {N-1}\sum_{i=1}^N{(I(i)-\mu_I)(\hat I(i)-\mu_{\hat I})}
+\]</span></p>
+<p><span class="math display">\[
+\mathcal C_s(I,\hat I)=\frac {\sigma_{I\hat I}+C_3}{\sigma_I\sigma_{\hat I} + C_3}
+\]</span></p>
+<p>最后的SSIM定义如下： <span class="math display">\[
+{ SSIM}(I,\hat I)=[\mathcal C_l(I,\hat I)]^\alpha[\mathcal C_c(I,\hat I)]^\beta[\mathcal C_s(I,\hat I)]^\gamma
+\]</span> 于SSIM是从HVS的角度来评价重建质量，因此较好地满足了感知评估的要求，也得到了广泛的应用。</p>
+<h5 id="平均意见得分mean-opinion-score-mos">平均意见得分（Mean Opinion Score, MOS）</h5>
+<p>在这种方法中，人类评分者被要求给被测试图像分配感知质量分数。通常，分数是1(差)到5(好)。最后的MOS是计算所有评级的算术平均值。</p>
+<h5 id="基于学习的感知质量">基于学习的感知质量</h5>
+<p>研究者们尝试通过在大数据集上学习来评估感知质量 。比如Ma和Talebi分别提出了无参考的评价方法Ma和NIMA，它们根据视觉感知分数直接预测质量分数，而不考虑地面真实图像。Zhang收集了一个大规模的感知相似度数据集，通过训练过的深度网络，根据深度特征的差异对感知图像patch相似度(LPIPS)进行评估，通过CNNs学习到的深度特征对感知相似度的模型要比不使用CNNs的测度好得多。</p>
 <p>虽然这些方法在捕捉人眼视觉感知方面表现出了更好的表现，但是<strong>需要什么样的感知质量(例如更真实的图像，或者与原始图像的一致性)仍然是一个有待探索的问题，</strong>因此客观的IQA方法(例如PSNR, SSIM)仍然是目前的主流。</p>
-<h5 id="基于任务的评估"><a href="#基于任务的评估" class="headerlink" title="基于任务的评估"></a>基于任务的评估</h5><p>由于SR模型总是可以用来帮助其他视觉任务，所以通过其他任务来评估重建效果也是一种有效方法。具体说就是，研究人员分别把原始的图像、重构的HR图像喂给某个任务的已训练好的模型，通过比较结果的性能来评估重构的质量。常用的任务由目标检测、面部识别、面部对齐与解析等。</p>
-<h5 id="其他的IQA方法"><a href="#其他的IQA方法" class="headerlink" title="其他的IQA方法"></a>其他的IQA方法</h5><ul>
+<h5 id="基于任务的评估">基于任务的评估</h5>
+<p>由于SR模型总是可以用来帮助其他视觉任务，所以通过其他任务来评估重建效果也是一种有效方法。具体说就是，研究人员分别把原始的图像、重构的HR图像喂给某个任务的已训练好的模型，通过比较结果的性能来评估重构的质量。常用的任务由目标检测、面部识别、面部对齐与解析等。</p>
+<h5 id="其他的iqa方法">其他的IQA方法</h5>
+<ul>
 <li>多尺度结构相似性(MS-SSIM)考虑到观察条件的变化，提供了比单一尺度结构相似性规模更大的灵活性。</li>
 <li>特征相似度(FSIM)基于相位一致性和图像梯度大小提取人类感兴趣的特征点来评价图像质量。</li>
 <li>自然图像质量评估器(NIQE)利用在自然图像中观察到的统计规律的可测量偏差</li>
 </ul>
 <p><strong>CVPR 2018的一篇工作(<a href="https://arxiv.org/pdf/1711.06077" target="_blank" rel="noopener">The Perception-Distortion Tradeoff</a>)用数学方法证明了这种数值特征(如PSNR、SSIM)和感知质量(如MOS)是彼此不一致的（即不可兼得）。</strong>因此，如何准确地测量SR质量仍然是一个迫切需要解决的问题。</p>
-<h4 id="SR的操作通道-Operating-Channels"><a href="#SR的操作通道-Operating-Channels" class="headerlink" title="SR的操作通道(Operating Channels)"></a>SR的操作通道(Operating Channels)</h4><ul>
+<h4 id="sr的操作通道operating-channels">SR的操作通道(Operating Channels)</h4>
+<ul>
 <li>常用的RGB色彩空间</li>
 <li>YCbCr颜色空间：Y、Cb、Cr通道分别表示亮度、蓝差和红差色度分量</li>
 </ul>
 <p>早期的工作经常使用前者，而近年的工作一般对后者操作。值得注意的是，对不同的颜色空间或通道进行操作(训练或评估)会使评估结果差异很大(有时候甚至高达4 dB)</p>
-<h4 id="SR问题中的两个最大的挑战"><a href="#SR问题中的两个最大的挑战" class="headerlink" title="SR问题中的两个最大的挑战"></a>SR问题中的两个最大的挑战</h4><h5 id="NTIRE-The-New-Trends-in-Image-Restoration-and-Enhancement"><a href="#NTIRE-The-New-Trends-in-Image-Restoration-and-Enhancement" class="headerlink" title="NTIRE(The New Trends in Image Restoration and Enhancement)"></a>NTIRE(The New Trends in Image Restoration and Enhancement)</h5><p>NTIRE一般是CVPR的热点（？），包括了SR、去噪、着色等多个任务。对于SR来说，NTIRE挑战体现在DIV2K数据集上，因为DIV2K数据集由双三次下采样和具有实际未知退化的下采样组成，NTIRE挑战的实质即是<strong>在理想的条件和现实的不利情况下的SR研究。</strong></p>
-<h5 id="PIRM-The-Perceptual-Image-Restoration-and-Manipulation"><a href="#PIRM-The-Perceptual-Image-Restoration-and-Manipulation" class="headerlink" title="PIRM(The Perceptual Image Restoration and Manipulation)"></a>PIRM(The Perceptual Image Restoration and Manipulation)</h5><p>PIRM一般是ECCV的热点（？）。PIRM的<strong>一个子挑战是生成精度和感知质量平衡</strong>；另一个是<strong>智能手机的SR</strong>。</p>
+<h4 id="sr问题中的两个最大的挑战">SR问题中的两个最大的挑战</h4>
+<h5 id="ntirethe-new-trends-in-image-restoration-and-enhancement">NTIRE(The New Trends in Image Restoration and Enhancement)</h5>
+<p>NTIRE一般是CVPR的热点（？），包括了SR、去噪、着色等多个任务。对于SR来说，NTIRE挑战体现在DIV2K数据集上，因为DIV2K数据集由双三次下采样和具有实际未知退化的下采样组成，NTIRE挑战的实质即是<strong>在理想的条件和现实的不利情况下的SR研究。</strong></p>
+<h5 id="pirmthe-perceptual-image-restoration-and-manipulation">PIRM(The Perceptual Image Restoration and Manipulation)</h5>
+<p>PIRM一般是ECCV的热点（？）。PIRM的<strong>一个子挑战是生成精度和感知质量平衡</strong>；另一个是<strong>智能手机的SR</strong>。</p>
 <p>(<a href="https://arxiv.org/pdf/1711.06077" target="_blank" rel="noopener">The Perception-Distortion Tradeoff</a>)证明了，以失真为目标的模型经常会产生视觉上欠佳的结果，而以感知质量为目标的模型在信息保真度方面表现较差，下面是这篇工作的一副插图：</p>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200828222502.png" alt="image-20200828222501977"></p>
+<figure>
+<img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200828222502.png" alt="image-20200828222501977" /><figcaption aria-hidden="true">image-20200828222501977</figcaption>
+</figure>
 <p>在另一个子挑战，智能手机上的SR中，参与者被要求在有限的智能手机硬件上进行SR(包括CPU、GPU、RAM等)，评估指标包括PSNR、MS-SSIM、MOS测试。</p>
-<h3 id="有监督的SR"><a href="#有监督的SR" class="headerlink" title="有监督的SR"></a>有监督的SR</h3><p>有监督的SR，即：<strong>可使用LR与其对应的HR图像进行训练</strong>。虽然有监督SR模型各不相同，但它们本质上都是一些组件的组合，比如模型框架、上采样方法、网络设计、学习策略等。下文中作者对于每种组件进行了集中的总结。</p>
-<h4 id="SR框架"><a href="#SR框架" class="headerlink" title="SR框架"></a>SR框架</h4><p>对于SR这个病态问题，如何体现上采样过程是一个关键问题。作者根据上采样操作的位置，把SR框架分为了四类。</p>
+<h3 id="有监督的sr">有监督的SR</h3>
+<p>有监督的SR，即：<strong>可使用LR与其对应的HR图像进行训练</strong>。虽然有监督SR模型各不相同，但它们本质上都是一些组件的组合，比如模型框架、上采样方法、网络设计、学习策略等。下文中作者对于每种组件进行了集中的总结。</p>
+<h4 id="sr框架">SR框架</h4>
+<p>对于SR这个病态问题，如何体现上采样过程是一个关键问题。作者根据上采样操作的位置，把SR框架分为了四类。</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200828225054.png" alt="image-20200828225053739" style="zoom:67%;" /></p>
-<h5 id="预上采样-Pre-upsampling"><a href="#预上采样-Pre-upsampling" class="headerlink" title="预上采样(Pre-upsampling)"></a>预上采样(Pre-upsampling)</h5><p>由于学一个从低维空间(像素少的LR图像)到一个高维空间(像素多的HR图像)的映射比较困难，预上采样框架先使用传统的上采样算法获得HR图像，再使用深度网络将其改进。比如最早的SRCNN就是使用这种框架。</p>
+<h5 id="预上采样pre-upsampling">预上采样(Pre-upsampling)</h5>
+<p>由于学一个从低维空间(像素少的LR图像)到一个高维空间(像素多的HR图像)的映射比较困难，预上采样框架先使用传统的上采样算法获得HR图像，再使用深度网络将其改进。比如最早的SRCNN就是使用这种框架。</p>
 <p>由于最复杂的上采样操作已经完成了，CNN只需要细化粗糙的图像，这就显著的减小了学习的难度。此外，该模型可以将任意尺寸和缩放因子的插值图像作为输入，得到与单尺度SR性能相当的结果。</p>
 <p>然而，预先定义的上采样通常会引入副作用(例如，噪声放大和模糊)，而且由于大多数操作都是在高维空间中执行的，时间和空间成本要比其他框架高得多。</p>
-<h5 id="后上采样-Post-upsampling"><a href="#后上采样-Post-upsampling" class="headerlink" title="后上采样(Post-upsampling)"></a>后上采样(Post-upsampling)</h5><p>为了提高计算效率，充分利用深度学习技术自动提高分辨率，研究者提出<strong>将预先定义的上采样替换为在模型末端集成的端到端可学习的层，在低维空间中进行大部分计算。</strong>比如最早使用这种框架的有<a href="https://arxiv.org/pdf/1608.00367" target="_blank" rel="noopener">FSRCNN</a>(使用转置卷积)、<a href="https://arxiv.org/pdf/1609.05158" target="_blank" rel="noopener">ESPCN</a>(亚像素卷积)。</p>
+<h5 id="后上采样post-upsampling">后上采样(Post-upsampling)</h5>
+<p>为了提高计算效率，充分利用深度学习技术自动提高分辨率，研究者提出<strong>将预先定义的上采样替换为在模型末端集成的端到端可学习的层，在低维空间中进行大部分计算。</strong>比如最早使用这种框架的有<a href="https://arxiv.org/pdf/1608.00367" target="_blank" rel="noopener">FSRCNN</a>(使用转置卷积)、<a href="https://arxiv.org/pdf/1609.05158" target="_blank" rel="noopener">ESPCN</a>(亚像素卷积)。</p>
 <p>由于计算量大的特征提取过程只发生在低维空间，直到网络末尾分辨率才会提高，这使得计算量和空间复杂度大大降低。所以近年很多工作都是采用这种框架，比如<a href="https://arxiv.org/pdf/1609.04802" target="_blank" rel="noopener">SRGAN</a>、<a href="https://arxiv.org/pdf/1707.02921" target="_blank" rel="noopener">EDSR</a>、<a href="https://openaccess.thecvf.com/content_ICCV_2017/papers/Tong_Image_Super-Resolution_Using_ICCV_2017_paper.pdf" target="_blank" rel="noopener">SRDenseNet</a>、<a href="https://openaccess.thecvf.com/content_cvpr_2018/CameraReady/3225.pdf" target="_blank" rel="noopener">DSRN</a>等。</p>
-<h5 id="逐步上采样-Progressive-Upsampling"><a href="#逐步上采样-Progressive-Upsampling" class="headerlink" title="逐步上采样(Progressive Upsampling)"></a>逐步上采样(Progressive Upsampling)</h5><p>虽然Post-upsampling的SR框架极大地降低了计算量，但仍存在一些不足：一方面，上采样只进行了一步，大大增加了大尺度因子(如4、8)的学习难度；另一方面，每个比例因子都需要训练一个单独的SR模型，不能满足多尺度SR的需求。为了解决这些缺点，<a href="http://vision.ai.illinois.edu/publications/Deep%20Laplacian%20Pyramid%20Networks%20for%20Fast%20and%20Accurate%20Super-Resolution.pdf" target="_blank" rel="noopener">LapSRN</a>首先采用了<strong>逐步上采样框架</strong>。具体来说，该框架下就是基于<strong>串联的</strong>CNN，逐步重构出更高分辨率的图像。其余的还有<a href="https://arxiv.org/pdf/1710.01992" target="_blank" rel="noopener">MS-LapSRN</a>、<a href="https://openaccess.thecvf.com/content_cvpr_2018_workshops/papers/w13/Wang_A_Fully_Progressive_CVPR_2018_paper.pdf" target="_blank" rel="noopener">ProSR</a>。</p>
+<h5 id="逐步上采样progressive-upsampling">逐步上采样(Progressive Upsampling)</h5>
+<p>虽然Post-upsampling的SR框架极大地降低了计算量，但仍存在一些不足：一方面，上采样只进行了一步，大大增加了大尺度因子(如4、8)的学习难度；另一方面，每个比例因子都需要训练一个单独的SR模型，不能满足多尺度SR的需求。为了解决这些缺点，<a href="http://vision.ai.illinois.edu/publications/Deep%20Laplacian%20Pyramid%20Networks%20for%20Fast%20and%20Accurate%20Super-Resolution.pdf" target="_blank" rel="noopener">LapSRN</a>首先采用了<strong>逐步上采样框架</strong>。具体来说，该框架下就是基于<strong>串联的</strong>CNN，逐步重构出更高分辨率的图像。其余的还有<a href="https://arxiv.org/pdf/1710.01992" target="_blank" rel="noopener">MS-LapSRN</a>、<a href="https://openaccess.thecvf.com/content_cvpr_2018_workshops/papers/w13/Wang_A_Fully_Progressive_CVPR_2018_paper.pdf" target="_blank" rel="noopener">ProSR</a>。</p>
 <p>通过把一个复杂的任务分解成简单的任务，这类框架<strong>在不引入过多的空间和时间成本的前提下，大大减小了大尺度、多尺度的学习难度</strong>。此外，有一些特别的学习策略被应用在这个框架中，比如curriculum learning、multi-supervision，进一步降低学习难度，提高最终的性能。</p>
 <p>但这些模型也存在着多阶段模型设计复杂、训练稳定性差等问题，需要更多的建模指导和更高级的训练策略。</p>
-<h5 id="迭代的上-下采样"><a href="#迭代的上-下采样" class="headerlink" title="迭代的上-下采样"></a>迭代的上-下采样</h5><p>迭代的上采样是为了更好地捕捉<em>LR-HR对</em>的相互依赖性，首先在CVPR 2016的<a href="https://arxiv.org/pdf/1511.02228" target="_blank" rel="noopener">Seven ways to improve example-based single image super resolution</a>这篇工作中首先提出把反向投影(back-projection)引入到SR中，即迭代的计算重构误差，再将其融合回网络的开始，继续调整后续的HR图像。</p>
+<h5 id="迭代的上-下采样">迭代的上-下采样</h5>
+<p>迭代的上采样是为了更好地捕捉<em>LR-HR对</em>的相互依赖性，首先在CVPR 2016的<a href="https://arxiv.org/pdf/1511.02228" target="_blank" rel="noopener">Seven ways to improve example-based single image super resolution</a>这篇工作中首先提出把反向投影(back-projection)引入到SR中，即迭代的计算重构误差，再将其融合回网络的开始，继续调整后续的HR图像。</p>
 <p><a href="https://openaccess.thecvf.com/content_cvpr_2018/papers/Haris_Deep_Back-Projection_Networks_CVPR_2018_paper.pdf" target="_blank" rel="noopener">DBPN</a>采用的就是这种框架，即交替连接上采样层和下采样层，利用所有中间重构结果去重构最终的HR结果。<a href="https://arxiv.org/pdf/1903.09814" target="_blank" rel="noopener">SRFBN</a>采用了一个具有更密集skip连接的迭代上-下采样反馈块；视频超分辨率的一篇工作<a href="https://openaccess.thecvf.com/content_CVPR_2019/papers/Haris_Recurrent_Back-Projection_Network_for_Video_Super-Resolution_CVPR_2019_paper.pdf" target="_blank" rel="noopener">RBPN</a>从连续视频帧中提取上下文，并通过反向投影模块将这些上下文组合起来。</p>
 <p><strong>此框架可以更好地挖掘LR-HR图像对之间的深层关系，从而提供更高质量的重建结果。</strong>然而，反向投影模块的设计标准尚不明确。由于该机制刚刚被引入到基于深度学习的SR中，<strong>因此该框架具有巨大的潜力，需要进一步探索。</strong></p>
-<h4 id="各类上采样方法"><a href="#各类上采样方法" class="headerlink" title="各类上采样方法"></a>各类上采样方法</h4><p>作者介绍了一些传统的基于插值的算法和基于深度学习的上采样层。</p>
-<h5 id="基于插值的上采样"><a href="#基于插值的上采样" class="headerlink" title="基于插值的上采样"></a>基于插值的上采样</h5><p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829005324.png" alt="image-20200829005323923" style="zoom:67%;" /></p>
+<h4 id="各类上采样方法">各类上采样方法</h4>
+<p>作者介绍了一些传统的基于插值的算法和基于深度学习的上采样层。</p>
+<h5 id="基于插值的上采样">基于插值的上采样</h5>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829005324.png" alt="image-20200829005323923" style="zoom:67%;" /></p>
 <ul>
 <li>最近邻插值</li>
 <li>双线性插值</li>
 <li>双三次插值</li>
 </ul>
 <p><strong>基于插值的上采样方法仅根据自身的图像信号来提高图像分辨率，而不提供其他额外的任何信息。所以它们经常引入一些副作用，如计算复杂度、噪声放大、结果模糊等。</strong>因此，目前的趋势是用可学习的上采样层代替基于插值的方法。</p>
-<h5 id="基于学习的上采样"><a href="#基于学习的上采样" class="headerlink" title="基于学习的上采样"></a>基于学习的上采样</h5><ul>
-<li>转置卷积层(Transposed Convolution Layer)<ul>
+<h5 id="基于学习的上采样">基于学习的上采样</h5>
+<ul>
+<li>转置卷积层(Transposed Convolution Layer)
+<ul>
 <li><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829005823.png" alt="image-20200829005823015" style="zoom: 67%;" /></li>
 <li>转置卷积在保持与普通卷积兼容的连通性模式的同时，以端到端的方式增大了图像的大小</li>
 <li>使用这种上采样方式的工作：<a href="https://openaccess.thecvf.com/content_ICCV_2017/papers/Tong_Image_Super-Resolution_Using_ICCV_2017_paper.pdf" target="_blank" rel="noopener">SRDenseNet</a>、<a href="https://openaccess.thecvf.com/content_cvpr_2018/CameraReady/3225.pdf" target="_blank" rel="noopener">DSRN</a>、<a href="https://openaccess.thecvf.com/content_cvpr_2018/papers/Haris_Deep_Back-Projection_Networks_CVPR_2018_paper.pdf" target="_blank" rel="noopener">DBPN</a></li>
 <li>然而，这一层很容易导致每个轴上的“不均匀重叠”(？)。</li>
-</ul>
-</li>
-<li>亚像素层(Sub-pixel Layer)<ul>
+</ul></li>
+<li>亚像素层(Sub-pixel Layer)
+<ul>
 <li><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829085616.png" alt="image-20200829085556128" style="zoom: 67%;" /></li>
 <li>使用这种上采样方式的工作：<a href="https://arxiv.org/pdf/1609.04802" target="_blank" rel="noopener">SRGAN</a>、<a href="https://arxiv.org/pdf/1803.08664" target="_blank" rel="noopener">CARN</a>、<a href="https://arxiv.org/pdf/1712.06116" target="_blank" rel="noopener">SRMD</a>、<a href="https://arxiv.org/pdf/1802.08797" target="_blank" rel="noopener">RDN</a></li>
 <li>与转置卷积相比，亚像素层具有<strong>更大的感受野</strong>，进而提供了更多的上下文信息，帮助生成更真实的细节。</li>
 <li>然而，由于感受野的分布不平坦（？）并且每个block(上图的1234)<strong>共享同一个感受野</strong>，所以在每个block之间会有artifact；另外，在同一个block中，<strong>独立地</strong>计算相邻像素，会导致输出不平滑。</li>
 <li>所以Gao在<a href="https://openreview.net/pdf?id=B1spAqUp-" target="_blank" rel="noopener">Pixel transposed convolutional networks</a>中提出了PixelTCL，将同一个block中各个像素的独立预测改为相互依赖的顺序预测，得到更平滑、更一致的结果。</li>
-</ul>
-</li>
-<li>Meta Upscale 模块<ul>
+</ul></li>
+<li>Meta Upscale 模块
+<ul>
 <li><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829092835.png" alt="image-20200829092835100" style="zoom: 67%;" /></li>
 <li>由于之前的两种上采样都需要预先设定放大因子(为不同的因子训练不同的上采样模型)，于是<a href="https://arxiv.org/pdf/1903.00875" target="_blank" rel="noopener">Meta-SR</a>提出了Meta Upscale模块，利用元学习解决了任意因子的SR</li>
 <li>但是，该方法基于几个独立于图像内容的值（？），对每个目标像素预测了大量的卷积权值，因此在面对较大的放大时，预测结果可能不稳定，效率较低</li>
+</ul></li>
 </ul>
-</li>
-</ul>
-<h4 id="网络设计"><a href="#网络设计" class="headerlink" title="网络设计"></a>网络设计</h4><h5 id="残差学习-Residual-Learning"><a href="#残差学习-Residual-Learning" class="headerlink" title="残差学习(Residual Learning)"></a>残差学习(Residual Learning)</h5><p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829094141.png" alt="image-20200829094141729" style="zoom:67%;" /></p>
+<h4 id="网络设计">网络设计</h4>
+<h5 id="残差学习residual-learning">残差学习(Residual Learning)</h5>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829094141.png" alt="image-20200829094141729" style="zoom:67%;" /></p>
 <p>分为以下两类：</p>
 <ul>
-<li>全局残差学习<ul>
+<li>全局残差学习
+<ul>
 <li>由于SR本质上是一个“图像”到“图像”的转换过程，LR图像和HR图像是高度相关的，所以研究者们想只学一个他们之间的残差。由于大部分区域的残差接近于零，大大降低了模型的复杂性和学习难度。</li>
-</ul>
-</li>
-<li>局部残差学习<ul>
+</ul></li>
+<li>局部残差学习
+<ul>
 <li>这和何凯明原始的ResNet中很像，用于缓解网络深度不断增加带来的梯度消失问题</li>
+</ul></li>
 </ul>
-</li>
-</ul>
-<h5 id="递归学习-Recursive-Learning"><a href="#递归学习-Recursive-Learning" class="headerlink" title="递归学习(Recursive Learning)"></a>递归学习(Recursive Learning)</h5><p>即递归地使用同样的模块多次，从而<strong>在学到更高级的特征的同时不引入过多的参数</strong>：</p>
+<h5 id="递归学习recursive-learning">递归学习(Recursive Learning)</h5>
+<p>即递归地使用同样的模块多次，从而<strong>在学到更高级的特征的同时不引入过多的参数</strong>：</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829102024.png" alt="image-20200829102024267" style="zoom:67%;" /></p>
 <p>例子：<a href="https://arxiv.org/pdf/1501.00092.pdf" target="_blank" rel="noopener">DRCN</a>、<a href="https://openaccess.thecvf.com/content_cvpr_2017/papers/Tai_Image_Super-Resolution_via_CVPR_2017_paper.pdf" target="_blank" rel="noopener">DRRN</a>、<a href="https://arxiv.org/pdf/1708.02209" target="_blank" rel="noopener">MemNet</a>、<a href="https://arxiv.org/pdf/1803.08664" target="_blank" rel="noopener">CARN</a>、<a href="https://openaccess.thecvf.com/content_CVPR_2019/papers/Li_Feedback_Network_for_Image_Super-Resolution_CVPR_2019_paper.pdf" target="_blank" rel="noopener">SRFBN</a>、<a href="https://openaccess.thecvf.com/content_cvpr_2018/CameraReady/3225.pdf" target="_blank" rel="noopener">DSRN</a>、<a href="https://arxiv.org/pdf/1710.01992" target="_blank" rel="noopener">MS-LapSRN</a></p>
 <p>但递归学习仍然不能避免高昂的计算成本，一定程度上造成了梯度爆炸/消失，因此残差学习和多监督(multi-supervision)经常和递归学习一起使用。</p>
-<h5 id="多路径学习-Multi-path-Learning"><a href="#多路径学习-Multi-path-Learning" class="headerlink" title="多路径学习(Multi-path Learning)"></a>多路径学习(Multi-path Learning)</h5><p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829103458.png" alt="image-20200829103458501" style="zoom:67%;" /></p>
+<h5 id="多路径学习multi-path-learning">多路径学习(Multi-path Learning)</h5>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829103458.png" alt="image-20200829103458501" style="zoom:67%;" /></p>
 <p>多路径学习利用多条路径提取特征，然后融合起来，从而<strong>获得更好的模型容量</strong>。多路径学习可以分为以下：</p>
 <ul>
-<li>全局多路径学习(Global Multi-path Learning)<ul>
+<li>全局多路径学习(Global Multi-path Learning)
+<ul>
 <li>使用多条路径去提取<strong>图像不同方面的特征</strong></li>
 <li>在传播过程中可以相互交叉，从而极大地提高学习能力</li>
-</ul>
-</li>
-<li>局部多路径学习(Local Multi-path Learning)<ul>
+</ul></li>
+<li>局部多路径学习(Local Multi-path Learning)
+<ul>
 <li>是从inception模块中产生的启发，在<a href="https://openaccess.thecvf.com/content_ECCV_2018/papers/Juncheng_Li_Multi-scale_Residual_Network_ECCV_2018_paper.pdf" target="_blank" rel="noopener">MSRN</a>中首先使用</li>
 <li>不同的路径使用concat操作连接起来，最后加个额外的1x1卷积</li>
 <li>能较好地从<strong>多个尺度提取图像特征</strong></li>
-</ul>
-</li>
-<li>特定尺度的多路径学习(Scale-specific Multi-path Learning)<ul>
+</ul></li>
+<li>特定尺度的多路径学习(Scale-specific Multi-path Learning)
+<ul>
 <li>代表工作是<a href="https://openaccess.thecvf.com/content_cvpr_2017_workshops/w12/papers/Lim_Enhanced_Deep_Residual_CVPR_2017_paper.pdf" target="_blank" rel="noopener">EDSR</a>，多条路径共享了模型的主要部件（比如特征提取），但<strong>分别在网络的开始和结束附加特定尺度的预处理路径和上采样路径</strong>。在训练过程中，只启用和更新与选择尺度相对应的路径。</li>
 <li><a href="https://arxiv.org/pdf/1803.08664" target="_blank" rel="noopener">CARN</a>和<a href="https://openaccess.thecvf.com/content_cvpr_2018_workshops/papers/w13/Wang_A_Fully_Progressive_CVPR_2018_paper.pdf" target="_blank" rel="noopener">ProSR</a>也采用了类似的特定尺度的多路径学习</li>
+</ul></li>
 </ul>
-</li>
-</ul>
-<h5 id="稠密连接-Dense-Connections"><a href="#稠密连接-Dense-Connections" class="headerlink" title="稠密连接(Dense Connections)"></a>稠密连接(Dense Connections)</h5><p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829121543.png" alt="image-20200829121543638" style="zoom:67%;" /></p>
+<h5 id="稠密连接dense-connections">稠密连接(Dense Connections)</h5>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829121543.png" alt="image-20200829121543638" style="zoom:67%;" /></p>
 <ul>
 <li>融合低层和高层特征，为重构高质量细节提供更丰富的信息</li>
 <li><a href="https://openaccess.thecvf.com/content_ICCV_2017/papers/Tong_Image_Super-Resolution_Using_ICCV_2017_paper.pdf" target="_blank" rel="noopener">SRDenseNet</a>、<a href="https://arxiv.org/pdf/1708.02209" target="_blank" rel="noopener">MemNet</a>、<a href="https://arxiv.org/pdf/1803.08664" target="_blank" rel="noopener">CARN</a>、<a href="https://arxiv.org/pdf/1802.08797" target="_blank" rel="noopener">RDN</a>、<a href="https://openaccess.thecvf.com/content_ECCVW_2018/papers/11133/Wang_ESRGAN_Enhanced_Super-Resolution_Generative_Adversarial_Networks_ECCVW_2018_paper.pdf" target="_blank" rel="noopener">ESRGAN</a>、<a href="https://openaccess.thecvf.com/content_cvpr_2018/papers/Haris_Deep_Back-Projection_Networks_CVPR_2018_paper.pdf" target="_blank" rel="noopener">DBPN</a></li>
 </ul>
-<h5 id="注意力机制-Attention-Mechanism"><a href="#注意力机制-Attention-Mechanism" class="headerlink" title="注意力机制(Attention Mechanism)"></a>注意力机制(Attention Mechanism)</h5><ul>
-<li>通道注意力机制(Channel Attention)<ul>
+<h5 id="注意力机制attention-mechanism">注意力机制(Attention Mechanism)</h5>
+<ul>
+<li>通道注意力机制(Channel Attention)
+<ul>
 <li><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829122502.png" style="zoom: 80%;" /></li>
 <li>考虑到不同通道间特征表征的相互依赖和相互作用，<a href="https://arxiv.org/pdf/1709.01507" target="_blank" rel="noopener">SENet</a>首先提出了这种机制：使用全局平均池化(GAP)，每个输入通道被压缩到一个通道描述符(即一个常数)中，然后这些描述符被送入两个Dense层，产生输入通道的信道尺度因子</li>
 <li><a href="https://arxiv.org/pdf/1807.02758" target="_blank" rel="noopener">RCAN</a>首次把通道注意力机制引入SR</li>
 <li><a href="https://www4.comp.polyu.edu.hk/~cslzhang/paper/CVPR19-SAN.pdf" target="_blank" rel="noopener">SOCA</a>使用二阶特征统计量而不是全局平均池化，自适应地调整信道方向的特征</li>
-</ul>
-</li>
-<li>非局部注意力机制(Non-local Attention)<ul>
+</ul></li>
+<li>非局部注意力机制(Non-local Attention)
+<ul>
 <li>现有的SR模型具有非常有限的局部感受野。然而，一些比较远的物体或纹理可能对局部patch的生成可能比较重要</li>
-<li><a href="https://arxiv.org/pdf/1903.10082" target="_blank" rel="noopener">RNAN</a>首先提出这种机制，提出了一个提取特征的主干分支了，以及一个非局部/局部掩模分支，用于自适应地调整主干分支的特征。<ul>
+<li><a href="https://arxiv.org/pdf/1903.10082" target="_blank" rel="noopener">RNAN</a>首先提出这种机制，提出了一个提取特征的主干分支了，以及一个非局部/局部掩模分支，用于自适应地调整主干分支的特征。
+<ul>
 <li>非局部分支利用嵌入的高斯函数对特征图中每两个位置指标之间的成对关系进行评估，预测标度权重</li>
 <li>该方法很好地捕捉了空域注意力</li>
-</ul>
-</li>
+</ul></li>
 <li><a href="https://www4.comp.polyu.edu.hk/~cslzhang/paper/CVPR19-SAN.pdf" target="_blank" rel="noopener">SOCA</a>也引入了非局部注意机制</li>
+</ul></li>
 </ul>
-</li>
-</ul>
-<h5 id="高级卷积"><a href="#高级卷积" class="headerlink" title="高级卷积"></a>高级卷积</h5><ul>
-<li>空洞卷积(Dilated Convolution)<ul>
+<h5 id="高级卷积">高级卷积</h5>
+<ul>
+<li>空洞卷积(Dilated Convolution)
+<ul>
 <li><a href="https://openaccess.thecvf.com/content_cvpr_2017/papers/Zhang_Learning_Deep_CNN_CVPR_2017_paper.pdf" target="_blank" rel="noopener">IRCNN</a>首先在CVPR 2017把空洞卷积引入SR模型，将感受野增加了两倍以上，获得了更好的表现</li>
-</ul>
-</li>
-<li>分组卷积(Group Convolution)<ul>
+</ul></li>
+<li>分组卷积(Group Convolution)
+<ul>
 <li>分组卷积减少了参数和操作的数量，但损失了一点性能</li>
-</ul>
-</li>
-<li>Depthwise Separable Convolution：<ul>
+</ul></li>
+<li>Depthwise Separable Convolution：
+<ul>
 <li><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829151640.png" alt="image-20200829151639982" style="zoom: 33%;" /></li>
 <li><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829151701.png" alt="image-20200829151701733" style="zoom: 33%;" /></li>
 <li>它由一个分解的深度卷积和一个点态卷积(即1x1卷积)组成，因此减少了大量的参数和操作</li>
+</ul></li>
 </ul>
-</li>
-</ul>
-<h5 id="Region-recursive-Learning"><a href="#Region-recursive-Learning" class="headerlink" title="Region-recursive Learning"></a>Region-recursive Learning</h5><ul>
+<h5 id="region-recursive-learning">Region-recursive Learning</h5>
+<ul>
 <li>大多数SR模型将SR视为一个与像素无关的任务，因此无法正确地获取生成的像素之间的依赖关系。</li>
 <li>受到PixelCNN的启发，<a href="https://openaccess.thecvf.com/content_ICCV_2017/papers/Dahl_Pixel_Recursive_Super_ICCV_2017_paper.pdf" target="_blank" rel="noopener">Pixel recursive super resolution</a>首先提出了像素递归学习来进行逐像素生成图片。它在非常低的像素面部图片SR中得到了很好的MOS结果。</li>
 <li><a href="https://arxiv.org/pdf/1708.03132" target="_blank" rel="noopener">Attention-FH</a>也使用了循环策略网络(recurrent policy network)，按顺序地发现参与补丁，实现局部patch增强。这样就能够<strong>根据每幅图像自身的特点自适应地采用最优的搜索路径</strong>，从而充分利用图像的全局差异性。</li>
 <li>但由于递归过程需要较长的传播路径，大大增加了计算量和训练难度</li>
 </ul>
-<h5 id="金字塔池化"><a href="#金字塔池化" class="headerlink" title="金字塔池化"></a>金字塔池化</h5><p>受何凯明的空间金字塔池化层的启发，Zhao提出了<a href="https://arxiv.org/pdf/1612.01105.pdf" target="_blank" rel="noopener">金字塔池化模块(pyramid pooling module)</a>:</p>
+<h5 id="金字塔池化">金字塔池化</h5>
+<p>受何凯明的空间金字塔池化层的启发，Zhao提出了<a href="https://arxiv.org/pdf/1612.01105.pdf" target="_blank" rel="noopener">金字塔池化模块(pyramid pooling module)</a>:</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829160126.png" alt="image-20200829160126731" style="zoom:67%;" /></p>
 <p>有效地集成了全局和局部上下文信息。<a href="https://openaccess.thecvf.com/content_cvpr_2018_workshops/papers/w13/Park_Efficient_Module_Based_CVPR_2018_paper.pdf" target="_blank" rel="noopener">EDSR-PP</a>也利用了这种模块。</p>
-<h5 id="小波变换-Wavelet-Transformation"><a href="#小波变换-Wavelet-Transformation" class="headerlink" title="小波变换(Wavelet Transformation)"></a>小波变换(Wavelet Transformation)</h5><ul>
+<h5 id="小波变换wavelet-transformation">小波变换(Wavelet Transformation)</h5>
+<ul>
 <li>小波变换(WT)是一种高效的图像表示方法，将图像信号分解为表示纹理细节的高频子带和包含全局拓扑信息的低频子带。</li>
 <li>在2016年，<a href="https://arxiv.org/pdf/1611.06345" target="_blank" rel="noopener">Beyond deep residual learning for image restoration: Persistent homology-guided manifold simplification</a>这篇工作首次把小波变换和深度学习结合在一起，应用到了SR模型中，以插值的LR小波子带为输入，预测相应HR子带的残差。</li>
 <li>在SR中，小波变换常用于分解LR图像；而小波逆变换常用于重构HR的过程</li>
 <li>由于小波变换的表示比较高效，在兼顾性能的同时，<strong>往往大大降低了模型的规模和计算量</strong>。</li>
 </ul>
-<h5 id="逆亚像素-Desubpixel"><a href="#逆亚像素-Desubpixel" class="headerlink" title="逆亚像素(Desubpixel)"></a>逆亚像素(Desubpixel)</h5><ul>
+<h5 id="逆亚像素desubpixel">逆亚像素(Desubpixel)</h5>
+<ul>
 <li>顾名思义，就是亚像素卷积层的逆过程</li>
 <li>Desubpixel对图像进行空间分割，将其作为额外的通道堆叠，从而避免了信息的丢失。</li>
 <li>通过这种方式，他们在模型的开始通过Desubpixel向下采样输入图像，学习低维空间的表示，并在最后向上采样到目标大小。</li>
 <li>这种方法的主要目的是提升推理速度，应用于智能手机等性能受限的场景。</li>
 </ul>
-<h5 id="xUnit"><a href="#xUnit" class="headerlink" title="xUnit"></a>xUnit</h5><p><a href="https://arxiv.org/pdf/1711.06445.pdf" target="_blank" rel="noopener">xUnit</a>的本质是在每个卷积的激活函数处增加参数，相比于原来只是使用一个relu的没有参数的激活函数，其表现力更强大：</p>
+<h5 id="xunit">xUnit</h5>
+<p><a href="https://arxiv.org/pdf/1711.06445.pdf" target="_blank" rel="noopener">xUnit</a>的本质是在每个卷积的激活函数处增加参数，相比于原来只是使用一个relu的没有参数的激活函数，其表现力更强大：</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829162407.png" alt="image-20200829162407019" style="zoom:67%;" /></p>
 <p>通过这种方式，作者在没有任何性能下降的情况下将模型大小减少了近50%。</p>
-<h4 id="学习策略"><a href="#学习策略" class="headerlink" title="学习策略"></a>学习策略</h4><h5 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h5><p>早期，研究者们总是用像素级别的L2损失，但后来发现这不能准确的衡量重构的质量，于是又提出了content loss、adversarial loss等</p>
+<h4 id="学习策略">学习策略</h4>
+<h5 id="损失函数">损失函数</h5>
+<p>早期，研究者们总是用像素级别的L2损失，但后来发现这不能准确的衡量重构的质量，于是又提出了content loss、adversarial loss等</p>
 <ul>
 <li><p>像素损失(Pixel Loss)</p>
 <ul>
 <li><p>通常的L1、L2：</p>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829162934.png" alt="image-20200829162934038" style="zoom: 67%;" /></p>
-</li>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829162934.png" alt="image-20200829162934038" style="zoom: 67%;" /></p></li>
 <li><p>Charbonnier损失：</p>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829163058.png" alt="image-20200829163058705" style="zoom:67%;" /></p>
-</li>
-<li><p><strong>相较于L1损失，L2损失惩罚更大的误差，容忍较小的误差</strong>。实践表明L1 loss能得到更好的性能</p>
-</li>
-<li><p>像素损失实际上并不影响图像质量(比如感知质量)，因此，结果往往缺乏高频细节，而且纹理经常过于光滑</p>
-</li>
-</ul>
-</li>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829163058.png" alt="image-20200829163058705" style="zoom:67%;" /></p></li>
+<li><p><strong>相较于L1损失，L2损失惩罚更大的误差，容忍较小的误差</strong>。实践表明L1 loss能得到更好的性能</p></li>
+<li><p>像素损失实际上并不影响图像质量(比如感知质量)，因此，结果往往缺乏高频细节，而且纹理经常过于光滑</p></li>
+</ul></li>
 <li><p>内容损失(Content Loss)</p>
 <ul>
 <li><p>使用一个预训练的图像分类网络来衡量：</p>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829163552.png" alt="image-20200829163552200" style="zoom: 67%;" /></p>
-</li>
-<li><p>内容损失实质上是将从分类网络中学到的图像层次特征转移到了SR网络上</p>
-</li>
-<li><p>VGG和ResNet最常用</p>
-</li>
-</ul>
-</li>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829163552.png" alt="image-20200829163552200" style="zoom: 67%;" /></p></li>
+<li><p>内容损失实质上是将从分类网络中学到的图像层次特征转移到了SR网络上</p></li>
+<li><p>VGG和ResNet最常用</p></li>
+</ul></li>
 <li><p>纹理损失(Texture Loss)</p>
 <ul>
-<li><p>重构的图像需要有相同的”style”（颜色、纹理、对比度）</p>
-</li>
-<li><p>图像的“纹理”被视作<strong>不同特征通道的相关性</strong>，于是定义为格拉姆矩阵(Gram Matrix)$G^{(l)} \in \R^{c_l\times c_l}$，$G^{(l)}_{ij}$定义为第$l$层中，被向量化的特征通道$i$和$j$的内积：</p>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829164637.png" alt="image-20200829164637262" style="zoom:67%;" /></p>
-</li>
+<li><p>重构的图像需要有相同的"style"（颜色、纹理、对比度）</p></li>
+<li><p>图像的“纹理”被视作<strong>不同特征通道的相关性</strong>，于是定义为格拉姆矩阵(Gram Matrix)<span class="math inline">\(G^{(l)} \in \R^{c_l\times c_l}\)</span>，<span class="math inline">\(G^{(l)}_{ij}\)</span>定义为第<span class="math inline">\(l\)</span>层中，被向量化的特征通道<span class="math inline">\(i\)</span>和<span class="math inline">\(j\)</span>的内积：</p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829164637.png" alt="image-20200829164637262" style="zoom:67%;" /></p></li>
 <li><p>于是纹理损失定义为：</p>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829164737.png" alt="image-20200829164737450" style="zoom:67%;" />\</p>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829164737.png" alt="image-20200829164737450" style="zoom:67%;" /><br />
+</p>
 <p><strong>（下面这段我不是很理解，为什么突然冒出了patch size）</strong></p>
 <blockquote>
 <p>Despite this, determining the patch size to match textures is still empirical. Too small patches lead to artifacts in textured regions, while too large patches lead to artifacts throughout the entire image because texture statistics are averaged over regions of varying textures.</p>
-</blockquote>
-</li>
-</ul>
-</li>
+</blockquote></li>
+</ul></li>
 <li><p>对抗损失(Adversarial Loss)</p>
 <ul>
-<li><p>在SR领域，将SR模型作为生成器，再额外定义一个鉴别器来判断输入图像是否生成的。</p>
-</li>
+<li><p>在SR领域，将SR模型作为生成器，再额外定义一个鉴别器来判断输入图像是否生成的。</p></li>
 <li><p><a href="https://arxiv.org/pdf/1609.04802" target="_blank" rel="noopener">SRGAN</a>首先提出了如下的对抗损失函数：</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829165723.png" alt="image-20200829165723902" style="zoom:67%;" /></p>
-<p>$I_s$是从ground-truth中随机采样的图像</p>
-</li>
+<p><span class="math inline">\(I_s\)</span>是从ground-truth中随机采样的图像</p></li>
 <li><p><a href="https://openaccess.thecvf.com/content_cvpr_2018_workshops/papers/w13/Yuan_Unsupervised_Image_Super-Resolution_CVPR_2018_paper.pdf" target="_blank" rel="noopener">Unsupervised image super-resolution using cycle-in-cycle generative adversarial networks</a>利用基于最小二乘误差的对抗式损失可以使训练过程更稳定，结果质量更高:</p>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829170219.png" alt="image-20200829170219251" style="zoom:67%;" /></p>
-</li>
-<li><p><a href="https://faculty.ucmerced.edu/mhyang/papers/iccv2017_gan_super_deblur.pdf" target="_blank" rel="noopener">Learning to Super-Resolve Blurry Face and Text Images</a>一文中使用了由一个生成器和多个类特定判别器组成的多类GAN</p>
-</li>
-<li><p><a href="https://openaccess.thecvf.com/content_ECCVW_2018/papers/11133/Wang_ESRGAN_Enhanced_Super-Resolution_Generative_Adversarial_Networks_ECCVW_2018_paper.pdf" target="_blank" rel="noopener">ESRGAN</a>采用<a href="https://arxiv.org/pdf/1807.00734" target="_blank" rel="noopener">relativistic GAN</a>来预测真实图像比虚假图像更真实的概率，而不是输入图像真实或虚假的概率，从而恢复更详细的纹理。</p>
-</li>
-<li><p>虽然对抗性损失和内容损失训练的SR模型的PSNR比损失像素训练的模型要低，但在<strong>感知质量上有显著的提高</strong>。</p>
-</li>
-<li><p><strong>本质上说，判别器提取出了HR图像的一些很难学习到的隐含模式(latent patterns)，进而迫使生成器去适配这种模式</strong></p>
-</li>
-<li><p>然而，目前GAN的训练过程仍然困难而且不稳定，如何确保整合到SR模型中的GANs得到正确的训练，仍然是一个待解决的问题</p>
-</li>
-</ul>
-</li>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829170219.png" alt="image-20200829170219251" style="zoom:67%;" /></p></li>
+<li><p><a href="https://faculty.ucmerced.edu/mhyang/papers/iccv2017_gan_super_deblur.pdf" target="_blank" rel="noopener">Learning to Super-Resolve Blurry Face and Text Images</a>一文中使用了由一个生成器和多个类特定判别器组成的多类GAN</p></li>
+<li><p><a href="https://openaccess.thecvf.com/content_ECCVW_2018/papers/11133/Wang_ESRGAN_Enhanced_Super-Resolution_Generative_Adversarial_Networks_ECCVW_2018_paper.pdf" target="_blank" rel="noopener">ESRGAN</a>采用<a href="https://arxiv.org/pdf/1807.00734" target="_blank" rel="noopener">relativistic GAN</a>来预测真实图像比虚假图像更真实的概率，而不是输入图像真实或虚假的概率，从而恢复更详细的纹理。</p></li>
+<li><p>虽然对抗性损失和内容损失训练的SR模型的PSNR比损失像素训练的模型要低，但在<strong>感知质量上有显著的提高</strong>。</p></li>
+<li><p><strong>本质上说，判别器提取出了HR图像的一些很难学习到的隐含模式(latent patterns)，进而迫使生成器去适配这种模式</strong></p></li>
+<li><p>然而，目前GAN的训练过程仍然困难而且不稳定，如何确保整合到SR模型中的GANs得到正确的训练，仍然是一个待解决的问题</p></li>
+</ul></li>
 <li><p>循环一致损失(Cycle Consistency Loss)</p>
 <ul>
-<li><p><a href="https://openaccess.thecvf.com/content_cvpr_2018_workshops/papers/w13/Yuan_Unsupervised_Image_Super-Resolution_CVPR_2018_paper.pdf" target="_blank" rel="noopener">Unsupervised image super-resolution using cycle-in-cycle generative adversarial networks</a>这篇工作首先把CycleGAN应用到了SR领域</p>
-</li>
+<li><p><a href="https://openaccess.thecvf.com/content_cvpr_2018_workshops/papers/w13/Yuan_Unsupervised_Image_Super-Resolution_CVPR_2018_paper.pdf" target="_blank" rel="noopener">Unsupervised image super-resolution using cycle-in-cycle generative adversarial networks</a>这篇工作首先把CycleGAN应用到了SR领域</p></li>
 <li><p>不仅有LR-&gt;HR，也把HR重新下采样到LR。需要重新生成的LR图像与输入LR图像的相同，因此引入循环一致性损失：</p>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829172252.png" alt="image-20200829172252334" style="zoom:67%;" /></p>
-</li>
-</ul>
-</li>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829172252.png" alt="image-20200829172252334" style="zoom:67%;" /></p></li>
+</ul></li>
 <li><p>TV损失(Total variation loss)</p>
 <ul>
-<li><p>目的是<strong>抑制生成图像中的噪声</strong></p>
-</li>
+<li><p>目的是<strong>抑制生成图像中的噪声</strong></p></li>
 <li><p>定义为相邻像素之间的绝对差之和，用于测量图像中噪声的大小：</p>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829172430.png" alt="image-20200829172430778" style="zoom:67%;" /></p>
-</li>
-</ul>
-</li>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829172430.png" alt="image-20200829172430778" style="zoom:67%;" /></p></li>
+</ul></li>
 <li><p>基于先验的损失(Prior-Based Loss)</p>
 <ul>
 <li>比如在脸部SR任务中，引入面部对齐网络(face alignment network, FAN)，作为先验与SR联合进行训练，从而提高了LR人脸对齐和人脸图像SR的性能。</li>
 <li>本质上，<strong>内容损失和纹理损失也都引入了一个图像分类网络，也是提供了图像层次特征的先验知识</strong></li>
-</ul>
-</li>
+</ul></li>
 </ul>
 <p>在实际应用中，研究人员经常采用加权平均的方法将以上多个损失函数组合起来。<strong>然而，不同损失函数的权重需要大量的实证探索，如何合理有效地组合仍是一个问题。</strong></p>
-<h5 id="批标准化-Batch-Normalization-BN"><a href="#批标准化-Batch-Normalization-BN" class="headerlink" title="批标准化(Batch Normalization, BN)"></a>批标准化(Batch Normalization, BN)</h5><ul>
+<h5 id="批标准化batch-normalization-bn">批标准化(Batch Normalization, BN)</h5>
+<ul>
 <li>由于BN校准中间特征的分布，并且缓解了梯度消失现象，它允许使用更高的学习率和比较粗糙的初始化。因此该技术被广泛应用于SR模型</li>
 <li>然而，<a href="https://arxiv.org/pdf/1707.02921" target="_blank" rel="noopener">Lim等人</a>认为BN丢失了每张图像的尺度信息，并且去掉了网络的范围灵活性。删除了BN并使用节省下来的内存成本(高达40%)来开发更大的模型，从而大幅提高了性能。</li>
 </ul>
-<h5 id="Curriculum-Learning-？"><a href="#Curriculum-Learning-？" class="headerlink" title="Curriculum Learning(？)"></a>Curriculum Learning(？)</h5><ul>
+<h5 id="curriculum-learning">Curriculum Learning(？)</h5>
+<ul>
 <li>Curriculum learning是指从较容易的任务开始，逐步增加难度。</li>
 <li>由于超分辨率是一个ill-posed问题，经常会遇到尺度因子大、噪声和模糊等不利条件，因此采用Curriculum learning来降低学习难度。</li>
 <li>例子：<a href="https://openaccess.thecvf.com/content_cvpr_2018_workshops/papers/w13/Wang_A_Fully_Progressive_CVPR_2018_paper.pdf" target="_blank" rel="noopener">ProSR</a>、<a href="https://arxiv.org/pdf/1805.03383.pdf" target="_blank" rel="noopener">ADRSR</a>等</li>
 <li>与一般的训练程序相比，Curriculum learning大大降低了训练难度，缩短了总训练时间，特别是在scale factor较大的情况下。</li>
 </ul>
-<h5 id="多监督-Multi-supervision"><a href="#多监督-Multi-supervision" class="headerlink" title="多监督(Multi-supervision)"></a>多监督(Multi-supervision)</h5><ul>
+<h5 id="多监督multi-supervision">多监督(Multi-supervision)</h5>
+<ul>
 <li>多监督是指在模型中加入多个监督信号(？)，以增强梯度传播，避免梯度的消失和爆炸。</li>
-<li><a href="https://arxiv.org/pdf/1501.00092.pdf" target="_blank" rel="noopener">DRCN</a>就使用了多监督来对抗递归学习的梯度问题<ul>
+<li><a href="https://arxiv.org/pdf/1501.00092.pdf" target="_blank" rel="noopener">DRCN</a>就使用了多监督来对抗递归学习的梯度问题
+<ul>
 <li>把每个递归单元的输出作为重建模块的输入，以生成HR图像，并通过<strong>合并所有中间重建</strong>来构建最终的预测。</li>
 <li>类似的还有<a href="https://arxiv.org/pdf/1708.02209" target="_blank" rel="noopener">MemNet</a>、<a href="https://openaccess.thecvf.com/content_cvpr_2018/CameraReady/3225.pdf" target="_blank" rel="noopener">DSRN</a></li>
-</ul>
-</li>
+</ul></li>
 <li>另外，对于<a href="http://vision.ai.illinois.edu/publications/Deep%20Laplacian%20Pyramid%20Networks%20for%20Fast%20and%20Accurate%20Super-Resolution.pdf" target="_blank" rel="noopener">LapSRN</a>这种逐步上采样框架，传播过程中产生不同尺度的中间结果，也能采用多监督策略<strong>(即期望中间结果与从ground truth HR图像中下采样的中间图像相同)</strong></li>
 <li>在实践中，这种多监督技术通常通过在损失函数中添加一些项来实现，这样可以更有效地将监督信号反向传播，从而降低训练难度，增强模型训练。(？这里没有例子，不是很理解)</li>
 </ul>
-<h4 id="其他的一些提升"><a href="#其他的一些提升" class="headerlink" title="其他的一些提升"></a>其他的一些提升</h4><p>除了网络设计和学习策略，还有其他技术可以进一步改进SR模型。</p>
-<h5 id="基于上下文的网络融合-Context-wise-Network-Fusion-CNF"><a href="#基于上下文的网络融合-Context-wise-Network-Fusion-CNF" class="headerlink" title="基于上下文的网络融合(Context-wise Network Fusion, CNF)"></a>基于上下文的网络融合(Context-wise Network Fusion, CNF)</h5><ul>
+<h4 id="其他的一些提升">其他的一些提升</h4>
+<p>除了网络设计和学习策略，还有其他技术可以进一步改进SR模型。</p>
+<h5 id="基于上下文的网络融合context-wise-network-fusion-cnf">基于上下文的网络融合(Context-wise Network Fusion, CNF)</h5>
+<ul>
 <li>上下文感知网络融合(CNF)指的是一种叠加技术，将来自多个SR网络的预测进行融合（<strong>也可以看做上文中提到的多路径学习的一个特例</strong>）</li>
 <li>分别训练具有不同架构的单个SR模型，将每个模型的预测输入到单独的卷积层中，最后将输出相加，成为最终的预测结果。</li>
 </ul>
-<h5 id="数据增广-Data-Augmentation"><a href="#数据增广-Data-Augmentation" class="headerlink" title="数据增广(Data Augmentation)"></a>数据增广(Data Augmentation)</h5><p>裁剪、翻转、缩放、旋转、颜色抖动(cropping, flipping, scaling, rotation, color jittering)</p>
+<h5 id="数据增广data-augmentation">数据增广(Data Augmentation)</h5>
+<p>裁剪、翻转、缩放、旋转、颜色抖动(cropping, flipping, scaling, rotation, color jittering)</p>
 <p>值得注意的是<a href="https://openaccess.thecvf.com/content_cvpr_2018_workshops/papers/w13/Bei_New_Techniques_for_CVPR_2018_paper.pdf" target="_blank" rel="noopener">Bei的一篇工作</a>还使用了对RGB通道进行随机洗牌的数据增广方法。</p>
-<h5 id="多任务学习-Multi-task-Learning"><a href="#多任务学习-Multi-task-Learning" class="headerlink" title="多任务学习(Multi-task Learning)"></a>多任务学习(Multi-task Learning)</h5><ul>
-<li><p>多任务学习是指利用某些相关任务(比如如目标检测和语义分割、头部姿态估计和面部属性推断等任务)训练中包含的特定领域的信息，从而提高泛化能力</p>
-</li>
+<h5 id="多任务学习multi-task-learning">多任务学习(Multi-task Learning)</h5>
+<ul>
+<li><p>多任务学习是指利用某些相关任务(比如如目标检测和语义分割、头部姿态估计和面部属性推断等任务)训练中包含的特定领域的信息，从而提高泛化能力</p></li>
 <li><p>比如在SR中，<a href="https://arxiv.org/pdf/1804.02815" target="_blank" rel="noopener">SFTGAN</a>使用了一个语义分割网络，用于提供语义知识和生成语义特定细节。</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829183906.png" alt="image-20200829183905919" style="zoom:67%;" /></p>
 <ul>
 <li>加入了空域特征变换(Spatial Feature Transform, SFT)，以利用语义分割的结果</li>
+</ul></li>
+<li><p>考虑到直接超分辨有噪图像可能会导致噪声放大，<a href="https://arxiv.org/pdf/1805.03383" target="_blank" rel="noopener">DNSR</a>提出分别训练去噪网络和SR网络，然后将其拼接并进行微调。</p></li>
+<li><p>将相关的任务与SR模型结合起来，通常可以通过提供额外的信息和知识来提高SR性能。</p></li>
 </ul>
-</li>
-<li><p>考虑到直接超分辨有噪图像可能会导致噪声放大，<a href="https://arxiv.org/pdf/1805.03383" target="_blank" rel="noopener">DNSR</a>提出分别训练去噪网络和SR网络，然后将其拼接并进行微调。</p>
-</li>
-<li><p>将相关的任务与SR模型结合起来，通常可以通过提供额外的信息和知识来提高SR性能。</p>
-</li>
-</ul>
-<h5 id="网络插值-Network-Interpolation"><a href="#网络插值-Network-Interpolation" class="headerlink" title="网络插值(Network Interpolation)"></a>网络插值(Network Interpolation)</h5><ul>
-<li><p>基于PSNR的模型产生的图像更接近地面事实，但引入了模糊问题；而基于GAN的模型带来了更好的感知质量，但引入了artifacts</p>
-</li>
+<h5 id="网络插值network-interpolation">网络插值(Network Interpolation)</h5>
+<ul>
+<li><p>基于PSNR的模型产生的图像更接近地面事实，但引入了模糊问题；而基于GAN的模型带来了更好的感知质量，但引入了artifacts</p></li>
 <li><p>为了平衡失真和感知损失，Wang等[103]，<a href="http://openaccess.thecvf.com/content_CVPR_2019/papers/Wang_Deep_Network_Interpolation_for_Continuous_Imagery_Effect_Transition_CVPR_2019_paper.pdf" target="_blank" rel="noopener">DIN</a>提出了一种网络插值策略</p>
 <ul>
 <li>分别训练一个基于PSNR的模型和一个基于GAN的模型，然后对两个网络的所有相应参数进行插值，得到中间模型。</li>
+</ul></li>
+<li><p><strong>通过调整插值权值而无需对网络进行再训练。</strong></p></li>
 </ul>
-</li>
-<li><p><strong>通过调整插值权值而无需对网络进行再训练。</strong></p>
-</li>
-</ul>
-<h5 id="自集成-Self-Ensemble"><a href="#自集成-Self-Ensemble" class="headerlink" title="自集成(Self-Ensemble)"></a>自集成(Self-Ensemble)</h5><ul>
+<h5 id="自集成self-ensemble">自集成(Self-Ensemble)</h5>
+<ul>
 <li>自集成，又称增强预测</li>
 <li>在LR图像上加以不同角度(0,90,180,270)的旋转和水平翻转，得到一组8张图像。然后将这些图像输入到SR模型中，对重构后的HR图像进行相应的逆变换得到输出结果</li>
 <li>我的理解：数据增强是制造多个训练数据，而这些训练数据之间没有关系；而自集成是在训练、测试过程中均制造多个数据输入，且把这些数据整合起来(取平均、中值等)生成最终的结果</li>
 </ul>
-<h4 id="SOTA-SR模型-有监督"><a href="#SOTA-SR模型-有监督" class="headerlink" title="SOTA SR模型(有监督)"></a>SOTA SR模型(有监督)</h4><p>作者把截止19年的SOTA的有监督SR模型总结如下表：</p>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829185728.png" alt="image-20200829185728350"></p>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200902210034.png" alt="image-20200902204945728"></p>
-<h3 id="无监督SR"><a href="#无监督SR" class="headerlink" title="无监督SR"></a>无监督SR</h3><p>有监督SR都是使用LR-HR图片对进行学习的。然而，对于同一个场景，很难获取两个不同分辨率的图像（想象一下使用两个摄像机拍摄同一个场景的照片），所以SR数据集中的LR图像总是通过把HR图像经过预定的退化方法得到的。<strong>因此在这种情况下，SR模型实际上学到的只是预定好的退化模型的反向过程。</strong></p>
+<h4 id="sota-sr模型有监督">SOTA SR模型(有监督)</h4>
+<p>作者把截止19年的SOTA的有监督SR模型总结如下表：</p>
+<figure>
+<img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200829185728.png" alt="image-20200829185728350" /><figcaption aria-hidden="true">image-20200829185728350</figcaption>
+</figure>
+<figure>
+<img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200902210034.png" alt="image-20200902204945728" /><figcaption aria-hidden="true">image-20200902204945728</figcaption>
+</figure>
+<h3 id="无监督sr">无监督SR</h3>
+<p>有监督SR都是使用LR-HR图片对进行学习的。然而，对于同一个场景，很难获取两个不同分辨率的图像（想象一下使用两个摄像机拍摄同一个场景的照片），所以SR数据集中的LR图像总是通过把HR图像经过预定的退化方法得到的。<strong>因此在这种情况下，SR模型实际上学到的只是预定好的退化模型的反向过程。</strong></p>
 <p>因此，为了不人工引入任何的退化先验，从而学到真实世界的LR-HR映射，即无监督的SR，也就是在训练过程中只提供不成对的LR-HR图像。</p>
 <p>下面介绍几个典型的无监督SR</p>
-<h4 id="ZSSR-Zero-shot-Super-resolution"><a href="#ZSSR-Zero-shot-Super-resolution" class="headerlink" title="ZSSR(Zero-shot Super-resolution)"></a>ZSSR(Zero-shot Super-resolution)</h4><p><a href="https://arxiv.org/pdf/1712.06087.pdf" target="_blank" rel="noopener">ZSSR</a>顾名思义就是一个零样本学习，即只使用待超分辨的LR图像，在test time训练一个image-specific的网络，从而完成SR任务。具体而言，就是使用了<a href="http://openaccess.thecvf.com/content_iccv_2013/papers/Michaeli_Nonparametric_Blind_Super-resolution_2013_ICCV_paper.pdf" target="_blank" rel="noopener">ICCV 2013的一篇工作</a>估计了退化核，然后使用这个退化核，利用不同的尺度(scaling factors)完成一个数据增强，建立一个小数据集，进而学到一个小的CNN网络用于最后的预测。</p>
+<h4 id="zssrzero-shot-super-resolution">ZSSR(Zero-shot Super-resolution)</h4>
+<p><a href="https://arxiv.org/pdf/1712.06087.pdf" target="_blank" rel="noopener">ZSSR</a>顾名思义就是一个零样本学习，即只使用待超分辨的LR图像，在test time训练一个image-specific的网络，从而完成SR任务。具体而言，就是使用了<a href="http://openaccess.thecvf.com/content_iccv_2013/papers/Michaeli_Nonparametric_Blind_Super-resolution_2013_ICCV_paper.pdf" target="_blank" rel="noopener">ICCV 2013的一篇工作</a>估计了退化核，然后使用这个退化核，利用不同的尺度(scaling factors)完成一个数据增强，建立一个小数据集，进而学到一个小的CNN网络用于最后的预测。</p>
 <p>这样一来，ZSSR利用了图像内部的跨尺度信息，在非理想的情况下(比如LR不是由双三次退化得到/图像加了模糊、噪声、压缩伪影)得到了比先前的模型更好的效果(若已知模糊核，提高2db；模糊核未知，提高1db)。但是每张图片都需要训练不同的网络，因此需要更多的时间。</p>
-<h4 id="弱监督的SR"><a href="#弱监督的SR" class="headerlink" title="弱监督的SR"></a>弱监督的SR</h4><p>所谓弱监督就是使用不成对的HR-LR图片(unpaired LR-HR images)进行学习。有两种思路：</p>
+<h4 id="弱监督的sr">弱监督的SR</h4>
+<p>所谓弱监督就是使用不成对的HR-LR图片(unpaired LR-HR images)进行学习。有两种思路：</p>
 <ul>
-<li>学习退化过程：<ul>
-<li><a href="https://arxiv.org/pdf/1807.11458" target="_blank" rel="noopener">ECCV 2018</a>的一篇就提出了一个方法，分两步：<ul>
+<li>学习退化过程：
+<ul>
+<li><a href="https://arxiv.org/pdf/1807.11458" target="_blank" rel="noopener">ECCV 2018</a>的一篇就提出了一个方法，分两步：
+<ul>
 <li>首先从一个unpaired LR-HR图像中学一个退化过程。即给Generator输入一个HR，产生LR，不仅要与输入的平均池化下采样匹配，还要符合真实的LR的分布(由Discriminator完成)</li>
 <li>然后使用上述学好的Generator，作为一个“真实的”退化模型，去构造LR-HR对，从而再训一个LR to HR的GAN，完成超分辨过程</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>Cycle-in-cycle超分辨率：<ul>
+</ul></li>
+</ul></li>
+<li>Cycle-in-cycle超分辨率：
+<ul>
 <li>也就是<a href="https://arxiv.org/pdf/1703.10593" target="_blank" rel="noopener">CycleGAN</a>的思想，把LR空间和HR空间开着两个域(domain)，使用“cycle-in-cycle”结构去学彼此之间的映射。即不仅要符合目标域的分布，也要使图像能映射回原来的域。</li>
-<li><a href="https://arxiv.org/pdf/1809.00437" target="_blank" rel="noopener">CinCGAN</a>就是利用这种思想，使用了4个Generator，2个Discriminator，构造了两个Cycle-GAN：LR&lt;—&gt;clean LR，clean LR &lt;—&gt; clean HR</li>
+<li><a href="https://arxiv.org/pdf/1809.00437" target="_blank" rel="noopener">CinCGAN</a>就是利用这种思想，使用了4个Generator，2个Discriminator，构造了两个Cycle-GAN：LR&lt;--&gt;clean LR，clean LR &lt;--&gt; clean HR</li>
 <li>然鹅，由于训练的病态本质和CinCGAN的复杂架构，需要一些先进的策略来降低训练的难度和不稳定性</li>
+</ul></li>
 </ul>
-</li>
-</ul>
-<h4 id="深度图像先验-Deep-Image-Prior-DIP"><a href="#深度图像先验-Deep-Image-Prior-DIP" class="headerlink" title="深度图像先验(Deep Image Prior, DIP)"></a>深度图像先验(Deep Image Prior, DIP)</h4><p><a href="https://arxiv.org/pdf/1711.10925" target="_blank" rel="noopener">DIP</a>中认为，CNN结构本身就足够捕获大量的低级图像信息，并应用于反问题上(比如去噪、图像超分辨等)，于是作者使用了一个随机初始化的CNN作为SR问题的先验。具体来说就是，建立了一个生成器网络，输入一个随机噪声z，生成HR图像。直接在训练过程中要求这张HR图像的下采样版本需要与LR图像相同。虽然这种方法的性能仍然比有监督的方法差(2 db)，其性能明显优于传统的双三次上采样(1 dB)。</p>
-<h3 id="特定领域的应用"><a href="#特定领域的应用" class="headerlink" title="特定领域的应用"></a>特定领域的应用</h3><h4 id="深度图-depth-maps-的图像超分辨"><a href="#深度图-depth-maps-的图像超分辨" class="headerlink" title="深度图(depth maps)的图像超分辨"></a>深度图(depth maps)的图像超分辨</h4><p>深度图记录了视点与物体对象在实际场景中的距离，在姿势估计和语义分割中有重要作用。然而，由于经济和生产方面的限制，深度传感器制作的深度图往往分辨率低，并受到噪声、量化和缺失值等退化影响。因此，引入超分辨率来提高深度图的空间分辨率。</p>
+<h4 id="深度图像先验deep-image-prior-dip">深度图像先验(Deep Image Prior, DIP)</h4>
+<p><a href="https://arxiv.org/pdf/1711.10925" target="_blank" rel="noopener">DIP</a>中认为，CNN结构本身就足够捕获大量的低级图像信息，并应用于反问题上(比如去噪、图像超分辨等)，于是作者使用了一个随机初始化的CNN作为SR问题的先验。具体来说就是，建立了一个生成器网络，输入一个随机噪声z，生成HR图像。直接在训练过程中要求这张HR图像的下采样版本需要与LR图像相同。虽然这种方法的性能仍然比有监督的方法差(2 db)，其性能明显优于传统的双三次上采样(1 dB)。</p>
+<h3 id="特定领域的应用">特定领域的应用</h3>
+<h4 id="深度图depth-maps的图像超分辨">深度图(depth maps)的图像超分辨</h4>
+<p>深度图记录了视点与物体对象在实际场景中的距离，在姿势估计和语义分割中有重要作用。然而，由于经济和生产方面的限制，深度传感器制作的深度图往往分辨率低，并受到噪声、量化和缺失值等退化影响。因此，引入超分辨率来提高深度图的空间分辨率。</p>
 <p>深度地图的SR现在最流行的做法之一是使用另一个经济的RGB相机来获得HR图像的相同场景，用于指导超分辨LR深度地图</p>
-<h3 id="结论与未来可能的方向"><a href="#结论与未来可能的方向" class="headerlink" title="结论与未来可能的方向"></a>结论与未来可能的方向</h3><p>在本节，作者指出一些SR领域尚未解决的问题。</p>
-<h4 id="网络设计-1"><a href="#网络设计-1" class="headerlink" title="网络设计"></a>网络设计</h4><p>一些网络设计的可能的方向：</p>
+<h3 id="结论与未来可能的方向">结论与未来可能的方向</h3>
+<p>在本节，作者指出一些SR领域尚未解决的问题。</p>
+<h4 id="网络设计-1">网络设计</h4>
+<p>一些网络设计的可能的方向：</p>
 <ul>
 <li>结合局部和全局的信息</li>
-<li>结合低级(low-level)和高级(high-level)的信息<ul>
+<li>结合低级(low-level)和高级(high-level)的信息
+<ul>
 <li>CNN的浅层提取颜色和边缘之类的低级信息</li>
 <li>深层提取目标检测之类的高级信息</li>
-</ul>
-</li>
-<li>上下文相关的注意力机制<ul>
-<li>在不同的上下文，人们往往会关注图像的不同方面<ul>
+</ul></li>
+<li>上下文相关的注意力机制
+<ul>
+<li>在不同的上下文，人们往往会关注图像的不同方面
+<ul>
 <li>举个例子：在草地区域，人们可能更关注当地的颜色和纹理；而在动物身体区域，人们可能更关注物种和相应的毛发细节。</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>效率更高的架构<ul>
+</ul></li>
+</ul></li>
+<li>效率更高的架构
+<ul>
 <li>现有的SR模式倾向于追求最终的性能，而忽略了模型大小和推理速度</li>
 <li>比如对于<a href="https://arxiv.org/pdf/1707.02921" target="_blank" rel="noopener">EDSR</a>，使用Titan GTX GPU，一张照片进行x4的SR，需要20s；<a href="https://openaccess.thecvf.com/content_cvpr_2018/papers/Haris_Deep_Back-Projection_Networks_CVPR_2018_paper.pdf" target="_blank" rel="noopener">DBPN</a>需要35s。</li>
 <li>如此长的预测时间在实际应用中是不可接受的，因此更高效的体系结构势在必行。</li>
-</ul>
-</li>
-<li>上采样方法<ul>
+</ul></li>
+<li>上采样方法
+<ul>
 <li>插值方法计算开销大，不能端到端学习；</li>
 <li>转置卷积产生棋盘状伪像；</li>
 <li>亚像素层带来接受场分布不均；</li>
 <li>Meta Upscale模块可能造成不稳定或效率低下。</li>
-</ul>
-</li>
+</ul></li>
 </ul>
 <p>另外，近年来，用于深度学习的神经结构搜索(neural architecture search, NAS)技术越来越流行，在很少人工干预的情况下极大地提高了性能或效率。对于SR领域，将上述方向与NAS结合探索具有很大的潜力。</p>
-<h4 id="学习策略-1"><a href="#学习策略-1" class="headerlink" title="学习策略"></a>学习策略</h4><ul>
+<h4 id="学习策略-1">学习策略</h4>
+<ul>
 <li>损失函数：现有的损失函数可以看作是建立LR/HR/SR图像之间的约束，并根据这些约束条件是否满足进行引导优化。在实际应用中，这些损失函数往往是加权组合的，对于SR的最佳损失函数仍然不清楚。</li>
 <li>标准化(Normalization)：既然BN不大行，那有其他的标准化方法吗？</li>
 </ul>
-<h4 id="评价指标"><a href="#评价指标" class="headerlink" title="评价指标"></a>评价指标</h4><ul>
-<li>更准确的指标<ul>
+<h4 id="评价指标">评价指标</h4>
+<ul>
+<li>更准确的指标
+<ul>
 <li>PSNR倾向于导致过度平滑，可能会在几乎无法区分的图像之间有很不同的PSNR结果</li>
 <li>SSIM对亮度、对比度和结构进行了评价，但仍不能准确地测量感知质量。</li>
 <li>MOS是最接近人类视觉反馈的，但需要付出大量的成本，而且不可复制。</li>
-</ul>
-</li>
-<li>盲IQA方法<ul>
+</ul></li>
+<li>盲IQA方法
+<ul>
 <li>现在SR的大多数度量都是全参考(all-reference)方法，也就是说，假设我们已经有Paired方法。但是有时候数据是难以取得的，并且常用的评价数据集往往是通过人工退化的方式构建的，我们执行的评估任务实际上是预定义降级的逆过程。</li>
+</ul></li>
 </ul>
-</li>
-</ul>
-<h4 id="无监督的超分辨"><a href="#无监督的超分辨" class="headerlink" title="无监督的超分辨"></a>无监督的超分辨</h4><h4 id="对真实世界场景的超分辨"><a href="#对真实世界场景的超分辨" class="headerlink" title="对真实世界场景的超分辨"></a>对真实世界场景的超分辨</h4><ul>
+<h4 id="无监督的超分辨">无监督的超分辨</h4>
+<h4 id="对真实世界场景的超分辨">对真实世界场景的超分辨</h4>
+<ul>
 <li>多样的退化过程：已经一些工作，如CinCGAN等，但这些方法存在固有的缺陷，如训练难度大，假设过完美等。这个问题迫切需要解决。</li>
 <li>特定应用场景的超分辨：视频监控，目标跟踪，医学成像和场景渲染</li>
 </ul>
@@ -789,7 +828,7 @@ I_x=\mathcal {D}(I_y;\delta)</script><p>其中$I_x$是LR图像，$I_y$是HR图�
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题定义与相关术语"><span class="nav-number">1.</span> <span class="nav-text">问题定义与相关术语</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#问题定义"><span class="nav-number">1.1.</span> <span class="nav-text">问题定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SR的相关数据集"><span class="nav-number">1.2.</span> <span class="nav-text">SR的相关数据集</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#图像的质量评价标准-Image-Quality-Assessment-IQA"><span class="nav-number">1.3.</span> <span class="nav-text">图像的质量评价标准(Image Quality Assessment, IQA)</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#峰值信噪比-Peak-Signal-to-Noise-Ratio-PSNR"><span class="nav-number">1.3.1.</span> <span class="nav-text">峰值信噪比(Peak Signal-to-Noise Ratio, PSNR)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#结构相似性-Structural-Similarity-SSIM"><span class="nav-number">1.3.2.</span> <span class="nav-text">结构相似性(Structural Similarity, SSIM)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#平均意见得分（Mean-Opinion-Score-MOS）"><span class="nav-number">1.3.3.</span> <span class="nav-text">平均意见得分（Mean Opinion Score, MOS）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#基于学习的感知质量"><span class="nav-number">1.3.4.</span> <span class="nav-text">基于学习的感知质量</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#基于任务的评估"><span class="nav-number">1.3.5.</span> <span class="nav-text">基于任务的评估</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#其他的IQA方法"><span class="nav-number">1.3.6.</span> <span class="nav-text">其他的IQA方法</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SR的操作通道-Operating-Channels"><span class="nav-number">1.4.</span> <span class="nav-text">SR的操作通道(Operating Channels)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SR问题中的两个最大的挑战"><span class="nav-number">1.5.</span> <span class="nav-text">SR问题中的两个最大的挑战</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#NTIRE-The-New-Trends-in-Image-Restoration-and-Enhancement"><span class="nav-number">1.5.1.</span> <span class="nav-text">NTIRE(The New Trends in Image Restoration and Enhancement)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#PIRM-The-Perceptual-Image-Restoration-and-Manipulation"><span class="nav-number">1.5.2.</span> <span class="nav-text">PIRM(The Perceptual Image Restoration and Manipulation)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#有监督的SR"><span class="nav-number">2.</span> <span class="nav-text">有监督的SR</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#SR框架"><span class="nav-number">2.1.</span> <span class="nav-text">SR框架</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#预上采样-Pre-upsampling"><span class="nav-number">2.1.1.</span> <span class="nav-text">预上采样(Pre-upsampling)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#后上采样-Post-upsampling"><span class="nav-number">2.1.2.</span> <span class="nav-text">后上采样(Post-upsampling)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#逐步上采样-Progressive-Upsampling"><span class="nav-number">2.1.3.</span> <span class="nav-text">逐步上采样(Progressive Upsampling)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#迭代的上-下采样"><span class="nav-number">2.1.4.</span> <span class="nav-text">迭代的上-下采样</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#各类上采样方法"><span class="nav-number">2.2.</span> <span class="nav-text">各类上采样方法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#基于插值的上采样"><span class="nav-number">2.2.1.</span> <span class="nav-text">基于插值的上采样</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#基于学习的上采样"><span class="nav-number">2.2.2.</span> <span class="nav-text">基于学习的上采样</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#网络设计"><span class="nav-number">2.3.</span> <span class="nav-text">网络设计</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#残差学习-Residual-Learning"><span class="nav-number">2.3.1.</span> <span class="nav-text">残差学习(Residual Learning)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#递归学习-Recursive-Learning"><span class="nav-number">2.3.2.</span> <span class="nav-text">递归学习(Recursive Learning)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#多路径学习-Multi-path-Learning"><span class="nav-number">2.3.3.</span> <span class="nav-text">多路径学习(Multi-path Learning)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#稠密连接-Dense-Connections"><span class="nav-number">2.3.4.</span> <span class="nav-text">稠密连接(Dense Connections)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#注意力机制-Attention-Mechanism"><span class="nav-number">2.3.5.</span> <span class="nav-text">注意力机制(Attention Mechanism)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#高级卷积"><span class="nav-number">2.3.6.</span> <span class="nav-text">高级卷积</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Region-recursive-Learning"><span class="nav-number">2.3.7.</span> <span class="nav-text">Region-recursive Learning</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#金字塔池化"><span class="nav-number">2.3.8.</span> <span class="nav-text">金字塔池化</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#小波变换-Wavelet-Transformation"><span class="nav-number">2.3.9.</span> <span class="nav-text">小波变换(Wavelet Transformation)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#逆亚像素-Desubpixel"><span class="nav-number">2.3.10.</span> <span class="nav-text">逆亚像素(Desubpixel)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#xUnit"><span class="nav-number">2.3.11.</span> <span class="nav-text">xUnit</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#学习策略"><span class="nav-number">2.4.</span> <span class="nav-text">学习策略</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#损失函数"><span class="nav-number">2.4.1.</span> <span class="nav-text">损失函数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#批标准化-Batch-Normalization-BN"><span class="nav-number">2.4.2.</span> <span class="nav-text">批标准化(Batch Normalization, BN)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Curriculum-Learning-？"><span class="nav-number">2.4.3.</span> <span class="nav-text">Curriculum Learning(？)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#多监督-Multi-supervision"><span class="nav-number">2.4.4.</span> <span class="nav-text">多监督(Multi-supervision)</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#其他的一些提升"><span class="nav-number">2.5.</span> <span class="nav-text">其他的一些提升</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#基于上下文的网络融合-Context-wise-Network-Fusion-CNF"><span class="nav-number">2.5.1.</span> <span class="nav-text">基于上下文的网络融合(Context-wise Network Fusion, CNF)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#数据增广-Data-Augmentation"><span class="nav-number">2.5.2.</span> <span class="nav-text">数据增广(Data Augmentation)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#多任务学习-Multi-task-Learning"><span class="nav-number">2.5.3.</span> <span class="nav-text">多任务学习(Multi-task Learning)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#网络插值-Network-Interpolation"><span class="nav-number">2.5.4.</span> <span class="nav-text">网络插值(Network Interpolation)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#自集成-Self-Ensemble"><span class="nav-number">2.5.5.</span> <span class="nav-text">自集成(Self-Ensemble)</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SOTA-SR模型-有监督"><span class="nav-number">2.6.</span> <span class="nav-text">SOTA SR模型(有监督)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#无监督SR"><span class="nav-number">3.</span> <span class="nav-text">无监督SR</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ZSSR-Zero-shot-Super-resolution"><span class="nav-number">3.1.</span> <span class="nav-text">ZSSR(Zero-shot Super-resolution)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#弱监督的SR"><span class="nav-number">3.2.</span> <span class="nav-text">弱监督的SR</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#深度图像先验-Deep-Image-Prior-DIP"><span class="nav-number">3.3.</span> <span class="nav-text">深度图像先验(Deep Image Prior, DIP)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#特定领域的应用"><span class="nav-number">4.</span> <span class="nav-text">特定领域的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#深度图-depth-maps-的图像超分辨"><span class="nav-number">4.1.</span> <span class="nav-text">深度图(depth maps)的图像超分辨</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结论与未来可能的方向"><span class="nav-number">5.</span> <span class="nav-text">结论与未来可能的方向</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#网络设计-1"><span class="nav-number">5.1.</span> <span class="nav-text">网络设计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#学习策略-1"><span class="nav-number">5.2.</span> <span class="nav-text">学习策略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#评价指标"><span class="nav-number">5.3.</span> <span class="nav-text">评价指标</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#无监督的超分辨"><span class="nav-number">5.4.</span> <span class="nav-text">无监督的超分辨</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#对真实世界场景的超分辨"><span class="nav-number">5.5.</span> <span class="nav-text">对真实世界场景的超分辨</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题定义与相关术语"><span class="nav-number">1.</span> <span class="nav-text">问题定义与相关术语</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#问题定义"><span class="nav-number">1.1.</span> <span class="nav-text">问题定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sr的相关数据集"><span class="nav-number">1.2.</span> <span class="nav-text">SR的相关数据集</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#图像的质量评价标准image-quality-assessment-iqa"><span class="nav-number">1.3.</span> <span class="nav-text">图像的质量评价标准(Image Quality Assessment, IQA)</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#峰值信噪比peak-signal-to-noise-ratio-psnr"><span class="nav-number">1.3.1.</span> <span class="nav-text">峰值信噪比(Peak Signal-to-Noise Ratio, PSNR)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#结构相似性structural-similarity-ssim"><span class="nav-number">1.3.2.</span> <span class="nav-text">结构相似性(Structural Similarity, SSIM)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#平均意见得分mean-opinion-score-mos"><span class="nav-number">1.3.3.</span> <span class="nav-text">平均意见得分（Mean Opinion Score, MOS）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#基于学习的感知质量"><span class="nav-number">1.3.4.</span> <span class="nav-text">基于学习的感知质量</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#基于任务的评估"><span class="nav-number">1.3.5.</span> <span class="nav-text">基于任务的评估</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#其他的iqa方法"><span class="nav-number">1.3.6.</span> <span class="nav-text">其他的IQA方法</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sr的操作通道operating-channels"><span class="nav-number">1.4.</span> <span class="nav-text">SR的操作通道(Operating Channels)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sr问题中的两个最大的挑战"><span class="nav-number">1.5.</span> <span class="nav-text">SR问题中的两个最大的挑战</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#ntirethe-new-trends-in-image-restoration-and-enhancement"><span class="nav-number">1.5.1.</span> <span class="nav-text">NTIRE(The New Trends in Image Restoration and Enhancement)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#pirmthe-perceptual-image-restoration-and-manipulation"><span class="nav-number">1.5.2.</span> <span class="nav-text">PIRM(The Perceptual Image Restoration and Manipulation)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#有监督的sr"><span class="nav-number">2.</span> <span class="nav-text">有监督的SR</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#sr框架"><span class="nav-number">2.1.</span> <span class="nav-text">SR框架</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#预上采样pre-upsampling"><span class="nav-number">2.1.1.</span> <span class="nav-text">预上采样(Pre-upsampling)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#后上采样post-upsampling"><span class="nav-number">2.1.2.</span> <span class="nav-text">后上采样(Post-upsampling)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#逐步上采样progressive-upsampling"><span class="nav-number">2.1.3.</span> <span class="nav-text">逐步上采样(Progressive Upsampling)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#迭代的上-下采样"><span class="nav-number">2.1.4.</span> <span class="nav-text">迭代的上-下采样</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#各类上采样方法"><span class="nav-number">2.2.</span> <span class="nav-text">各类上采样方法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#基于插值的上采样"><span class="nav-number">2.2.1.</span> <span class="nav-text">基于插值的上采样</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#基于学习的上采样"><span class="nav-number">2.2.2.</span> <span class="nav-text">基于学习的上采样</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#网络设计"><span class="nav-number">2.3.</span> <span class="nav-text">网络设计</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#残差学习residual-learning"><span class="nav-number">2.3.1.</span> <span class="nav-text">残差学习(Residual Learning)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#递归学习recursive-learning"><span class="nav-number">2.3.2.</span> <span class="nav-text">递归学习(Recursive Learning)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#多路径学习multi-path-learning"><span class="nav-number">2.3.3.</span> <span class="nav-text">多路径学习(Multi-path Learning)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#稠密连接dense-connections"><span class="nav-number">2.3.4.</span> <span class="nav-text">稠密连接(Dense Connections)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#注意力机制attention-mechanism"><span class="nav-number">2.3.5.</span> <span class="nav-text">注意力机制(Attention Mechanism)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#高级卷积"><span class="nav-number">2.3.6.</span> <span class="nav-text">高级卷积</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#region-recursive-learning"><span class="nav-number">2.3.7.</span> <span class="nav-text">Region-recursive Learning</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#金字塔池化"><span class="nav-number">2.3.8.</span> <span class="nav-text">金字塔池化</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#小波变换wavelet-transformation"><span class="nav-number">2.3.9.</span> <span class="nav-text">小波变换(Wavelet Transformation)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#逆亚像素desubpixel"><span class="nav-number">2.3.10.</span> <span class="nav-text">逆亚像素(Desubpixel)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#xunit"><span class="nav-number">2.3.11.</span> <span class="nav-text">xUnit</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#学习策略"><span class="nav-number">2.4.</span> <span class="nav-text">学习策略</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#损失函数"><span class="nav-number">2.4.1.</span> <span class="nav-text">损失函数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#批标准化batch-normalization-bn"><span class="nav-number">2.4.2.</span> <span class="nav-text">批标准化(Batch Normalization, BN)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#curriculum-learning"><span class="nav-number">2.4.3.</span> <span class="nav-text">Curriculum Learning(？)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#多监督multi-supervision"><span class="nav-number">2.4.4.</span> <span class="nav-text">多监督(Multi-supervision)</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#其他的一些提升"><span class="nav-number">2.5.</span> <span class="nav-text">其他的一些提升</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#基于上下文的网络融合context-wise-network-fusion-cnf"><span class="nav-number">2.5.1.</span> <span class="nav-text">基于上下文的网络融合(Context-wise Network Fusion, CNF)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#数据增广data-augmentation"><span class="nav-number">2.5.2.</span> <span class="nav-text">数据增广(Data Augmentation)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#多任务学习multi-task-learning"><span class="nav-number">2.5.3.</span> <span class="nav-text">多任务学习(Multi-task Learning)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#网络插值network-interpolation"><span class="nav-number">2.5.4.</span> <span class="nav-text">网络插值(Network Interpolation)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#自集成self-ensemble"><span class="nav-number">2.5.5.</span> <span class="nav-text">自集成(Self-Ensemble)</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sota-sr模型有监督"><span class="nav-number">2.6.</span> <span class="nav-text">SOTA SR模型(有监督)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#无监督sr"><span class="nav-number">3.</span> <span class="nav-text">无监督SR</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#zssrzero-shot-super-resolution"><span class="nav-number">3.1.</span> <span class="nav-text">ZSSR(Zero-shot Super-resolution)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#弱监督的sr"><span class="nav-number">3.2.</span> <span class="nav-text">弱监督的SR</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#深度图像先验deep-image-prior-dip"><span class="nav-number">3.3.</span> <span class="nav-text">深度图像先验(Deep Image Prior, DIP)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#特定领域的应用"><span class="nav-number">4.</span> <span class="nav-text">特定领域的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#深度图depth-maps的图像超分辨"><span class="nav-number">4.1.</span> <span class="nav-text">深度图(depth maps)的图像超分辨</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结论与未来可能的方向"><span class="nav-number">5.</span> <span class="nav-text">结论与未来可能的方向</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#网络设计-1"><span class="nav-number">5.1.</span> <span class="nav-text">网络设计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#学习策略-1"><span class="nav-number">5.2.</span> <span class="nav-text">学习策略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#评价指标"><span class="nav-number">5.3.</span> <span class="nav-text">评价指标</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#无监督的超分辨"><span class="nav-number">5.4.</span> <span class="nav-text">无监督的超分辨</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#对真实世界场景的超分辨"><span class="nav-number">5.5.</span> <span class="nav-text">对真实世界场景的超分辨</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"jamekuma.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","width":270,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="论文背景这里，作者照例总结了几个生成模型：  自回归模型(Autoregressive models)：简易，但并行化不够 变分编码器(VAEs)：对数据的对数似然的下界进行优化，相较于变分编码器，有并行化的优势，但优化起来比较困难 基于流的生成模型(Flow-based generative models)：在NICE中首次描述，在Real NVP中进行了扩展  基于流的生成模型有如下的优点：">
+  <meta name="description" content="论文背景 这里，作者照例总结了几个生成模型：  自回归模型(Autoregressive models)：简易，但并行化不够 变分编码器(VAEs)：对数据的对数似然的下界进行优化，相较于变分编码器，有并行化的优势，但优化起来比较困难 基于流的生成模型(Flow-based generative models)：在NICE中首次描述，在Real NVP中进行了扩展  基于流的生成模型">
 <meta property="og:type" content="article">
 <meta property="og:title" content="读论文：Glow：generative flow with invertible 1x1 convolutions">
 <meta property="og:url" content="https://jamekuma.github.io/2020/11/07/2020-11-07-Glow%EF%BC%9Agenerative%20flow%20with%20invertible%201x1%20convolutions/index.html">
 <meta property="og:site_name" content="Jame&#39;s Blog">
-<meta property="og:description" content="论文背景这里，作者照例总结了几个生成模型：  自回归模型(Autoregressive models)：简易，但并行化不够 变分编码器(VAEs)：对数据的对数似然的下界进行优化，相较于变分编码器，有并行化的优势，但优化起来比较困难 基于流的生成模型(Flow-based generative models)：在NICE中首次描述，在Real NVP中进行了扩展  基于流的生成模型有如下的优点：">
+<meta property="og:description" content="论文背景 这里，作者照例总结了几个生成模型：  自回归模型(Autoregressive models)：简易，但并行化不够 变分编码器(VAEs)：对数据的对数似然的下界进行优化，相较于变分编码器，有并行化的优势，但优化起来比较困难 基于流的生成模型(Flow-based generative models)：在NICE中首次描述，在Real NVP中进行了扩展  基于流的生成模型">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://image.jiqizhixin.com/uploads/editor/2c6ffd2f-0341-4f33-91ea-0566b85dcefb/1535347013381.png">
 <meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:22:32.png">
@@ -237,7 +237,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>这里，作者照例总结了几个生成模型：</p>
+        <h3 id="论文背景">论文背景</h3>
+<p>这里，作者照例总结了几个生成模型：</p>
 <ul>
 <li>自回归模型(Autoregressive models)：简易，但并行化不够</li>
 <li>变分编码器(VAEs)：对数据的对数似然的<strong>下界</strong>进行优化，相较于变分编码器，有并行化的优势，但优化起来比较困难</li>
@@ -245,65 +246,76 @@
 </ul>
 <p>基于流的生成模型有如下的优点：</p>
 <ul>
-<li>精确隐变量推理和对数似然评价<ul>
+<li>精确隐变量推理和对数似然评价
+<ul>
 <li>在VAEs中，只能推断出数据点对应的隐变量的<strong>估计值</strong>。在可逆生成模型中，这可以在没有近似的情况下精确地实现。这不仅可以导致准确的推断，还可以优化数据的精确对数似然值，而不是数据的下界</li>
-</ul>
-</li>
-<li>高效的推理与训练<ul>
+</ul></li>
+<li>高效的推理与训练
+<ul>
 <li>在自回归模型，如Pixel-CNN中，难以并行化。而基于流的生成模型解决了这个问题</li>
-</ul>
-</li>
-<li>隐空间对下游任务有用<ul>
+</ul></li>
+<li>隐空间对下游任务有用
+<ul>
 <li>在自回归模型中，隐层的边缘分布是未知的，这使得执行有效的数据操作更加困难。在GANs中，数据点通常不能直接表示在潜在空间中，因为GAN没有Encoder。</li>
-</ul>
-</li>
-<li>内存节省<ul>
+</ul></li>
+<li>内存节省
+<ul>
 <li>正如RevNet论文(Gomez et al.，2017)中所解释的，可逆神经网络中计算梯度需要的记忆量是恒定的，而不是线性的。</li>
-</ul>
-</li>
+</ul></li>
 </ul>
 <a id="more"></a>
-<h3 id="问题定义"><a href="#问题定义" class="headerlink" title="问题定义"></a>问题定义</h3><p>$\mathbf x$是一个高维向量，分布$\mathbf{x} \sim p^{*}(\mathbf{x})$是未知的。我们收集了一个独立同分布的数据集$\mathcal{D}$，要选择一个模型$p_{\boldsymbol \theta}(\mathbf x)$的参数$\theta$。对于离散的数据$\mathbf x$，以对数似然形式构建的目标函数为:</p>
-<script type="math/tex; mode=display">
-\mathcal{L}(\mathcal{D})=\frac{1}{N} \sum_{i=1}^{N}-\log p_{\boldsymbol{\theta}}\left(\mathbf{x}^{(i)}\right)</script><p>上述目标函数使用小批量数据的随机梯度下降进行优化。</p>
-<p>而生成过程被描述为：</p>
-<script type="math/tex; mode=display">
+<h3 id="问题定义">问题定义</h3>
+<p><span class="math inline">\(\mathbf x\)</span>是一个高维向量，分布<span class="math inline">\(\mathbf{x} \sim p^{*}(\mathbf{x})\)</span>是未知的。我们收集了一个独立同分布的数据集<span class="math inline">\(\mathcal{D}\)</span>，要选择一个模型<span class="math inline">\(p_{\boldsymbol \theta}(\mathbf x)\)</span>的参数<span class="math inline">\(\theta\)</span>。对于离散的数据<span class="math inline">\(\mathbf x\)</span>，以对数似然形式构建的目标函数为: <span class="math display">\[
+\mathcal{L}(\mathcal{D})=\frac{1}{N} \sum_{i=1}^{N}-\log p_{\boldsymbol{\theta}}\left(\mathbf{x}^{(i)}\right)
+\]</span> 上述目标函数使用小批量数据的随机梯度下降进行优化。</p>
+<p>而生成过程被描述为： <span class="math display">\[
 \begin{array}{l}
 \mathbf{z} \sim p_{\boldsymbol{\theta}}(\mathbf{z}) \\
 \mathbf{x}=\mathbf{g}_{\boldsymbol{\theta}}(\mathbf{z})
-\end{array}</script><p>$\mathbf z$是一个隐变量，有着一个易于处理的简单分布$p_{\boldsymbol{\theta}}(\mathbf{z})$，比如多变量高斯分布$p_{\boldsymbol{\theta}}(\mathbf{z})=\mathcal{N}(\mathbf{z} ; 0, \mathbf{I})$。而$\mathbf g(\cdot)$是可逆的：$\mathbf{z}=\mathbf{f}_{\boldsymbol{\theta}}(\mathbf{x})=\mathbf{g}_{\boldsymbol \theta}^{-1}(\mathbf{x})$。</p>
-<p>而作者这次关注的主要问题是，当$\mathbf f$由一个变换序列组合而成：$\mathbf{f}=\mathbf{f}_{1} \circ \mathbf{f}_{2} \circ \cdots \circ \mathbf{f}_{K}$，那么$\mathbf x$与$\mathbf z$之间的关系表示为：</p>
-<script type="math/tex; mode=display">
-\mathbf{x} \stackrel{\mathbf{f}_{1}}{\longleftrightarrow} \mathbf{h}_{1} \stackrel{\mathbf{f}_{2}}{\longleftrightarrow} \mathbf{h}_{2} \cdots \stackrel{\mathbf{f}_{K}}{\longleftrightarrow} \mathbf{z}</script><p>根据变量代换公式，原本的密度可以表示为：</p>
-<script type="math/tex; mode=display">
+\end{array}
+\]</span> <span class="math inline">\(\mathbf z\)</span>是一个隐变量，有着一个易于处理的简单分布<span class="math inline">\(p_{\boldsymbol{\theta}}(\mathbf{z})\)</span>，比如多变量高斯分布<span class="math inline">\(p_{\boldsymbol{\theta}}(\mathbf{z})=\mathcal{N}(\mathbf{z} ; 0, \mathbf{I})\)</span>。而<span class="math inline">\(\mathbf g(\cdot)\)</span>是可逆的：<span class="math inline">\(\mathbf{z}=\mathbf{f}_{\boldsymbol{\theta}}(\mathbf{x})=\mathbf{g}_{\boldsymbol \theta}^{-1}(\mathbf{x})\)</span>。</p>
+<p>而作者这次关注的主要问题是，当<span class="math inline">\(\mathbf f\)</span>由一个变换序列组合而成：<span class="math inline">\(\mathbf{f}=\mathbf{f}_{1} \circ \mathbf{f}_{2} \circ \cdots \circ \mathbf{f}_{K}\)</span>，那么<span class="math inline">\(\mathbf x\)</span>与<span class="math inline">\(\mathbf z\)</span>之间的关系表示为： <span class="math display">\[
+\mathbf{x} \stackrel{\mathbf{f}_{1}}{\longleftrightarrow} \mathbf{h}_{1} \stackrel{\mathbf{f}_{2}}{\longleftrightarrow} \mathbf{h}_{2} \cdots \stackrel{\mathbf{f}_{K}}{\longleftrightarrow} \mathbf{z}
+\]</span> 根据变量代换公式，原本的密度可以表示为： <span class="math display">\[
 \begin{aligned}
-\log p_{\boldsymbol{\theta}}(\mathbf{x}) &=\log p_{\boldsymbol{\theta}}(\mathbf{z})+\log |\operatorname{det}(d \mathbf{z} / d \mathbf{x})| \\
-&=\log p_{\boldsymbol{\theta}}(\mathbf{z})+\sum_{i=1}^{K} \log \left|\operatorname{det}\left(d \mathbf{h}_{i} / d \mathbf{h}_{i-1}\right)\right|
-\end{aligned}</script><p>为了方便，我们设置$\mathbf{h}_{0} \triangleq \mathbf{x} , \mathbf{h}_{K} \triangleq \mathbf{z}$。虽然这个雅克比行列式看起来很吓人，但是它的值对于某些变换的选择计算起来却出奇的简单。其基本思想是选择其雅可比矩阵为三角矩阵的变换，这样一来其对数雅克比就很简单：</p>
-<script type="math/tex; mode=display">
-\log \left|\operatorname{det}\left(d \mathbf{h}_{i} / d \mathbf{h}_{i-1}\right)\right|=\operatorname{sum}\left(\log \left|\operatorname{diag}\left(d \mathbf{h}_{i} / d \mathbf{h}_{i-1}\right)\right|\right)</script><h3 id="主要方法"><a href="#主要方法" class="headerlink" title="主要方法"></a>主要方法</h3><h4 id="可逆1x1卷积"><a href="#可逆1x1卷积" class="headerlink" title="可逆1x1卷积"></a>可逆1x1卷积</h4><p>如题目所述，这篇文章的主要重点为1x1可逆卷积。</p>
+\log p_{\boldsymbol{\theta}}(\mathbf{x}) &amp;=\log p_{\boldsymbol{\theta}}(\mathbf{z})+\log |\operatorname{det}(d \mathbf{z} / d \mathbf{x})| \\
+&amp;=\log p_{\boldsymbol{\theta}}(\mathbf{z})+\sum_{i=1}^{K} \log \left|\operatorname{det}\left(d \mathbf{h}_{i} / d \mathbf{h}_{i-1}\right)\right|
+\end{aligned}
+\]</span></p>
+<p>为了方便，我们设置<span class="math inline">\(\mathbf{h}_{0} \triangleq \mathbf{x} , \mathbf{h}_{K} \triangleq \mathbf{z}\)</span>。虽然这个雅克比行列式看起来很吓人，但是它的值对于某些变换的选择计算起来却出奇的简单。其基本思想是选择其雅可比矩阵为三角矩阵的变换，这样一来其对数雅克比就很简单： <span class="math display">\[
+\log \left|\operatorname{det}\left(d \mathbf{h}_{i} / d \mathbf{h}_{i-1}\right)\right|=\operatorname{sum}\left(\log \left|\operatorname{diag}\left(d \mathbf{h}_{i} / d \mathbf{h}_{i-1}\right)\right|\right)
+\]</span></p>
+<h3 id="主要方法">主要方法</h3>
+<h4 id="可逆1x1卷积">可逆1x1卷积</h4>
+<p>如题目所述，这篇文章的主要重点为1x1可逆卷积。</p>
 <p><strong>置换矩阵</strong></p>
 <p>对向量的置换操作，可以用矩阵乘法来描述，比如原来向量是 [1,2,3,4]，分别交换第一、二和第三、四两个数，得到 [2,1,4,3]，这个操作可以用矩阵乘法来描述：</p>
 <p><img src="https://image.jiqizhixin.com/uploads/editor/2c6ffd2f-0341-4f33-91ea-0566b85dcefb/1535347013381.png" alt="img" style="zoom:50%;" /></p>
-<p>其中右端第一项是“由单位矩阵不断交换两行或两列最终得到的矩阵”称为置换矩阵。 </p>
-<p><strong>一般化置换</strong> </p>
-<p>既然这样，那很自然的想法就是：为什么不将置换矩阵换成一般的可训练的参数矩阵呢？所谓 1x1 可逆卷积，就是这个想法的结果。 </p>
-<p>一开始提出 flow 模型的思路时就已经明确指出，flow 模型中的变换要满足两个条件：一是可逆，二是雅可比行列式容易计算。如果直接写出变换：</p>
-<script type="math/tex; mode=display">
-h=xW</script><p>那么它就只是一个普通的没有 bias 的全连接层，并不能保证满足这两个条件。为此，要做一些准备工作。首先，让 h 和 x 的维度一样，也就是说 W 是一个方阵，这是最基本的设置；其次，由于这只是一个线性变换，因此它的雅可比矩阵就是$\left[\frac{\partial h}{\partial x}\right]=W$，所以它的行列式就是 det <em>W</em>，因此需要把 −log |det <em>W</em>| 这一项加入到 loss 中；最后，初始化时为了保证 W 的可逆性，一般使用“随机正交矩阵”初始化。</p>
+<p>其中右端第一项是“由单位矩阵不断交换两行或两列最终得到的矩阵”称为置换矩阵。</p>
+<p><strong>一般化置换</strong></p>
+<p>既然这样，那很自然的想法就是：为什么不将置换矩阵换成一般的可训练的参数矩阵呢？所谓 1x1 可逆卷积，就是这个想法的结果。</p>
+<p>一开始提出 flow 模型的思路时就已经明确指出，flow 模型中的变换要满足两个条件：一是可逆，二是雅可比行列式容易计算。如果直接写出变换： <span class="math display">\[
+h=xW
+\]</span> 那么它就只是一个普通的没有 bias 的全连接层，并不能保证满足这两个条件。为此，要做一些准备工作。首先，让 h 和 x 的维度一样，也就是说 W 是一个方阵，这是最基本的设置；其次，由于这只是一个线性变换，因此它的雅可比矩阵就是<span class="math inline">\(\left[\frac{\partial h}{\partial x}\right]=W\)</span>，所以它的行列式就是 det <em>W</em>，因此需要把 −log |det <em>W</em>| 这一项加入到 loss 中；最后，初始化时为了保证 W 的可逆性，一般使用“随机正交矩阵”初始化。</p>
 <p><strong>利用LU分解</strong></p>
-<p>由于算矩阵的行列式运算量特别大，还容易溢出。而 Glow 给出了一个非常巧妙的解决方案：LU 分解的逆运用。具体来说，是因为任意矩阵都可以分解为：</p>
-<script type="math/tex; mode=display">
-W = PLU</script><p>其中 P 是一个置换矩阵，也就是前面说的 shuffle 的等价矩阵；L 是一个下三角阵，对角线元素全为 1；U 是一个上三角阵。这种形式的分解称为 LU 分解。如果知道这种矩阵的表达形式，显然求雅可比行列式是很容易的，它等于：</p>
-<script type="math/tex; mode=display">
-\log |\operatorname{det} \boldsymbol{W}|=\sum \log |\operatorname{diag}(\boldsymbol{U})|</script><p> 本文中给出的技巧：先随机生成一个正交矩阵，然后做 LU 分解，得到 P,L,U，固定 P，也固定 U 的对角线的正负号，然后约束 L 为对角线全 1 的下三角阵，U 为上三角阵，优化训练 L,U 的其余参数。 </p>
-<h4 id="Actnorm"><a href="#Actnorm" class="headerlink" title="Actnorm"></a>Actnorm</h4><p>RealNVP 中用到了 BN 层，而 Glow 中提出了名为 Actnorm 的层来取代 BN。不过，所谓 Actnorm 层事实上只不过是 NICE 中的尺度变换层的一般化，也就是 (5) 式提到的缩放平移变换：</p>
-<script type="math/tex; mode=display">
-\hat{z}=\frac{z-\boldsymbol{\mu}}{\boldsymbol{\sigma}}</script><p>其中 μ,σ 都是训练参数。Glow 在论文中提出的创新点是用初始的 batch 的均值和方差去初始化 μ,σ 这两个参数。</p>
+<p>由于算矩阵的行列式运算量特别大，还容易溢出。而 Glow 给出了一个非常巧妙的解决方案：LU 分解的逆运用。具体来说，是因为任意矩阵都可以分解为： <span class="math display">\[
+W = PLU
+\]</span> 其中 P 是一个置换矩阵，也就是前面说的 shuffle 的等价矩阵；L 是一个下三角阵，对角线元素全为 1；U 是一个上三角阵。这种形式的分解称为 LU 分解。如果知道这种矩阵的表达形式，显然求雅可比行列式是很容易的，它等于： <span class="math display">\[
+\log |\operatorname{det} \boldsymbol{W}|=\sum \log |\operatorname{diag}(\boldsymbol{U})|
+\]</span></p>
+<p>本文中给出的技巧：先随机生成一个正交矩阵，然后做 LU 分解，得到 P,L,U，固定 P，也固定 U 的对角线的正负号，然后约束 L 为对角线全 1 的下三角阵，U 为上三角阵，优化训练 L,U 的其余参数。</p>
+<h4 id="actnorm">Actnorm</h4>
+<p>RealNVP 中用到了 BN 层，而 Glow 中提出了名为 Actnorm 的层来取代 BN。不过，所谓 Actnorm 层事实上只不过是 NICE 中的尺度变换层的一般化，也就是 (5) 式提到的缩放平移变换： <span class="math display">\[
+\hat{z}=\frac{z-\boldsymbol{\mu}}{\boldsymbol{\sigma}}
+\]</span> 其中 μ,σ 都是训练参数。Glow 在论文中提出的创新点是用初始的 batch 的均值和方差去初始化 μ,σ 这两个参数。</p>
 <p>相比于加性耦合层，仿射耦合层多了一个尺度变换层，从而计算量翻了一倍。但事实上相比加性耦合，仿射耦合效果的提升并不高（尤其是加入了 Actnorm 后），<strong>所以要训练大型的模型，为了节省资源，一般都只用加性耦合</strong>，比如 Glow 训练 256x256 的高清人脸生成模型，就只用到了加性耦合。</p>
-<h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><p>使用Glow训练人脸：</p>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:22:32.png" alt="image-20201107161822636"></p>
-<h3 id="总结与思考"><a href="#总结与思考" class="headerlink" title="总结与思考"></a>总结与思考</h3><p>整体来看，Glow 模型在 RealNVP 的基础上引入了 1x1 可逆卷积来代替前面说的打乱通道轴的操作，并且对 RealNVP 的原始模型做了简化和规范，使得它更易于理解和使用。</p>
+<h3 id="实验结果">实验结果</h3>
+<p>使用Glow训练人脸：</p>
+<figure>
+<img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images2020/12/12/12:22:32.png" alt="image-20201107161822636" /><figcaption aria-hidden="true">image-20201107161822636</figcaption>
+</figure>
+<h3 id="总结与思考">总结与思考</h3>
+<p>整体来看，Glow 模型在 RealNVP 的基础上引入了 1x1 可逆卷积来代替前面说的打乱通道轴的操作，并且对 RealNVP 的原始模型做了简化和规范，使得它更易于理解和使用。</p>
 
     </div>
 
@@ -390,7 +402,7 @@ W = PLU</script><p>其中 P 是一个置换矩阵，也就是前面说的 shuffl
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#论文背景"><span class="nav-number">1.</span> <span class="nav-text">论文背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题定义"><span class="nav-number">2.</span> <span class="nav-text">问题定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主要方法"><span class="nav-number">3.</span> <span class="nav-text">主要方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#可逆1x1卷积"><span class="nav-number">3.1.</span> <span class="nav-text">可逆1x1卷积</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Actnorm"><span class="nav-number">3.2.</span> <span class="nav-text">Actnorm</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验结果"><span class="nav-number">4.</span> <span class="nav-text">实验结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结与思考"><span class="nav-number">5.</span> <span class="nav-text">总结与思考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#论文背景"><span class="nav-number">1.</span> <span class="nav-text">论文背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题定义"><span class="nav-number">2.</span> <span class="nav-text">问题定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主要方法"><span class="nav-number">3.</span> <span class="nav-text">主要方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#可逆1x1卷积"><span class="nav-number">3.1.</span> <span class="nav-text">可逆1x1卷积</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#actnorm"><span class="nav-number">3.2.</span> <span class="nav-text">Actnorm</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验结果"><span class="nav-number">4.</span> <span class="nav-text">实验结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结与思考"><span class="nav-number">5.</span> <span class="nav-text">总结与思考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

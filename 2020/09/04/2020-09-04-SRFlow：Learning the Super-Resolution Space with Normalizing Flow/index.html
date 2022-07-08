@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"jamekuma.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","width":270,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="论文背景作者表示，SR问题本来就是一个ill-posed的问题，可是大多数工作忽略了这一点，只致力于去学一个单图像到单图像的映射。而作者利用了基于标准化流(Normalizing Flow)的方法，去学一个LR到HR分布的映射（学习与输入LR图像相对应的真实HR图像的分布，即可以看做是给定LR图像，HR的条件概率分布），同时还表明在去噪、复原的任务中也能发挥作用。 所谓标准化流(Normalizi">
+  <meta name="description" content="论文背景 作者表示，SR问题本来就是一个ill-posed的问题，可是大多数工作忽略了这一点，只致力于去学一个单图像到单图像的映射。而作者利用了基于标准化流(Normalizing Flow)的方法，去学一个LR到HR分布的映射（学习与输入LR图像相对应的真实HR图像的分布，即可以看做是给定LR图像，HR的条件概率分布），同时还表明在去噪、复原的任务中也能发挥作用。 所谓标准化流(Normal">
 <meta property="og:type" content="article">
 <meta property="og:title" content="读论文：SRFlow：Learning the Super-Resolution Space with Normalizing Flow">
 <meta property="og:url" content="https://jamekuma.github.io/2020/09/04/2020-09-04-SRFlow%EF%BC%9ALearning%20the%20Super-Resolution%20Space%20with%20Normalizing%20Flow/index.html">
 <meta property="og:site_name" content="Jame&#39;s Blog">
-<meta property="og:description" content="论文背景作者表示，SR问题本来就是一个ill-posed的问题，可是大多数工作忽略了这一点，只致力于去学一个单图像到单图像的映射。而作者利用了基于标准化流(Normalizing Flow)的方法，去学一个LR到HR分布的映射（学习与输入LR图像相对应的真实HR图像的分布，即可以看做是给定LR图像，HR的条件概率分布），同时还表明在去噪、复原的任务中也能发挥作用。 所谓标准化流(Normalizi">
+<meta property="og:description" content="论文背景 作者表示，SR问题本来就是一个ill-posed的问题，可是大多数工作忽略了这一点，只致力于去学一个单图像到单图像的映射。而作者利用了基于标准化流(Normalizing Flow)的方法，去学一个LR到HR分布的映射（学习与输入LR图像相对应的真实HR图像的分布，即可以看做是给定LR图像，HR的条件概率分布），同时还表明在去噪、复原的任务中也能发挥作用。 所谓标准化流(Normal">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204120.png">
 <meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204121.png">
@@ -241,43 +241,80 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>作者表示，SR问题本来就是一个ill-posed的问题，可是大多数工作忽略了这一点，只致力于去学一个单图像到单图像的映射。而作者利用了基于标准化流(Normalizing Flow)的方法，去学一个LR到<strong>HR分布</strong>的映射（学习与输入LR图像相对应的真实HR图像的分布，即可以看做是给定LR图像，HR的条件概率分布），同时还表明在去噪、复原的任务中也能发挥作用。</p>
-<p>所谓标准化流(Normalizing Flow)的方法，是用来拟合一些复杂概率分布的。实际上就是学一个可逆神经网络$f_{\theta}$，使用它的逆过程$f_{\theta}^{- 1}$把一个简单的分布(比如高斯分布、均匀分布等)$p_{\mathbf{z}}(\mathbf{z})$变成$\mathbf{y} = f_{\theta}^{- 1}(\mathbf{z})$。</p>
+        <h3 id="论文背景">论文背景</h3>
+<p>作者表示，SR问题本来就是一个ill-posed的问题，可是大多数工作忽略了这一点，只致力于去学一个单图像到单图像的映射。而作者利用了基于标准化流(Normalizing Flow)的方法，去学一个LR到<strong>HR分布</strong>的映射（学习与输入LR图像相对应的真实HR图像的分布，即可以看做是给定LR图像，HR的条件概率分布），同时还表明在去噪、复原的任务中也能发挥作用。</p>
+<p>所谓标准化流(Normalizing Flow)的方法，是用来拟合一些复杂概率分布的。实际上就是学一个可逆神经网络<span class="math inline">\(f_{\theta}\)</span>，使用它的逆过程<span class="math inline">\(f_{\theta}^{- 1}\)</span>把一个简单的分布(比如高斯分布、均匀分布等)<span class="math inline">\(p_{\mathbf{z}}(\mathbf{z})\)</span>变成<span class="math inline">\(\mathbf{y} = f_{\theta}^{- 1}(\mathbf{z})\)</span>。</p>
 <a id="more"></a>
-<h3 id="主要方法"><a href="#主要方法" class="headerlink" title="主要方法"></a>主要方法</h3><h4 id="SR中的条件标准化流"><a href="#SR中的条件标准化流" class="headerlink" title="SR中的条件标准化流"></a>SR中的条件标准化流</h4><p>设$\mathbf{x}$是LR图像，$\mathbf{y}$是HR图像。本文要求确定LR图像下，HR图像的条件概率分布$p_{\mathbf{y|x}}(\mathbf{y|x,\theta})$。提供的训练数据是LR-HR图像对${(\mathbf{x}_{i},\mathbf{y}_{i})}_{i = 1}^{M}$</p>
-<p>根据标准化流的思想，要使用一个可逆神经网络$f_{\theta}$去拟合这个分布$p_{\mathbf{y|x}}$，$f_{\theta}$把一个HR-LR图像对映射到一个隐变量$z$上：$\mathbf{z} = f_{\theta}(\mathbf{y;x})$。而要求这个网络在任意$\mathbf{x}$的条件下，对于$\mathbf{y}$是可逆的，即$\mathbf{y} = f_{\theta}^{- 1}(\mathbf{z;x})$。使用概率论中的随机变量代换，可以得到以下式子：</p>
-<script type="math/tex; mode=display">
-p_{\mathbf{y} \mid \mathbf{x}}(\mathbf{y} \mid \mathbf{x},\mathbf{\theta}) = p_{\mathbf{z}}\left( f_{\mathbf{\theta}}(\mathbf{y};\mathbf{x}) \right)\left| \det\frac{\partial f_{\mathbf{\theta}}}{\partial\mathbf{y}}(\mathbf{y};\mathbf{x}) \right|</script><p>也就是给定HR图像$\mathbf{y}$和LR图像$\mathbf{x}$，最大化这个$p_{\mathbf{y} \mid \mathbf{x}}(\mathbf{y} \mid \mathbf{x},\mathbf{\theta})$就可。写成负对数：</p>
-<script type="math/tex; mode=display">
-\mathcal{L}(\mathbf{\theta};\mathbf{x},\mathbf{y}) = - \log p_{\mathbf{y} \mid \mathbf{x}}(\mathbf{y} \mid \mathbf{x},\mathbf{\theta}) = - \log p_{\mathbf{z}}\left( f_{\mathbf{\theta}}(\mathbf{y};\mathbf{x}) \right) - \log\left| \det\frac{\partial f_{\mathbf{\theta}}}{\partial\mathbf{y}}(\mathbf{y};\mathbf{x}) \right|</script><p>即可作为损失函数进行训练了。要想在拟合的分布中采样也很简单，就使用符合预定的分布的$\mathbf{z}$代入$\mathbf{y} = f_{\mathbf{\theta}}^{- 1}(\mathbf{z};\mathbf{x})$即可。</p>
+<h3 id="主要方法">主要方法</h3>
+<h4 id="sr中的条件标准化流">SR中的条件标准化流</h4>
+<p>设<span class="math inline">\(\mathbf{x}\)</span>是LR图像，<span class="math inline">\(\mathbf{y}\)</span>是HR图像。本文要求确定LR图像下，HR图像的条件概率分布<span class="math inline">\(p_{\mathbf{y|x}}(\mathbf{y|x,\theta})\)</span>。提供的训练数据是LR-HR图像对<span class="math inline">\(\{(\mathbf{x}_{i},\mathbf{y}_{i})\}_{i = 1}^{M}\)</span></p>
+<p>根据标准化流的思想，要使用一个可逆神经网络<span class="math inline">\(f_{\theta}\)</span>去拟合这个分布<span class="math inline">\(p_{\mathbf{y|x}}\)</span>，<span class="math inline">\(f_{\theta}\)</span>把一个HR-LR图像对映射到一个隐变量<span class="math inline">\(z\)</span>上：<span class="math inline">\(\mathbf{z} = f_{\theta}(\mathbf{y;x})\)</span>。而要求这个网络在任意<span class="math inline">\(\mathbf{x}\)</span>的条件下，对于<span class="math inline">\(\mathbf{y}\)</span>是可逆的，即<span class="math inline">\(\mathbf{y} = f_{\theta}^{- 1}(\mathbf{z;x})\)</span>。使用概率论中的随机变量代换，可以得到以下式子：</p>
+<p><span class="math display">\[
+p_{\mathbf{y} \mid \mathbf{x}}(\mathbf{y} \mid \mathbf{x},\mathbf{\theta}) = p_{\mathbf{z}}\left( f_{\mathbf{\theta}}(\mathbf{y};\mathbf{x}) \right)\left| \det\frac{\partial f_{\mathbf{\theta}}}{\partial\mathbf{y}}(\mathbf{y};\mathbf{x}) \right|
+\]</span> 也就是给定HR图像<span class="math inline">\(\mathbf{y}\)</span>和LR图像<span class="math inline">\(\mathbf{x}\)</span>，最大化这个<span class="math inline">\(p_{\mathbf{y} \mid \mathbf{x}}(\mathbf{y} \mid \mathbf{x},\mathbf{\theta})\)</span>就可。写成负对数：</p>
+<p><span class="math display">\[
+\mathcal{L}(\mathbf{\theta};\mathbf{x},\mathbf{y}) = - \log p_{\mathbf{y} \mid \mathbf{x}}(\mathbf{y} \mid \mathbf{x},\mathbf{\theta}) = - \log p_{\mathbf{z}}\left( f_{\mathbf{\theta}}(\mathbf{y};\mathbf{x}) \right) - \log\left| \det\frac{\partial f_{\mathbf{\theta}}}{\partial\mathbf{y}}(\mathbf{y};\mathbf{x}) \right|
+\]</span></p>
+<p>即可作为损失函数进行训练了。要想在拟合的分布中采样也很简单，就使用符合预定的分布的<span class="math inline">\(\mathbf{z}\)</span>代入<span class="math inline">\(\mathbf{y} = f_{\mathbf{\theta}}^{- 1}(\mathbf{z};\mathbf{x})\)</span>即可。</p>
 <p>把以上(3)式的第二项改写成每一层可逆模块串接的形式：</p>
-<script type="math/tex; mode=display">
-\mathcal{L}(\mathbf{\theta};\mathbf{x},\mathbf{y}) = - \log p_{\mathbf{z}}(\mathbf{z}) - \sum_{n = 0}^{N - 1}\log\left| \det\frac{\partial f_{\mathbf{\theta}}^{n}}{\partial\mathbf{h}^{n}}\left( \mathbf{h}^{n};g_{\mathbf{\theta}}(\mathbf{x}) \right) \right|</script><p>其中，$\mathbf{h}^{n + 1} = f_{\mathbf{\theta}}^{n}\left( \mathbf{h}^{n};g_{\mathbf{\theta}}(\mathbf{x}) \right)$，且$\mathbf{h}^{0} = \mathbf{y}$、$\mathbf{h}^{N} = \mathbf{z}$。这样，只需在每一层上计算特定的雅克比行列式，而不是全体一起计算。而且加入了一个CNN网络$g_{\theta}$来学习LR图像最适合作为条件的表示。</p>
-<h4 id="条件流层-Conditional-Flow-Layers"><a href="#条件流层-Conditional-Flow-Layers" class="headerlink" title="条件流层(Conditional Flow Layers)"></a>条件流层(Conditional Flow Layers)</h4><h5 id="条件仿射耦合-Conditional-Affine-Coupling"><a href="#条件仿射耦合-Conditional-Affine-Coupling" class="headerlink" title="条件仿射耦合(Conditional Affine Coupling)"></a>条件仿射耦合(Conditional Affine Coupling)</h5><script type="math/tex; mode=display">
-\mathbf{h}_{A}^{n + 1} = \mathbf{h}_{A}^{n},\quad\mathbf{h}_{B}^{n + 1} = \exp\left( f_{\mathbf{\theta},\mathbf{s}}^{n}\left( \mathbf{h}_{A}^{n};\mathbf{u} \right) \right) \cdot \mathbf{h}_{B}^{n} + f_{\mathbf{\theta},\mathbf{b}}^{n}\left( \mathbf{h}_{A}^{n};\mathbf{u} \right)</script><p>$\mathbf{h}^{n} = \left( \mathbf{h}_{A}^{n},\mathbf{h}_{B}^{n} \right)$是特征图，A和B是其通道上的分离。这样就能通过仿射变换实现可逆。同时，雅克比矩阵是一个三角阵，他的行列式的对数形式容易写成$\sum_{\text{ijk}}^{}f_{\mathbf{\theta},s}^{n}\left( \mathbf{h}_{A}^{n};\mathbf{u} \right)_{\text{ijk}}$</p>
-<h5 id="仿射注入-Affine-Injector"><a href="#仿射注入-Affine-Injector" class="headerlink" title="仿射注入(Affine Injector)"></a>仿射注入(Affine Injector)</h5><p>对于上一节的设计，要求$f_{\mathbf{\theta}}^{n}$是可逆的，而且可以处理雅克比行列式。于是作者做了以下设计，称之为仿射注入器(Affine Injector)：</p>
-<script type="math/tex; mode=display">
-\mathbf{h}^{n + 1} = \exp\left( f_{\mathbf{\theta},s}^{n}(\mathbf{u}) \right) \cdot \mathbf{h}^{n} + f_{\mathbf{\theta},b}(\mathbf{u})</script><p>其中$\mathbf{u} = g_{\theta}(\mathbf{x})$，易得其实可逆的：$\mathbf{h}^{n} = \exp\left( - f_{\mathbf{\theta},s}^{n}(\mathbf{u}) \right) \cdot \left( \mathbf{h}^{n + 1} - f_{\mathbf{\theta},b}^{n}(\mathbf{u}) \right)$</p>
-<p>同时，雅克比矩阵是一个三角阵，他的行列式的对数形式容易写成$\sum_{\text{ijk}}^{}f_{\mathbf{\theta},s}^{n}\left( \mathbf{h}_{A}^{n};\mathbf{u} \right)_{\text{ijk}}$</p>
-<h4 id="网络结构"><a href="#网络结构" class="headerlink" title="网络结构"></a>网络结构</h4><p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204120.png" alt="image-20200917170228257"></p>
-<h4 id="其他的应用"><a href="#其他的应用" class="headerlink" title="其他的应用"></a>其他的应用</h4><h5 id="LR一致的Style-Transfer"><a href="#LR一致的Style-Transfer" class="headerlink" title="LR一致的Style Transfer"></a>LR一致的Style Transfer</h5><p>即把一张HR图像下采样成LR图像，进而控制隐变量$\mathbf{z}$转移成不同风格的HR图像</p>
-<h5 id="Latent-Space-Normalization"><a href="#Latent-Space-Normalization" class="headerlink" title="Latent Space Normalization"></a>Latent Space Normalization</h5><p>在上述的SR任务中，核心是：把<strong>任意</strong>符合<strong>给定要求</strong>（\”要求\”即LR图像）的HR图像映射到一个隐含空间(即z)，而为了匹配LR图像中那些”共有的低频特征”，这个z被”标准化”为某一分布。</p>
-<p>作者提出，原始的$\widetilde{\mathcal{Z}}$可以被标准化为另外一个分布$\widehat{\mathcal{Z}}$：</p>
-<script type="math/tex; mode=display">
-\widehat{z} = \frac{\widehat{\sigma}}{\widetilde{\sigma}}(\widetilde{z} - \widetilde{\mu}) + \widehat{\mu},\quad\forall\widetilde{z} \in \widetilde{\mathcal{Z}}</script><p>其中$\widetilde{\sigma}$与$\widetilde{\mu}$是原始分布的经验标准差和经验均值。进而通过逆过程实现图像风格的迁移$\widehat{\mathbf{y}} = f_{\mathbf{\theta}}^{- 1}(\widehat{\mathbf{z}},\mathbf{x})$</p>
+<p><span class="math display">\[
+\mathcal{L}(\mathbf{\theta};\mathbf{x},\mathbf{y}) = - \log p_{\mathbf{z}}(\mathbf{z}) - \sum_{n = 0}^{N - 1}\log\left| \det\frac{\partial f_{\mathbf{\theta}}^{n}}{\partial\mathbf{h}^{n}}\left( \mathbf{h}^{n};g_{\mathbf{\theta}}(\mathbf{x}) \right) \right|
+\]</span></p>
+<p>其中，<span class="math inline">\(\mathbf{h}^{n + 1} = f_{\mathbf{\theta}}^{n}\left( \mathbf{h}^{n};g_{\mathbf{\theta}}(\mathbf{x}) \right)\)</span>，且<span class="math inline">\(\mathbf{h}^{0} = \mathbf{y}\)</span>、<span class="math inline">\(\mathbf{h}^{N} = \mathbf{z}\)</span>。这样，只需在每一层上计算特定的雅克比行列式，而不是全体一起计算。而且加入了一个CNN网络<span class="math inline">\(g_{\theta}\)</span>来学习LR图像最适合作为条件的表示。</p>
+<h4 id="条件流层conditional-flow-layers">条件流层(Conditional Flow Layers)</h4>
+<h5 id="条件仿射耦合conditional-affine-coupling">条件仿射耦合(Conditional Affine Coupling)</h5>
+<p><span class="math display">\[
+\mathbf{h}_{A}^{n + 1} = \mathbf{h}_{A}^{n},\quad\mathbf{h}_{B}^{n + 1} = \exp\left( f_{\mathbf{\theta},\mathbf{s}}^{n}\left( \mathbf{h}_{A}^{n};\mathbf{u} \right) \right) \cdot \mathbf{h}_{B}^{n} + f_{\mathbf{\theta},\mathbf{b}}^{n}\left( \mathbf{h}_{A}^{n};\mathbf{u} \right)
+\]</span></p>
+<p><span class="math inline">\(\mathbf{h}^{n} = \left( \mathbf{h}_{A}^{n},\mathbf{h}_{B}^{n} \right)\)</span>是特征图，A和B是其通道上的分离。这样就能通过仿射变换实现可逆。同时，雅克比矩阵是一个三角阵，他的行列式的对数形式容易写成<span class="math inline">\(\sum_{\text{ijk}}^{}f_{\mathbf{\theta},s}^{n}\left( \mathbf{h}_{A}^{n};\mathbf{u} \right)_{\text{ijk}}\)</span></p>
+<h5 id="仿射注入affine-injector">仿射注入(Affine Injector)</h5>
+<p>对于上一节的设计，要求<span class="math inline">\(f_{\mathbf{\theta}}^{n}\)</span>是可逆的，而且可以处理雅克比行列式。于是作者做了以下设计，称之为仿射注入器(Affine Injector)：</p>
+<p><span class="math display">\[
+\mathbf{h}^{n + 1} = \exp\left( f_{\mathbf{\theta},s}^{n}(\mathbf{u}) \right) \cdot \mathbf{h}^{n} + f_{\mathbf{\theta},b}(\mathbf{u})
+\]</span></p>
+<p>其中<span class="math inline">\(\mathbf{u} = g_{\theta}(\mathbf{x})\)</span>，易得其实可逆的：<span class="math inline">\(\mathbf{h}^{n} = \exp\left( - f_{\mathbf{\theta},s}^{n}(\mathbf{u}) \right) \cdot \left( \mathbf{h}^{n + 1} - f_{\mathbf{\theta},b}^{n}(\mathbf{u}) \right)\)</span></p>
+<p>同时，雅克比矩阵是一个三角阵，他的行列式的对数形式容易写成<span class="math inline">\(\sum_{\text{ijk}}^{}f_{\mathbf{\theta},s}^{n}\left( \mathbf{h}_{A}^{n};\mathbf{u} \right)_{\text{ijk}}\)</span></p>
+<h4 id="网络结构">网络结构</h4>
+<figure>
+<img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204120.png" alt="image-20200917170228257" /><figcaption aria-hidden="true">image-20200917170228257</figcaption>
+</figure>
+<h4 id="其他的应用">其他的应用</h4>
+<h5 id="lr一致的style-transfer">LR一致的Style Transfer</h5>
+<p>即把一张HR图像下采样成LR图像，进而控制隐变量<span class="math inline">\(\mathbf{z}\)</span>转移成不同风格的HR图像</p>
+<h5 id="latent-space-normalization">Latent Space Normalization</h5>
+<p>在上述的SR任务中，核心是：把<strong>任意</strong>符合<strong>给定要求</strong>（"要求"即LR图像）的HR图像映射到一个隐含空间(即z)，而为了匹配LR图像中那些"共有的低频特征"，这个z被"标准化"为某一分布。</p>
+<p>作者提出，原始的<span class="math inline">\(\widetilde{\mathcal{Z}}\)</span>可以被标准化为另外一个分布<span class="math inline">\(\widehat{\mathcal{Z}}\)</span>：</p>
+<p><span class="math display">\[
+\widehat{z} = \frac{\widehat{\sigma}}{\widetilde{\sigma}}(\widetilde{z} - \widetilde{\mu}) + \widehat{\mu},\quad\forall\widetilde{z} \in \widetilde{\mathcal{Z}}
+\]</span></p>
+<p>其中<span class="math inline">\(\widetilde{\sigma}\)</span>与<span class="math inline">\(\widetilde{\mu}\)</span>是原始分布的经验标准差和经验均值。进而通过逆过程实现图像风格的迁移<span class="math inline">\(\widehat{\mathbf{y}} = f_{\mathbf{\theta}}^{- 1}(\widehat{\mathbf{z}},\mathbf{x})\)</span></p>
 <p>后面是这种标准化的两个具体应用。</p>
-<h5 id="Image-Content-Transfer"><a href="#Image-Content-Transfer" class="headerlink" title="Image Content Transfer"></a>Image Content Transfer</h5><p>首先有一张待迁移的HR图片$\mathbf{y}$，我们把它下采样$\mathbf{x} = d_{\downarrow}(\mathbf{y})$。然后我们可以直接在$\mathbf{y}$上进行篡改（或许改的很拙劣），得到$\widetilde{\mathbf{y}}$。现在我们为了使$\widetilde{\mathbf{y}}$看起来不那么拙劣，我们首先把其对应的隐分布表示出来$\widetilde{\mathbf{z}} = f_{\mathbf{\theta}}(\widetilde{\mathbf{y}};\mathbf{x})$（注意，这里用到的”要求”是原始的$\mathbf{y}$的下采样版本），再使用上述的Latent Space Normalization，从而得到迁移后的图片</p>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204121.png" alt="image-20200917170248004"></p>
-<h5 id="Image-Restoration"><a href="#Image-Restoration" class="headerlink" title="Image Restoration"></a>Image Restoration</h5><p>一种使用SR实现图像复原的朴素思想是，利用一些下采样方法，把噪声图像中的噪声去除，再使用SR方法进行复原。但是在下采样的过程中丢失了很多细节。</p>
-<p>而使用上述的思想就可以避免这种问题。可以把退化的图像、退化图像的下采样版本都放进$f_{\theta}$里：$\widetilde{\mathbf{z}} = f_{\mathbf{\theta}}(\widetilde{\mathbf{y}};\mathbf{x})$，然后对$\widetilde{\mathbf{z}}$进行标准化为$\widehat{\mathbf{z}}$，进而得到复原的图像$\widehat{\mathbf{y}} = f_{\mathbf{\theta}}^{- 1}(\widehat{\mathbf{z}},\mathbf{x})$。完整的复原过程描述为：$\widehat{\mathbf{y}} = f_{\mathbf{\theta}}^{- 1}\left( \phi\left( f_{\mathbf{\theta}}\left( \widetilde{\mathbf{y}};d_{\downarrow}(\widetilde{\mathbf{y}}) \right) \right),d_{\downarrow}(\widetilde{\mathbf{y}}) \right)$.</p>
-<p>直观来说，这个方法是把一个退化图像映射到了分布$p_{\mathbf{y} \mid \mathbf{x}}(\mathbf{y} \mid \mathbf{x},\mathbf{\theta})$中最接近的图片，因为这个分布训练的时候，是没有引入退化的，所以就能得到对应的”干净”的HR图片。</p>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204122.png" alt="image-20200917170257774"></p>
-<h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204123.png" alt="image-20200917170303654"></p>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204124.png" alt="image-20200917170309522"></p>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204125.png" alt="image-20200917170315063"></p>
-<h3 id="总结与思考"><a href="#总结与思考" class="headerlink" title="总结与思考"></a>总结与思考</h3><p>这篇文章与以往大多数超分不一样，它产生的是一个HR图片的分布，而不是单张图片。让我第一次了解到了标准化流的思想，收获很大。</p>
-<p>感觉这篇和那篇Invertible Image Rescaling有异曲同工的地方，都使用了一个可逆网络，都是把信息隐藏在一个隐变量中。不同的是，Invertible Image Rescaling是把图像缩小时的丢失的<strong>高频信息</strong>放在了z中；而本文所求得的”HR图片分布”中的不同样本却对应了同一种z分布，这反映了不同HR样本中的相同的低频内容，从某种意义上是把LR图像中的<strong>低频特征</strong>放在了z中。</p>
-<p>我觉得这篇文章很惊艳的部分在于，利用隐变量的标准化，把这个超分框架推广到了图像风格迁移、图像复原上面。其中”寻找分布$p_{\mathbf{y} \mid \mathbf{x}}(\mathbf{y} \mid \mathbf{x},\mathbf{\theta})$中，与目标图像最接近的干净图片”的思想，也非常亮眼。</p>
+<h5 id="image-content-transfer">Image Content Transfer</h5>
+<p>首先有一张待迁移的HR图片<span class="math inline">\(\mathbf{y}\)</span>，我们把它下采样<span class="math inline">\(\mathbf{x} = d_{\downarrow}(\mathbf{y})\)</span>。然后我们可以直接在<span class="math inline">\(\mathbf{y}\)</span>上进行篡改（或许改的很拙劣），得到<span class="math inline">\(\widetilde{\mathbf{y}}\)</span>。现在我们为了使<span class="math inline">\(\widetilde{\mathbf{y}}\)</span>看起来不那么拙劣，我们首先把其对应的隐分布表示出来<span class="math inline">\(\widetilde{\mathbf{z}} = f_{\mathbf{\theta}}(\widetilde{\mathbf{y}};\mathbf{x})\)</span>（注意，这里用到的"要求"是原始的<span class="math inline">\(\mathbf{y}\)</span>的下采样版本），再使用上述的Latent Space Normalization，从而得到迁移后的图片</p>
+<figure>
+<img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204121.png" alt="image-20200917170248004" /><figcaption aria-hidden="true">image-20200917170248004</figcaption>
+</figure>
+<h5 id="image-restoration">Image Restoration</h5>
+<p>一种使用SR实现图像复原的朴素思想是，利用一些下采样方法，把噪声图像中的噪声去除，再使用SR方法进行复原。但是在下采样的过程中丢失了很多细节。</p>
+<p>而使用上述的思想就可以避免这种问题。可以把退化的图像、退化图像的下采样版本都放进<span class="math inline">\(f_{\theta}\)</span>里：<span class="math inline">\(\widetilde{\mathbf{z}} = f_{\mathbf{\theta}}(\widetilde{\mathbf{y}};\mathbf{x})\)</span>，然后对<span class="math inline">\(\widetilde{\mathbf{z}}\)</span>进行标准化为<span class="math inline">\(\widehat{\mathbf{z}}\)</span>，进而得到复原的图像<span class="math inline">\(\widehat{\mathbf{y}} = f_{\mathbf{\theta}}^{- 1}(\widehat{\mathbf{z}},\mathbf{x})\)</span>。完整的复原过程描述为：<span class="math inline">\(\widehat{\mathbf{y}} = f_{\mathbf{\theta}}^{- 1}\left( \phi\left( f_{\mathbf{\theta}}\left( \widetilde{\mathbf{y}};d_{\downarrow}(\widetilde{\mathbf{y}}) \right) \right),d_{\downarrow}(\widetilde{\mathbf{y}}) \right)\)</span>.</p>
+<p>直观来说，这个方法是把一个退化图像映射到了分布<span class="math inline">\(p_{\mathbf{y} \mid \mathbf{x}}(\mathbf{y} \mid \mathbf{x},\mathbf{\theta})\)</span>中最接近的图片，因为这个分布训练的时候，是没有引入退化的，所以就能得到对应的"干净"的HR图片。</p>
+<figure>
+<img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204122.png" alt="image-20200917170257774" /><figcaption aria-hidden="true">image-20200917170257774</figcaption>
+</figure>
+<h3 id="实验结果">实验结果</h3>
+<figure>
+<img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204123.png" alt="image-20200917170303654" /><figcaption aria-hidden="true">image-20200917170303654</figcaption>
+</figure>
+<figure>
+<img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204124.png" alt="image-20200917170309522" /><figcaption aria-hidden="true">image-20200917170309522</figcaption>
+</figure>
+<figure>
+<img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204125.png" alt="image-20200917170315063" /><figcaption aria-hidden="true">image-20200917170315063</figcaption>
+</figure>
+<h3 id="总结与思考">总结与思考</h3>
+<p>这篇文章与以往大多数超分不一样，它产生的是一个HR图片的分布，而不是单张图片。让我第一次了解到了标准化流的思想，收获很大。</p>
+<p>感觉这篇和那篇Invertible Image Rescaling有异曲同工的地方，都使用了一个可逆网络，都是把信息隐藏在一个隐变量中。不同的是，Invertible Image Rescaling是把图像缩小时的丢失的<strong>高频信息</strong>放在了z中；而本文所求得的"HR图片分布"中的不同样本却对应了同一种z分布，这反映了不同HR样本中的相同的低频内容，从某种意义上是把LR图像中的<strong>低频特征</strong>放在了z中。</p>
+<p>我觉得这篇文章很惊艳的部分在于，利用隐变量的标准化，把这个超分框架推广到了图像风格迁移、图像复原上面。其中"寻找分布<span class="math inline">\(p_{\mathbf{y} \mid \mathbf{x}}(\mathbf{y} \mid \mathbf{x},\mathbf{\theta})\)</span>中，与目标图像最接近的干净图片"的思想，也非常亮眼。</p>
 
     </div>
 
@@ -364,7 +401,7 @@ p_{\mathbf{y} \mid \mathbf{x}}(\mathbf{y} \mid \mathbf{x},\mathbf{\theta}) = p_{
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#论文背景"><span class="nav-number">1.</span> <span class="nav-text">论文背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主要方法"><span class="nav-number">2.</span> <span class="nav-text">主要方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#SR中的条件标准化流"><span class="nav-number">2.1.</span> <span class="nav-text">SR中的条件标准化流</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#条件流层-Conditional-Flow-Layers"><span class="nav-number">2.2.</span> <span class="nav-text">条件流层(Conditional Flow Layers)</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#条件仿射耦合-Conditional-Affine-Coupling"><span class="nav-number">2.2.1.</span> <span class="nav-text">条件仿射耦合(Conditional Affine Coupling)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#仿射注入-Affine-Injector"><span class="nav-number">2.2.2.</span> <span class="nav-text">仿射注入(Affine Injector)</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#网络结构"><span class="nav-number">2.3.</span> <span class="nav-text">网络结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#其他的应用"><span class="nav-number">2.4.</span> <span class="nav-text">其他的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#LR一致的Style-Transfer"><span class="nav-number">2.4.1.</span> <span class="nav-text">LR一致的Style Transfer</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Latent-Space-Normalization"><span class="nav-number">2.4.2.</span> <span class="nav-text">Latent Space Normalization</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Image-Content-Transfer"><span class="nav-number">2.4.3.</span> <span class="nav-text">Image Content Transfer</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Image-Restoration"><span class="nav-number">2.4.4.</span> <span class="nav-text">Image Restoration</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验结果"><span class="nav-number">3.</span> <span class="nav-text">实验结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结与思考"><span class="nav-number">4.</span> <span class="nav-text">总结与思考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#论文背景"><span class="nav-number">1.</span> <span class="nav-text">论文背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主要方法"><span class="nav-number">2.</span> <span class="nav-text">主要方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#sr中的条件标准化流"><span class="nav-number">2.1.</span> <span class="nav-text">SR中的条件标准化流</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#条件流层conditional-flow-layers"><span class="nav-number">2.2.</span> <span class="nav-text">条件流层(Conditional Flow Layers)</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#条件仿射耦合conditional-affine-coupling"><span class="nav-number">2.2.1.</span> <span class="nav-text">条件仿射耦合(Conditional Affine Coupling)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#仿射注入affine-injector"><span class="nav-number">2.2.2.</span> <span class="nav-text">仿射注入(Affine Injector)</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#网络结构"><span class="nav-number">2.3.</span> <span class="nav-text">网络结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#其他的应用"><span class="nav-number">2.4.</span> <span class="nav-text">其他的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#lr一致的style-transfer"><span class="nav-number">2.4.1.</span> <span class="nav-text">LR一致的Style Transfer</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#latent-space-normalization"><span class="nav-number">2.4.2.</span> <span class="nav-text">Latent Space Normalization</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#image-content-transfer"><span class="nav-number">2.4.3.</span> <span class="nav-text">Image Content Transfer</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#image-restoration"><span class="nav-number">2.4.4.</span> <span class="nav-text">Image Restoration</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验结果"><span class="nav-number">3.</span> <span class="nav-text">实验结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结与思考"><span class="nav-number">4.</span> <span class="nav-text">总结与思考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

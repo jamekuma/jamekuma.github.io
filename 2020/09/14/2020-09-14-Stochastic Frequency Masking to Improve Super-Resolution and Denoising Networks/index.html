@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"jamekuma.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","width":270,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="这篇算是一篇超分辨&#x2F;去噪的数据增强方面的文章，与以往的数据增强不同的是，它是在频域的角度设置了数据增强方法。 论文背景作者指出，基于学习的超分辨&#x2F;去噪的CNN网络，总是基于一个庞大的数据集来训练。而这个数据集往往是通过把ground-truth图片经过一个模糊核&#x2F;有限的模糊核集合进行退化构造出LR图片。但是在测试过程中，往往需要针对一个未知模糊核的LR图像来进行SR，或是对一个未知等级的噪声进行d">
+  <meta name="description" content="这篇算是一篇超分辨&#x2F;去噪的数据增强方面的文章，与以往的数据增强不同的是，它是在频域的角度设置了数据增强方法。 论文背景 作者指出，基于学习的超分辨&#x2F;去噪的CNN网络，总是基于一个庞大的数据集来训练。而这个数据集往往是通过把ground-truth图片经过一个模糊核&#x2F;有限的模糊核集合进行退化构造出LR图片。但是在测试过程中，往往需要针对一个未知模糊核的LR图像来进行SR，或是对一个未知等级的噪声">
 <meta property="og:type" content="article">
 <meta property="og:title" content="读论文：Stochastic Frequency Masking to Improve Super-Resolution and Denoising Networks">
 <meta property="og:url" content="https://jamekuma.github.io/2020/09/14/2020-09-14-Stochastic%20Frequency%20Masking%20to%20Improve%20Super-Resolution%20and%20Denoising%20Networks/index.html">
 <meta property="og:site_name" content="Jame&#39;s Blog">
-<meta property="og:description" content="这篇算是一篇超分辨&#x2F;去噪的数据增强方面的文章，与以往的数据增强不同的是，它是在频域的角度设置了数据增强方法。 论文背景作者指出，基于学习的超分辨&#x2F;去噪的CNN网络，总是基于一个庞大的数据集来训练。而这个数据集往往是通过把ground-truth图片经过一个模糊核&#x2F;有限的模糊核集合进行退化构造出LR图片。但是在测试过程中，往往需要针对一个未知模糊核的LR图像来进行SR，或是对一个未知等级的噪声进行d">
+<meta property="og:description" content="这篇算是一篇超分辨&#x2F;去噪的数据增强方面的文章，与以往的数据增强不同的是，它是在频域的角度设置了数据增强方法。 论文背景 作者指出，基于学习的超分辨&#x2F;去噪的CNN网络，总是基于一个庞大的数据集来训练。而这个数据集往往是通过把ground-truth图片经过一个模糊核&#x2F;有限的模糊核集合进行退化构造出LR图片。但是在测试过程中，往往需要针对一个未知模糊核的LR图像来进行SR，或是对一个未知等级的噪声">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204144.png">
 <meta property="og:image" content="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204145.png">
@@ -248,52 +248,59 @@
 
       
         <p>这篇算是一篇超分辨/去噪的数据增强方面的文章，与以往的数据增强不同的是，它是在频域的角度设置了数据增强方法。</p>
-<h3 id="论文背景"><a href="#论文背景" class="headerlink" title="论文背景"></a>论文背景</h3><p>作者指出，基于学习的超分辨/去噪的CNN网络，总是基于一个庞大的数据集来训练。而这个数据集往往是通过把ground-truth图片经过一个模糊核/有限的模糊核集合进行退化构造出LR图片。但是在测试过程中，往往需要针对一个未知模糊核的LR图像来进行SR，或是对一个未知等级的噪声进行denoising。<strong>作者指出，现有的SR模型都对有限的退化模型产生了过拟合。</strong>作者在频域中分析了这一点。进一步地，作者更加形式化地揭示了SR过程中隐含的一种条件学习——“在已知低频的情况下学习高频”。据此，作者提出了本文的主要工作——随机频率掩蔽(Stochastic Frequency Masking, SFM)。</p>
+<h3 id="论文背景">论文背景</h3>
+<p>作者指出，基于学习的超分辨/去噪的CNN网络，总是基于一个庞大的数据集来训练。而这个数据集往往是通过把ground-truth图片经过一个模糊核/有限的模糊核集合进行退化构造出LR图片。但是在测试过程中，往往需要针对一个未知模糊核的LR图像来进行SR，或是对一个未知等级的噪声进行denoising。<strong>作者指出，现有的SR模型都对有限的退化模型产生了过拟合。</strong>作者在频域中分析了这一点。进一步地，作者更加形式化地揭示了SR过程中隐含的一种条件学习——“在已知低频的情况下学习高频”。据此，作者提出了本文的主要工作——随机频率掩蔽(Stochastic Frequency Masking, SFM)。</p>
 <a id="more"></a>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204144.png" alt="image-20200917205540371" style="zoom:67%;" /></p>
-<h3 id="方法详述"><a href="#方法详述" class="headerlink" title="方法详述"></a>方法详述</h3><h4 id="背景知识"><a href="#背景知识" class="headerlink" title="背景知识"></a>背景知识</h4><p>在信号与系统中学习过，一个离散的信号x(n)，设它的DTFT(离散时间傅里叶变换)为X(ω)，则对x(n)的采样间隔。为T的采样信号z的DTFT为$Z(\omega)=\frac{1}{T} \sum_{k=0}^{T-1} X((\omega+2 \pi k) / T)$。这T个X(ω)的副本会使得Z(ω)频谱的高频部分发生混叠。即如果想要从z恢复到x时，高频的混叠就会造成视觉扭曲。因此有时也在下采样的过程中使用一个(非理想的)低通滤波器，先把可能重叠的高频部分减弱，这个低通滤波器就对应了模糊核。</p>
+<h3 id="方法详述">方法详述</h3>
+<h4 id="背景知识">背景知识</h4>
+<p>在信号与系统中学习过，一个离散的信号x(n)，设它的DTFT(离散时间傅里叶变换)为X(ω)，则对x(n)的采样间隔。为T的采样信号z的DTFT为<span class="math inline">\(Z(\omega)=\frac{1}{T} \sum_{k=0}^{T-1} X((\omega+2 \pi k) / T)\)</span>。这T个X(ω)的副本会使得Z(ω)频谱的高频部分发生混叠。即如果想要从z恢复到x时，高频的混叠就会造成视觉扭曲。因此有时也在下采样的过程中使用一个(非理想的)低通滤波器，先把可能重叠的高频部分减弱，这个低通滤波器就对应了模糊核。</p>
 <blockquote>
 <p>这里我对这个逻辑还是有疑问，为什么是为了防止混叠才用这个模糊核。难道模糊核不是退化模型中客观存在的过程吗？</p>
 <p>原文如下：</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204145.png" alt="image-20200917212102189" style="zoom:67%;" /></p>
 </blockquote>
 <p>真实的模糊核毕竟只是所有数学上所有可能的核的一个子空间。但是，在以前的工作中，这个子空间并没有很好的定义，而总是定义为一个空域的卷积核，比如一个高斯核，即试图模拟原始捕获设备的点扩展函数(可以理解为冲激响应函数)。但是实际上，即使是单个成像设备也会产生多个模糊核，甚至不一定是高斯核。</p>
-<h4 id="SR过程在频域上的可视化实验"><a href="#SR过程在频域上的可视化实验" class="headerlink" title="SR过程在频域上的可视化实验"></a>SR过程在频域上的可视化实验</h4><p>作者做了一个实验，先使用$\sigma=4.1$的高斯核构造一个训练数据集，去训练一个RRDB网络。然后在测试过程，利用这个网络来SR一个由$\sigma=7.4$的高斯核构造的LR图像。</p>
+<h4 id="sr过程在频域上的可视化实验">SR过程在频域上的可视化实验</h4>
+<p>作者做了一个实验，先使用<span class="math inline">\(\sigma=4.1\)</span>的高斯核构造一个训练数据集，去训练一个RRDB网络。然后在测试过程，利用这个网络来SR一个由<span class="math inline">\(\sigma=7.4\)</span>的高斯核构造的LR图像。</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204146.png" alt="image-20200917220015573" style="zoom: 50%;" /></p>
 <p>对于测试过程，在频域分别分析了groud-truth、LR、SR图片的功率谱密度：</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204147.png" alt="image-20200917215907810" style="zoom:67%;" /></p>
 <ul>
-<li><p>对于一张自然图像，功率谱密度一般满足$1/f^\alpha$的幂函数（绿色）</p>
-</li>
-<li><p>而退化后的LR图像，会缺少大量的高频信息（粉色）</p>
-</li>
+<li><p>对于一张自然图像，功率谱密度一般满足<span class="math inline">\(1/f^\alpha\)</span>的幂函数（绿色）</p></li>
+<li><p>而退化后的LR图像，会缺少大量的高频信息（粉色）</p></li>
 <li><p>而经过SR网络后，SR图像的部分高频强度会被恢复（红色）</p>
 <ul>
-<li>但是，从图中可以看出，恢复的主要是频率大于$0.2\pi$的高频信息。也就是构造<strong>训练集</strong>时，原始的HR图像中被高斯低通滤波器滤掉的那一部分。</li>
-<li>而构造<strong>测试集</strong>时，其实使用的是一个更加“严格的”低通滤波器(空域上高斯核的$\sigma$与频域上高斯滤波器的$\sigma$是负相关的，$g(x)=\frac{1}{\sqrt{2 \pi \sigma^{2}}} e^{-\frac{x^{2}}{2 \sigma^{2}}}$  &lt;-&gt;$G(f)=e^{-\frac{f^{2}}{2 / \sigma^{2}}}$)，所以它的最低截止频率比训练集中的低。</li>
+<li>但是，从图中可以看出，恢复的主要是频率大于<span class="math inline">\(0.2\pi\)</span>的高频信息。也就是构造<strong>训练集</strong>时，原始的HR图像中被高斯低通滤波器滤掉的那一部分。</li>
+<li>而构造<strong>测试集</strong>时，其实使用的是一个更加“严格的”低通滤波器(空域上高斯核的<span class="math inline">\(\sigma\)</span>与频域上高斯滤波器的<span class="math inline">\(\sigma\)</span>是负相关的，<span class="math inline">\(g(x)=\frac{1}{\sqrt{2 \pi \sigma^{2}}} e^{-\frac{x^{2}}{2 \sigma^{2}}}\)</span> &lt;-&gt;<span class="math inline">\(G(f)=e^{-\frac{f^{2}}{2 / \sigma^{2}}}\)</span>)，所以它的最低截止频率比训练集中的低。</li>
 <li>这导致了在恢复的SR输出中没有得到的缺失频率分量（上图中的蓝色虚线圆）</li>
-</ul>
-</li>
+</ul></li>
 <li><p>而作者表示，用了他提出的SFM就不会有这个问题：</p>
-<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204148.png" alt="image-20200917221256524" style="zoom:67%;" /></p>
-</li>
+<p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204148.png" alt="image-20200917221256524" style="zoom:67%;" /></p></li>
 </ul>
-<h4 id="隐含的条件学习"><a href="#隐含的条件学习" class="headerlink" title="隐含的条件学习"></a>隐含的条件学习</h4><p>如果抗混叠时使用的滤波器是一个理想低通滤波器（高频全去掉，低频不受影响），那么SR网络对应如下的条件学习：</p>
-<script type="math/tex; mode=display">
-P\left(I^{H R} \otimes F^{H P} \mid I^{H R} \otimes F^{L P}\right)</script><p>意为从低频信息中去学习高频信息。</p>
-<p>而对于实际上的非理想低通滤波器，它既不能全部去掉高频，又不能完全不衰减低频。于是对应了如下的条件学习：</p>
-<script type="math/tex; mode=display">
-P\left(I^{H R} \otimes F^{H P} \mid I^{H R} \otimes F_{o}^{L P}\right), \quad P\left(I^{H R} \otimes F^{L P}-I^{H R} \otimes F_{0}^{L P} \mid I^{H R} \otimes F_{o}^{L P}\right)</script><h4 id="把以上理论扩展到去噪"><a href="#把以上理论扩展到去噪" class="headerlink" title="把以上理论扩展到去噪"></a>把以上理论扩展到去噪</h4><p>高斯白噪声的功率谱密度是一条水平线，噪声加在原始的图像上，形成了信噪比的变化。而每个频率上的信噪比，随着频率增加而降低(即$1/f^\alpha$曲线)：</p>
+<h4 id="隐含的条件学习">隐含的条件学习</h4>
+<p>如果抗混叠时使用的滤波器是一个理想低通滤波器（高频全去掉，低频不受影响），那么SR网络对应如下的条件学习： <span class="math display">\[
+P\left(I^{H R} \otimes F^{H P} \mid I^{H R} \otimes F^{L P}\right)
+\]</span> 意为从低频信息中去学习高频信息。</p>
+<p>而对于实际上的非理想低通滤波器，它既不能全部去掉高频，又不能完全不衰减低频。于是对应了如下的条件学习： <span class="math display">\[
+P\left(I^{H R} \otimes F^{H P} \mid I^{H R} \otimes F_{o}^{L P}\right), \quad P\left(I^{H R} \otimes F^{L P}-I^{H R} \otimes F_{0}^{L P} \mid I^{H R} \otimes F_{o}^{L P}\right)
+\]</span></p>
+<h4 id="把以上理论扩展到去噪">把以上理论扩展到去噪</h4>
+<p>高斯白噪声的功率谱密度是一条水平线，噪声加在原始的图像上，形成了信噪比的变化。而每个频率上的信噪比，随着频率增加而降低(即<span class="math inline">\(1/f^\alpha\)</span>曲线)：</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204149.png" alt="image-20200918151017689" style="zoom:67%;" /></p>
 <p>换句话说，高频几乎完全被噪声所取代，而低频受噪声的影响则小得多。并且，当噪声水平越高时，启动频率(超过这个频率，信噪比就非常小)越低。这和上述SR的分析是一致的。</p>
 <p>综上，无论是SR还是denoising，都存在一种隐含条件学习，可以在低频部分受到较少影响的情况下，预测高频部分的损失。</p>
-<h4 id="随机频率掩蔽-SFM"><a href="#随机频率掩蔽-SFM" class="headerlink" title="随机频率掩蔽(SFM)"></a>随机频率掩蔽(SFM)</h4><p>把图片使用离散余弦变换到频域上，然后在通道级别上进行频率掩蔽。频率掩蔽带都是一个四分之一的圆环，即只需确定掩蔽带的频率上下界即可。具体确定掩蔽带的方法有两种模式：中心模式、目标模式</p>
-<h5 id="中心模式"><a href="#中心模式" class="headerlink" title="中心模式"></a>中心模式</h5><p>中心模式是指，掩蔽带的上下界都是$[0,r_M]$的均匀分布，$r_M$是最大半径。于是根据概率论的知识很容易推出，给定一个频率$r_\omega$，被掩蔽的概率是：</p>
-<script type="math/tex; mode=display">
-P\left(r_{I}<r_{\omega}<r_{O}\right)=2\left(\frac{r_{\omega}}{r_{M}}-\left(\frac{r_{\omega}}{r_{M}}\right)^{2}\right)</script><p>这个是一个凸的二次函数，也就是在中心部位的频率最容易被掩蔽。</p>
-<h5 id="目标模式"><a href="#目标模式" class="headerlink" title="目标模式"></a>目标模式</h5><p>选定一个目标频率$r_C$以及另一个参数$\sigma_{\Delta}$，定义掩蔽的范围是$\left[r_{C}-\delta_{I}, r_{C}+\delta_{O}\right]$，$\delta_{I}$与$\delta_{O}$都是服从一个高斯分布$f_{\Delta}(\delta)=\sqrt{2} / \sqrt{\pi \sigma_{\Delta}^{2}} e^{-\delta^{2} /\left(2 \sigma_{\Delta}^{2}\right)}, \forall \delta \geq 0$。在这种模式下，频率$r_C$总是被掩蔽，远离$r_C$的频率越来越不可能被掩蔽，并具有正态分布的衰减。</p>
-<p>中心模式用于SR任务，而目标模式用于denoising。前者有一个缓慢的凹概率衰减，允许覆盖更宽的波段，而后者有一个指数衰减适应于目标非常狭窄的波段。在这两种情况下，最高的频率最有可能被掩盖，较低的频率被衰减概率掩盖。（这句话我没理解，中心模式下，不应该是$\frac {r_M} 2$下才是最高概率吗）</p>
-<h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><p>实际应用中，作者对50%的数据集进行了SFM，得到的效果都比原来好了很多。</p>
+<h4 id="随机频率掩蔽sfm">随机频率掩蔽(SFM)</h4>
+<p>把图片使用离散余弦变换到频域上，然后在通道级别上进行频率掩蔽。频率掩蔽带都是一个四分之一的圆环，即只需确定掩蔽带的频率上下界即可。具体确定掩蔽带的方法有两种模式：中心模式、目标模式</p>
+<h5 id="中心模式">中心模式</h5>
+<p>中心模式是指，掩蔽带的上下界都是<span class="math inline">\([0,r_M]\)</span>的均匀分布，<span class="math inline">\(r_M\)</span>是最大半径。于是根据概率论的知识很容易推出，给定一个频率<span class="math inline">\(r_\omega\)</span>，被掩蔽的概率是： <span class="math display">\[
+P\left(r_{I}&lt;r_{\omega}&lt;r_{O}\right)=2\left(\frac{r_{\omega}}{r_{M}}-\left(\frac{r_{\omega}}{r_{M}}\right)^{2}\right)
+\]</span> 这个是一个凸的二次函数，也就是在中心部位的频率最容易被掩蔽。</p>
+<h5 id="目标模式">目标模式</h5>
+<p>选定一个目标频率<span class="math inline">\(r_C\)</span>以及另一个参数<span class="math inline">\(\sigma_{\Delta}\)</span>，定义掩蔽的范围是<span class="math inline">\(\left[r_{C}-\delta_{I}, r_{C}+\delta_{O}\right]\)</span>，<span class="math inline">\(\delta_{I}\)</span>与<span class="math inline">\(\delta_{O}\)</span>都是服从一个高斯分布<span class="math inline">\(f_{\Delta}(\delta)=\sqrt{2} / \sqrt{\pi \sigma_{\Delta}^{2}} e^{-\delta^{2} /\left(2 \sigma_{\Delta}^{2}\right)}, \forall \delta \geq 0\)</span>。在这种模式下，频率<span class="math inline">\(r_C\)</span>总是被掩蔽，远离<span class="math inline">\(r_C\)</span>的频率越来越不可能被掩蔽，并具有正态分布的衰减。</p>
+<p>中心模式用于SR任务，而目标模式用于denoising。前者有一个缓慢的凹概率衰减，允许覆盖更宽的波段，而后者有一个指数衰减适应于目标非常狭窄的波段。在这两种情况下，最高的频率最有可能被掩盖，较低的频率被衰减概率掩盖。（这句话我没理解，中心模式下，不应该是<span class="math inline">\(\frac {r_M} 2\)</span>下才是最高概率吗）</p>
+<h3 id="实验结果">实验结果</h3>
+<p>实际应用中，作者对50%的数据集进行了SFM，得到的效果都比原来好了很多。</p>
 <p>这是使用双三次退化、高斯模糊的LR图片测试结果：</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204150.png" alt="image-20200918162037612" style="zoom:67%;" /></p>
 <p>使用真实场景下的退化数据集RealSR和SR-RAW：</p>
@@ -304,7 +311,8 @@ P\left(r_{I}<r_{\omega}<r_{O}\right)=2\left(\frac{r_{\omega}}{r_{M}}-\left(\frac
 <p>真实的泊松-高斯噪声图片：</p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204154.png" alt="image-20200918162500452" style="zoom:67%;" /></p>
 <p><img src="https://img-1302874500.cos.ap-shanghai-fsi.myqcloud.com/images20200921204155.png" alt="image-20200918162517579" style="zoom:67%;" /></p>
-<h3 id="总结与思考"><a href="#总结与思考" class="headerlink" title="总结与思考"></a>总结与思考</h3><ul>
+<h3 id="总结与思考">总结与思考</h3>
+<ul>
 <li>这篇工作本身并没有特别复杂，但是从频域角度进行数据增强的思路倒是比较新颖</li>
 <li>作者设置了巧妙的实验，并通过功率谱密度图，说明了频域下图像复原的条件学习，进而引导出随机频率掩蔽的方法</li>
 </ul>
@@ -394,7 +402,7 @@ P\left(r_{I}<r_{\omega}<r_{O}\right)=2\left(\frac{r_{\omega}}{r_{M}}-\left(\frac
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#论文背景"><span class="nav-number">1.</span> <span class="nav-text">论文背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法详述"><span class="nav-number">2.</span> <span class="nav-text">方法详述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#背景知识"><span class="nav-number">2.1.</span> <span class="nav-text">背景知识</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SR过程在频域上的可视化实验"><span class="nav-number">2.2.</span> <span class="nav-text">SR过程在频域上的可视化实验</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#隐含的条件学习"><span class="nav-number">2.3.</span> <span class="nav-text">隐含的条件学习</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#把以上理论扩展到去噪"><span class="nav-number">2.4.</span> <span class="nav-text">把以上理论扩展到去噪</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#随机频率掩蔽-SFM"><span class="nav-number">2.5.</span> <span class="nav-text">随机频率掩蔽(SFM)</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#中心模式"><span class="nav-number">2.5.1.</span> <span class="nav-text">中心模式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#目标模式"><span class="nav-number">2.5.2.</span> <span class="nav-text">目标模式</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验结果"><span class="nav-number">3.</span> <span class="nav-text">实验结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结与思考"><span class="nav-number">4.</span> <span class="nav-text">总结与思考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#论文背景"><span class="nav-number">1.</span> <span class="nav-text">论文背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法详述"><span class="nav-number">2.</span> <span class="nav-text">方法详述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#背景知识"><span class="nav-number">2.1.</span> <span class="nav-text">背景知识</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sr过程在频域上的可视化实验"><span class="nav-number">2.2.</span> <span class="nav-text">SR过程在频域上的可视化实验</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#隐含的条件学习"><span class="nav-number">2.3.</span> <span class="nav-text">隐含的条件学习</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#把以上理论扩展到去噪"><span class="nav-number">2.4.</span> <span class="nav-text">把以上理论扩展到去噪</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#随机频率掩蔽sfm"><span class="nav-number">2.5.</span> <span class="nav-text">随机频率掩蔽(SFM)</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#中心模式"><span class="nav-number">2.5.1.</span> <span class="nav-text">中心模式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#目标模式"><span class="nav-number">2.5.2.</span> <span class="nav-text">目标模式</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验结果"><span class="nav-number">3.</span> <span class="nav-text">实验结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结与思考"><span class="nav-number">4.</span> <span class="nav-text">总结与思考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

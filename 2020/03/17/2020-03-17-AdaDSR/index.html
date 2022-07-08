@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"jamekuma.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","width":270,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="主要思想目前的SISR（单图像超分辨率）领域已经有了很多模型。但是现有的这些模型大多是确定的，一旦模型训练结束，无论输入什么图像，对于整副图像的每个部分，计算卷积的深度都是确定的。 但是作者考虑了以下两点：">
+  <meta name="description" content="主要思想 目前的SISR（单图像超分辨率）领域已经有了很多模型。但是现有的这些模型大多是确定的，一旦模型训练结束，无论输入什么图像，对于整副图像的每个部分，计算卷积的深度都是确定的。 但是作者考虑了以下两点：">
 <meta property="og:type" content="article">
 <meta property="og:title" content="读论文：应用于单图像超分辨率的深度自适应网络">
 <meta property="og:url" content="https://jamekuma.github.io/2020/03/17/2020-03-17-AdaDSR/index.html">
 <meta property="og:site_name" content="Jame&#39;s Blog">
-<meta property="og:description" content="主要思想目前的SISR（单图像超分辨率）领域已经有了很多模型。但是现有的这些模型大多是确定的，一旦模型训练结束，无论输入什么图像，对于整副图像的每个部分，计算卷积的深度都是确定的。 但是作者考虑了以下两点：">
+<meta property="og:description" content="主要思想 目前的SISR（单图像超分辨率）领域已经有了很多模型。但是现有的这些模型大多是确定的，一旦模型训练结束，无论输入什么图像，对于整副图像的每个部分，计算卷积的深度都是确定的。 但是作者考虑了以下两点：">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://jamekuma.github.io/images/image-20200317153901125.png">
 <meta property="og:image" content="https://jamekuma.github.io/images/image-20200317160151113.png">
@@ -242,31 +242,35 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="主要思想"><a href="#主要思想" class="headerlink" title="主要思想"></a>主要思想</h2><p>目前的SISR（单图像超分辨率）领域已经有了很多模型。但是现有的这些模型大多是确定的，一旦模型训练结束，无论输入什么图像，对于整副图像的每个部分，计算卷积的深度都是确定的。</p>
+        <h2 id="主要思想">主要思想</h2>
+<p>目前的SISR（单图像超分辨率）领域已经有了很多模型。但是现有的这些模型大多是确定的，一旦模型训练结束，无论输入什么图像，对于整副图像的每个部分，计算卷积的深度都是确定的。</p>
 <p>但是作者考虑了以下两点：</p>
 <a id="more"></a>
-<ol>
+<ol type="1">
 <li><p>在一幅图像中，不同区域的纹理复杂度不一样，为达到所需效果而需要的模型深度也不一样。全都采用同样的深度，会浪费计算资源。比如下图，纹理光滑的patch，即使使用深度教小的网络，也能达到很好的效果；</p>
 <p><img src="https://jamekuma.github.io/images/image-20200317153901125.png" alt="image-20200317153901125" style="zoom: 50%;" /></p>
-<p>​                                                                                     图 1</p>
-</li>
-<li><p>在很多实际应用条件下，会存在很多的性能约束（比如硬件平台的性能，机器的计算负载等）。应该把这些约束考虑进去。</p>
-</li>
+<p>​ 图 1</p></li>
+<li><p>在很多实际应用条件下，会存在很多的性能约束（比如硬件平台的性能，机器的计算负载等）。应该把这些约束考虑进去。</p></li>
 </ol>
 <p>这两点综合起来，可以在给定性能限制的前提下，超分辨率的整体效果更好（峰值信噪比更高）。</p>
 <p>基于以上思想，作者将一些经典SISR模型进行改进（比如EDSR、RCAN）增加了适配器，形成了本文的工作成果——AdaDSR。</p>
-<h2 id="主要方法"><a href="#主要方法" class="headerlink" title="主要方法"></a>主要方法</h2><h3 id="空域上可变的网络深度"><a href="#空域上可变的网络深度" class="headerlink" title="空域上可变的网络深度"></a>空域上可变的网络深度</h3><p>由图1所述思想，想让图像的不同位置上，跑不同的模型深度(这里表现为残差块的深度)。也就是建立一个空间坐标到网络深度的映射$\mathbf d\in \mathbb{R}^{G\times H\times W}$。由这个深度映射，可以为每一层的残差块，建立一个如下的函数，$l$代表残差块层数。一共有D层，那么就有D个下列函数：</p>
+<h2 id="主要方法">主要方法</h2>
+<h3 id="空域上可变的网络深度">空域上可变的网络深度</h3>
+<p>由图1所述思想，想让图像的不同位置上，跑不同的模型深度(这里表现为残差块的深度)。也就是建立一个空间坐标到网络深度的映射<span class="math inline">\(\mathbf d\in \mathbb{R}^{G\times H\times W}\)</span>。由这个深度映射，可以为每一层的残差块，建立一个如下的函数，<span class="math inline">\(l\)</span>代表残差块层数。一共有D层，那么就有D个下列函数：</p>
 <p><img src="https://jamekuma.github.io/images/image-20200317160151113.png" alt="image-20200317160151113" style="zoom:67%;" /></p>
 <p>直观来看，这个函数就是每一层残差的模块对每个像素进行筛别，判断其是否需要在本层进行计算。</p>
 <p>根据残差网络的性质，容易得到以下公式：</p>
 <p><img src="https://jamekuma.github.io/images/image-20200317160558094.png" alt="image-20200317160558094" style="zoom:67%;" /></p>
 <p>本质就是对每层残差块做了一个mask操作。</p>
-<h3 id="基于im2col的稀疏卷积"><a href="#基于im2col的稀疏卷积" class="headerlink" title="基于im2col的稀疏卷积"></a>基于im2col的稀疏卷积</h3><p>如果只是单纯的在原有的卷积运算上加mask，并不能减小运算次数，于是这里引入的一个广泛应用的im2col操作，把卷积的转换为矩阵乘积的过程。</p>
+<h3 id="基于im2col的稀疏卷积">基于im2col的稀疏卷积</h3>
+<p>如果只是单纯的在原有的卷积运算上加mask，并不能减小运算次数，于是这里引入的一个广泛应用的im2col操作，把卷积的转换为矩阵乘积的过程。</p>
 <p><img src="https://jamekuma.github.io/images/image-20200317160956786.png" alt="image-20200317160956786" style="zoom:50%;" /></p>
 <p>如上图所示，可以在计算矩阵乘积之前就进行mask操作，大大减小了运算量。</p>
-<h3 id="考虑性能约束的适配器网络"><a href="#考虑性能约束的适配器网络" class="headerlink" title="考虑性能约束的适配器网络"></a>考虑性能约束的适配器网络</h3><p>为了根据图片的特征构建上述的网络深度的映射$\mathbf d$，作者构建了一个模型，输入是原图像特征$\mathbf z_0$和性能约束$d$，输出就是网络深度的映射$\mathbf d$。作者对这个网络的训练目标有两个，定性来说，一是使超分辨率后的图像与原始高分辨率图像更接近；二是使输出的网络深度的映射$\mathbf d$更接近于性能约束$d$。从而构造了如下的损失函数进行训练：</p>
-<p><img src="https://jamekuma.github.io/images/image-20200317162123984.png" alt="image-20200317162123984"><img src="https://jamekuma.github.io/images/image-20200317162133876.png" alt="image-20200317162133876"><img src="https://jamekuma.github.io/images/image-20200317162148920.png" alt="image-20200317162148920"></p>
-<h2 id="最终的模型结构"><a href="#最终的模型结构" class="headerlink" title="最终的模型结构"></a>最终的模型结构</h2><p>依据训练好的适配器网络，输入原始图像及性能约束，构造出网络深度的映射$\mathbf d$，添加到现有SISR模型的各层残差块中去，使得一幅图像的不同位置依据其纹理复杂度的不同，而运行不同的模型深度。在有限的计算资源下达到更好的整体效果。</p>
+<h3 id="考虑性能约束的适配器网络">考虑性能约束的适配器网络</h3>
+<p>为了根据图片的特征构建上述的网络深度的映射<span class="math inline">\(\mathbf d\)</span>，作者构建了一个模型，输入是原图像特征<span class="math inline">\(\mathbf z_0\)</span>和性能约束<span class="math inline">\(d\)</span>，输出就是网络深度的映射<span class="math inline">\(\mathbf d\)</span>。作者对这个网络的训练目标有两个，定性来说，一是使超分辨率后的图像与原始高分辨率图像更接近；二是使输出的网络深度的映射<span class="math inline">\(\mathbf d\)</span>更接近于性能约束<span class="math inline">\(d\)</span>。从而构造了如下的损失函数进行训练：</p>
+<p><img src="https://jamekuma.github.io/images/image-20200317162123984.png" alt="image-20200317162123984" /><img src="https://jamekuma.github.io/images/image-20200317162133876.png" alt="image-20200317162133876" /><img src="https://jamekuma.github.io/images/image-20200317162148920.png" alt="image-20200317162148920" /></p>
+<h2 id="最终的模型结构">最终的模型结构</h2>
+<p>依据训练好的适配器网络，输入原始图像及性能约束，构造出网络深度的映射<span class="math inline">\(\mathbf d\)</span>，添加到现有SISR模型的各层残差块中去，使得一幅图像的不同位置依据其纹理复杂度的不同，而运行不同的模型深度。在有限的计算资源下达到更好的整体效果。</p>
 <p><img src="https://jamekuma.github.io/images/image-20200317162509296.png" alt="image-20200317162509296" style="zoom: 30%;" /></p>
 
     </div>

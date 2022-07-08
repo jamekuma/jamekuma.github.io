@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"jamekuma.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","width":270,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="同余关系定义数学中同余关系是一种等价关系。当两个整数a, b除以同一个正整数n，若得到相同的余数，则这两个整数同余。记做$a\equiv b\ \ \pmod n$. 性质整除性：a，b相减能被n整除 传递性：等价关系的共有特性 $\left.\begin{array}{l}a \equiv b(\bmod m) \b \equiv c(\bmod m) \end{array}\right} \R">
+  <meta name="description" content="同余关系 定义 数学中同余关系是一种等价关系。当两个整数a, b除以同一个正整数n，若得到相同的余数，则这两个整数同余。记做\(a\equiv b\ \ \pmod n\). 性质 整除性：a，b相减能被n整除 传递性：等价关系的共有特性 \(\left.\begin{array}{l} a \equiv b(\bmod m) \\ b \equiv c(\bmod m) \end{a">
 <meta property="og:type" content="article">
 <meta property="og:title" content="几个重要数论结论的总结">
 <meta property="og:url" content="https://jamekuma.github.io/2020/04/12/2020-04-12-%E5%87%A0%E4%B8%AA%E6%95%B0%E8%AE%BA%E7%BB%93%E8%AE%BA%E7%9A%84%E6%80%BB%E7%BB%93/index.html">
 <meta property="og:site_name" content="Jame&#39;s Blog">
-<meta property="og:description" content="同余关系定义数学中同余关系是一种等价关系。当两个整数a, b除以同一个正整数n，若得到相同的余数，则这两个整数同余。记做$a\equiv b\ \ \pmod n$. 性质整除性：a，b相减能被n整除 传递性：等价关系的共有特性 $\left.\begin{array}{l}a \equiv b(\bmod m) \b \equiv c(\bmod m) \end{array}\right} \R">
+<meta property="og:description" content="同余关系 定义 数学中同余关系是一种等价关系。当两个整数a, b除以同一个正整数n，若得到相同的余数，则这两个整数同余。记做\(a\equiv b\ \ \pmod n\). 性质 整除性：a，b相减能被n整除 传递性：等价关系的共有特性 \(\left.\begin{array}{l} a \equiv b(\bmod m) \\ b \equiv c(\bmod m) \end{a">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-04-12T02:04:00.000Z">
-<meta property="article:modified_time" content="2020-12-31T08:47:17.455Z">
+<meta property="article:modified_time" content="2022-07-08T17:39:03.929Z">
 <meta property="article:author" content="Jame Kuma">
 <meta property="article:tag" content="算法">
 <meta property="article:tag" content="数论">
@@ -234,31 +234,38 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="同余关系"><a href="#同余关系" class="headerlink" title="同余关系"></a>同余关系</h3><h4 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h4><p>数学中同余关系是一种等价关系。当两个整数a, b除以同一个正整数n，若得到相同的余数，则这两个整数同余。记做$a\equiv b\ \ \pmod n$.</p>
-<h4 id="性质"><a href="#性质" class="headerlink" title="性质"></a>性质</h4><p><strong>整除性：</strong>a，b相减能被n整除</p>
+        <h3 id="同余关系">同余关系</h3>
+<h4 id="定义">定义</h4>
+<p>数学中同余关系是一种等价关系。当两个整数a, b除以同一个正整数n，若得到相同的余数，则这两个整数同余。记做<span class="math inline">\(a\equiv b\ \ \pmod n\)</span>.</p>
+<h4 id="性质">性质</h4>
+<p><strong>整除性：</strong>a，b相减能被n整除</p>
 <p><strong>传递性：</strong>等价关系的共有特性</p>
-<p>$\left.\begin{array}{l}<br>a \equiv b(\bmod m) \<br>b \equiv c(\bmod m) \end{array}\right} \Rightarrow a \equiv c \quad(\bmod m)$</p>
+<p><span class="math inline">\(\left.\begin{array}{l} a \equiv b(\bmod m) \\ b \equiv c(\bmod m) \end{array}\right\} \Rightarrow a \equiv c \quad(\bmod m)\)</span></p>
 <a id="more"></a>
 <p><strong>保持基本运算：</strong>(<strong>加减乘</strong>)</p>
-<p>$\left.{\begin{matrix}a\equiv b{\pmod {m} }\c\equiv d{\pmod {m} }\end{matrix} }\right}\Rightarrow \left{ {\begin{matrix}a\pm c\equiv b\pm d{\pmod {m} }\ac\equiv bd{\pmod {m} }\end{matrix} }\right.$</p>
+<p><span class="math inline">\(\left.{\begin{matrix}a\equiv b{\pmod {m} }\\ c\equiv d{\pmod {m} }\end{matrix} }\right\}\Rightarrow \left\{ {\begin{matrix}a\pm c\equiv b\pm d{\pmod {m} }\\ ac\equiv bd{\pmod {m} }\end{matrix} }\right.\)</span></p>
 <p>可进一步写成：</p>
-<p>$a\equiv b{\pmod {m} }\Rightarrow {\begin{cases}an\equiv bn{\pmod {m} },\forall n\in \mathbb {Z} \a^{n}\equiv b^{n}{\pmod {m} },\forall n\in \mathbb {N} ^{0}\end{cases} }$</p>
+<p><span class="math inline">\(a\equiv b{\pmod {m} }\Rightarrow {\begin{cases}an\equiv bn{\pmod {m} },\forall n\in \mathbb {Z} \\ a^{n}\equiv b^{n}{\pmod {m} },\forall n\in \mathbb {N} ^{0}\end{cases} }\)</span></p>
 <p><strong>放大缩小底数：</strong>（对底数加减模数的倍数均可）</p>
-<p>k为整数，n为正整数，$(km\pm a)^{n}\equiv (\pm a)^{n}{\pmod m}$</p>
+<p>k为整数，n为正整数，<span class="math inline">\((km\pm a)^{n}\equiv (\pm a)^{n}{\pmod m}\)</span></p>
 <p><strong>放大缩小模数：</strong>（对模数和等式两边的数同乘k）</p>
-<p> $k$为正整数，$a\equiv b{\pmod m}$，当且仅当$ka\equiv kb\pmod {km}$</p>
+<p><span class="math inline">\(k\)</span>为正整数，<span class="math inline">\(a\equiv b{\pmod m}\)</span>，当且仅当<span class="math inline">\(ka\equiv kb\pmod {km}\)</span></p>
 <p>还有几个性质，懒得码了，详见wiki：<a href="https://zh.wikipedia.org/wiki/同餘" target="_blank" rel="noopener">同余</a></p>
-<h3 id="欧拉函数"><a href="#欧拉函数" class="headerlink" title="欧拉函数"></a>欧拉函数</h3><p>对正整数$n$，欧拉函数$\varphi(n)$为小于等于$n$的正整数中，与$n$互质的数的个数。</p>
-<h3 id="欧拉定理"><a href="#欧拉定理" class="headerlink" title="欧拉定理"></a>欧拉定理</h3><p>若$n,a$为正整数，且$n, a$互素(即$gcd(n, a) = 1$) ，则$a^{\varphi (n)}\equiv 1{\pmod n} $.</p>
-<p>一般的证明中会用到“所有与 $  n $<a href="https://zh.wikipedia.org/wiki/互質" target="_blank" rel="noopener">互质</a>的同余类构成一个<a href="https://zh.wikipedia.org/wiki/群" target="_blank" rel="noopener">群</a>”的性质，也就是说，设 $\left{ {\overline {a_{1} }},{\overline {a_{2} }},\cdots ,{\overline {a_{\varphi (n)} }}\right}$是比 $  n $ 小的正整数中所有与$n$互素的数对应的<a href="https://zh.wikipedia.org/wiki/同余" target="_blank" rel="noopener">同余类</a>组成的集合（这个集合也称为模$n$的<a href="https://zh.wikipedia.org/wiki/简化剩余系" target="_blank" rel="noopener">简化剩余系</a>）。这些同余类构成一个群，称为<strong><a href="https://zh.wikipedia.org/wiki/整数模n乘法群" target="_blank" rel="noopener">整数模n乘法群</a></strong>。因为此群阶为$\varphi (n)$，所以 $  a^{\varphi (n)}\equiv 1{\pmod {n} } $。<del>(开始后悔近世代数没认真学)</del></p>
-<h3 id="费马小定理"><a href="#费马小定理" class="headerlink" title="费马小定理"></a>费马小定理</h3><p>当n为素数的时候,，则$\varphi(n)=n-1$，即$a^{n-1}\equiv1\ \ \pmod n$.</p>
-<h3 id="模逆元"><a href="#模逆元" class="headerlink" title="模逆元"></a>模逆元</h3><p>一<a href="https://zh.wikipedia.org/wiki/整数" target="_blank" rel="noopener">整数</a>a对<a href="https://zh.wikipedia.org/wiki/同餘" target="_blank" rel="noopener">同余</a>n的<strong>模逆元</strong>是指满足$ab\equiv1\ \pmod n$的整数 b。</p>
+<h3 id="欧拉函数">欧拉函数</h3>
+<p>对正整数<span class="math inline">\(n\)</span>，欧拉函数<span class="math inline">\(\varphi(n)\)</span>为小于等于<span class="math inline">\(n\)</span>的正整数中，与<span class="math inline">\(n\)</span>互质的数的个数。</p>
+<h3 id="欧拉定理">欧拉定理</h3>
+<p>若<span class="math inline">\(n,a\)</span>为正整数，且<span class="math inline">\(n, a\)</span>互素(即<span class="math inline">\(gcd(n, a) = 1\)</span>) ，则$a^{(n)} $.</p>
+<p>一般的证明中会用到“所有与 $ n $<a href="https://zh.wikipedia.org/wiki/互質" target="_blank" rel="noopener">互质</a>的同余类构成一个<a href="https://zh.wikipedia.org/wiki/群" target="_blank" rel="noopener">群</a>”的性质，也就是说，设 <span class="math inline">\(\left\{ {\overline {a_{1} }},{\overline {a_{2} }},\cdots ,{\overline {a_{\varphi (n)} }}\right\}\)</span>是比 $ n $ 小的正整数中所有与<span class="math inline">\(n\)</span>互素的数对应的<a href="https://zh.wikipedia.org/wiki/同余" target="_blank" rel="noopener">同余类</a>组成的集合（这个集合也称为模<span class="math inline">\(n\)</span>的<a href="https://zh.wikipedia.org/wiki/简化剩余系" target="_blank" rel="noopener">简化剩余系</a>）。这些同余类构成一个群，称为<strong><a href="https://zh.wikipedia.org/wiki/整数模n乘法群" target="_blank" rel="noopener">整数模n乘法群</a></strong>。因为此群阶为<span class="math inline">\(\varphi (n)\)</span>，所以 $ a^{(n)} $。<del>(开始后悔近世代数没认真学)</del></p>
+<h3 id="费马小定理">费马小定理</h3>
+<p>当n为素数的时候,，则<span class="math inline">\(\varphi(n)=n-1\)</span>，即<span class="math inline">\(a^{n-1}\equiv1\ \ \pmod n\)</span>.</p>
+<h3 id="模逆元">模逆元</h3>
+<p>一<a href="https://zh.wikipedia.org/wiki/整数" target="_blank" rel="noopener">整数</a>a对<a href="https://zh.wikipedia.org/wiki/同餘" target="_blank" rel="noopener">同余</a>n的<strong>模逆元</strong>是指满足<span class="math inline">\(ab\equiv1\ \pmod n\)</span>的整数 b。</p>
 <p>整数 a 对模数 n 之模逆元存在的<a href="https://zh.wikipedia.org/wiki/充分必要條件" target="_blank" rel="noopener">充分必要条件</a>是 a 和 n <a href="https://zh.wikipedia.org/wiki/互質" target="_blank" rel="noopener">互素</a></p>
 <p>如何求a 对模数 n 之模逆元？</p>
-<p>由于a与n互质，所以可用欧拉定理，即$a^{\varphi(n)}=a\cdot a^{\varphi(n)-1}\equiv1\ \ \pmod n$，即a对模数n的模逆元是$a^{\varphi(n)-1}$。</p>
-<p>特别的，当n为质数时，根据费马小定理，a对模数n的模逆元是$a^{n-2}$。(这样就可使用快速幂在$log(n)$时间求出a的逆元)</p>
+<p>由于a与n互质，所以可用欧拉定理，即<span class="math inline">\(a^{\varphi(n)}=a\cdot a^{\varphi(n)-1}\equiv1\ \ \pmod n\)</span>，即a对模数n的模逆元是<span class="math inline">\(a^{\varphi(n)-1}\)</span>。</p>
+<p>特别的，当n为质数时，根据费马小定理，a对模数n的模逆元是<span class="math inline">\(a^{n-2}\)</span>。(这样就可使用快速幂在<span class="math inline">\(log(n)\)</span>时间求出a的逆元)</p>
 <p><strong>还有个小trick:</strong></p>
-<p>求X的模MOD逆元时，若$X\ \big|\ (MOD +1)$，则X的模逆元可表示成$\frac{MOD + 1} X$。比如当MOD为奇数时，2的逆元是$\frac {MOD +1}2$</p>
+<p>求X的模MOD逆元时，若<span class="math inline">\(X\ \big|\ (MOD +1)\)</span>，则X的模逆元可表示成<span class="math inline">\(\frac{MOD + 1} X\)</span>。比如当MOD为奇数时，2的逆元是<span class="math inline">\(\frac {MOD +1}2\)</span></p>
 
     </div>
 
